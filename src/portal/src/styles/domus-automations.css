@@ -55,6 +55,59 @@
   background: #182338;
   color: #d1ddf2;
 }
+.domus-automations .domus-run-detail {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  background: var(--ui-surface, #fff);
+  box-shadow: var(--ui-card-shadow);
+}
+.domus-run-detail > h2,
+.domus-run-detail > p {
+  margin: 0;
+}
+.domus-run-detail > p {
+  color: var(--ui-muted, #647087);
+  line-height: 1.6;
+}
+.domus-run-detail > details {
+  width: 100%;
+  min-width: 0;
+  border-top: 1px solid var(--ui-border, #dde2e8);
+  padding-top: 20px;
+}
+.domus-run-detail summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding-block: 4px;
+}
+.domus-run-detail pre {
+  margin: 16px 0 0;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.domus-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid var(--ui-primary, #167d8d);
+  border-radius: 9px;
+  background: var(--ui-primary, #167d8d);
+  color: var(--ui-on-primary, #fff);
+  font-weight: 600;
+  text-decoration: none;
+  transition: box-shadow 0.16s;
+}
+.domus-download-button:hover {
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--ui-primary, #167d8d) 25%, transparent);
+}
 .domus-catalog-toolbar {
   display: flex;
   align-items: flex-end;

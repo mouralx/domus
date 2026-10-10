@@ -1,4 +1,5 @@
 import { readJsonResponse } from '../../infrastructure/jsonResponse';
+import { Download } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Input = {
@@ -33,13 +34,19 @@ type Run = {
 type Status = { packages: Package[]; runs: Run[]; metrics: { running: number; completed: number } };
 type Entry = {
   assetId: string;
+  automationId: string;
   name: string;
   description: string;
   version: string;
   installedVersion?: string;
   action: 'install' | 'update' | 'installed';
 };
-type Job = { id: string; status: string; error?: string };
+type Job = {
+  id: string;
+  status: string;
+  error?: string;
+  recipe: { assetId: string; automationId: string };
+};
 
 export function AutomationsModule({
   workspace,
@@ -55,6 +62,8 @@ export function AutomationsModule({
   initialRunId?: string;
 }) {
   const pendingJob = useRef(false);
+  const installingIds = useRef(new Set<string>());
+  const [submitting, setSubmitting] = useState<string[]>([]);
   const [status, setStatus] = useState<Status | null>(null);
   const [catalog, setCatalog] = useState<Entry[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -172,13 +181,42 @@ export function AutomationsModule({
       setBusy(false);
     }
   }
+  async function install(item: Entry) {
+    if (installingIds.current.has(item.automationId)) return;
+    installingIds.current.add(item.automationId);
+    setSubmitting((current) => [...current, item.automationId]);
+    setError('');
+    try {
+      const job = await request<{ id: string; status: string }>('/catalog/install', {
+        method: 'POST',
+        body: JSON.stringify({ assetId: item.assetId }),
+      });
+      pendingJob.current = true;
+      setJobs((current) => [
+        ...current.filter((value) => value.recipe.automationId !== item.automationId),
+        { ...job, recipe: { assetId: item.assetId, automationId: item.automationId } },
+      ]);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : String(reason));
+    } finally {
+      installingIds.current.delete(item.automationId);
+      setSubmitting((current) => current.filter((id) => id !== item.automationId));
+    }
+  }
   const pkg = status?.packages.find((item) => item.key === packageKey);
   const text = (value: string) =>
     value
       .normalize('NFD')
       .replace(/\p{Diacritic}/gu, '')
       .toLowerCase();
-  const pending = jobs.some((job) => ['queued', 'installing'].includes(job.status));
+  const pendingCount = jobs.filter((job) => ['queued', 'installing'].includes(job.status)).length;
+  const installationPending = (item: Entry) =>
+    submitting.includes(item.automationId) ||
+    jobs.some(
+      (job) =>
+        job.recipe.automationId === item.automationId &&
+        ['queued', 'installing'].includes(job.status),
+    );
   return (
     <section className="domus-automations">
       {error && (
@@ -332,7 +370,9 @@ export function AutomationsModule({
               Atualizar catálogo
             </button>
           </div>
-          {pending && <p role="status">Uma instalação está em processamento pelo worker.</p>}
+          {pendingCount > 0 && (
+            <p role="status">{pendingCount} instalação(ões) na fila ou em processamento.</p>
+          )}
           {jobs
             .filter((job) => job.status === 'failed')
             .map((job) => (
@@ -362,22 +402,16 @@ export function AutomationsModule({
                     <td>{item.installedVersion || '—'}</td>
                     <td>
                       <button
-                        disabled={busy || pending || !canManage || item.action === 'installed'}
-                        onClick={() =>
-                          void perform(async () => {
-                            pendingJob.current = true;
-                            await request('/catalog/install', {
-                              method: 'POST',
-                              body: JSON.stringify({ assetId: item.assetId }),
-                            });
-                          })
+                        disabled={
+                          installationPending(item) || !canManage || item.action === 'installed'
                         }
+                        onClick={() => void install(item)}
                       >
-                        {
-                          { install: 'Instalar', update: 'Atualizar', installed: 'Instalada' }[
-                            item.action
-                          ]
-                        }
+                        {installationPending(item)
+                          ? 'A instalar…'
+                          : { install: 'Instalar', update: 'Atualizar', installed: 'Instalada' }[
+                              item.action
+                            ]}
                       </button>
                     </td>
                   </tr>
@@ -437,9 +471,9 @@ export function AutomationsModule({
             </tbody>
           </table>
           {selected && (
-            <article>
+            <article className="domus-run-detail">
               <h2>{selected.name}</h2>
-              <p>{selected.message}</p>
+              {selected.message && <p>{selected.message}</p>}
               {!['completed', 'failed', 'cancelled'].includes(selected.status) && (
                 <button
                   disabled={busy}
@@ -458,6 +492,7 @@ export function AutomationsModule({
               )}
               {!!selected.files?.length && (
                 <a
+                  className="domus-download-button"
                   href={
                     '/automations-api/api/runs/' +
                     selected.id +
@@ -465,6 +500,7 @@ export function AutomationsModule({
                     encodeURIComponent(workspace)
                   }
                 >
+                  <Download size={16} aria-hidden="true" />
                   Descarregar resultados ZIP
                 </a>
               )}
