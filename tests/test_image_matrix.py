@@ -32,6 +32,7 @@ class ImageSelectionTests(unittest.TestCase):
             '.github/workflows/publish-images.yml': images.ALL,
             '.github/scripts/image_matrix.py': images.ALL,
             '.github/scripts/image_version.py': images.ALL,
+            '.github/image-version.json': images.ALL,
         }
         for path, expected in cases.items():
             with self.subTest(path=path):

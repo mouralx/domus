@@ -20,7 +20,7 @@ ALL = {name for name, _ in COMPONENTS}
 def affected_images(paths):
     selected = set()
     for path in paths:
-        if path in {'.dockerignore', '.github/workflows/publish-images.yml', '.github/scripts/image_matrix.py', '.github/scripts/image_version.py'}:
+        if path in {'.dockerignore', '.github/workflows/publish-images.yml', '.github/scripts/image_matrix.py', '.github/scripts/image_version.py', '.github/image-version.json'}:
             selected.update(ALL)
         if path in {'src/global.json', 'src/Directory.Build.props'}:
             selected.update(BACKENDS)

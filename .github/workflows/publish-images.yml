@@ -2,8 +2,15 @@ name: Publish container images
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
+    inputs:
+      channel:
+        description: Publication channel (stable requires main)
+        type: choice
+        required: true
+        default: preview
+        options: [preview, stable]
 
 permissions:
   contents: read
@@ -15,7 +22,8 @@ jobs:
     outputs:
       matrix: ${{ steps.images.outputs.matrix }}
       has_changes: ${{ steps.images.outputs.has_changes }}
-      build_date: ${{ steps.date.outputs.date }}
+      version: ${{ steps.version.outputs.version }}
+      channel: ${{ steps.version.outputs.channel }}
     steps:
       - name: Check out repository and history
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -23,12 +31,15 @@ jobs:
           fetch-depth: 0
       - name: Verify image selection rules
         run: python3 -m unittest discover -s tests -p "test_image_*.py"
-      - name: Set shared UTC build date
-        id: date
-        run: python3 .github/scripts/image_version.py --date-only
       - name: Build image matrix
         id: images
         run: python3 .github/scripts/image_matrix.py
+      - name: Generate semantic image version
+        if: steps.images.outputs.has_changes == 'true'
+        id: version
+        env:
+          IMAGE_CHANNEL: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || (github.ref == 'refs/heads/main' && 'stable' || 'preview') }}
+        run: python3 .github/scripts/image_version.py
 
   publish:
     needs: changes
@@ -61,12 +72,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate publication version
-        id: version
-        env:
-          IMAGE_BUILD_DATE: ${{ needs.changes.outputs.build_date }}
-        run: python3 .github/scripts/image_version.py
-
       - name: Image metadata
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
@@ -74,11 +79,12 @@ jobs:
           images: ghcr.io/${{ github.repository }}-${{ matrix.component }}
           flavor: latest=false
           tags: |
-            type=raw,value=${{ steps.version.outputs.version }},priority=900
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=sha,format=long
+            type=raw,value=${{ needs.changes.outputs.version }},priority=900
+            type=raw,value=${{ needs.changes.outputs.channel }}
+            type=raw,value=latest,enable=${{ needs.changes.outputs.channel == 'stable' }}
+            type=sha,format=long,prefix=${{ needs.changes.outputs.channel == 'preview' && 'prev-sha-' || 'sha-' }}
           labels: |
-            org.opencontainers.image.version=${{ steps.version.outputs.version }}
+            org.opencontainers.image.version=${{ needs.changes.outputs.version }}
             org.opencontainers.image.title=domus ${{ matrix.component }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 

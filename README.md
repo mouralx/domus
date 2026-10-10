@@ -93,7 +93,7 @@ npm --prefix tests test
 
 The [architecture decision](docs/decisions/001-platform-boundaries.md) documents service boundaries. The [automation authoring guide](docs/reference/automations/manifest-authoring.md) documents manifests stored alongside each automation and the [schema](docs/schemas/automation.schema.json).
 
-`.github/workflows/publish-images.yml` publishes affected application images on every push to `main`. The six image suffixes are `portal`, `membership`, `boards`, `automations`, `boards-worker` and `automation-worker`, under `ghcr.io/<owner>/<repository>-<component>`. Images support AMD64/ARM64 and receive an automatic calendar version, `latest` on main, and a full commit SHA tag. The automatic GitHub token supplies package publication permissions; the workflow does not deploy the platform.
+`.github/workflows/publish-images.yml` publishes affected application images on pushes to `main` (stable) and `develop` (preview). The six image suffixes are `portal`, `membership`, `boards`, `automations`, `boards-worker` and `automation-worker`, under `ghcr.io/<owner>/<repository>-<component>`. Images support AMD64/ARM64 and receive a version tag, their channel alias (`stable` or `preview`), and a commit tag; stable builds also retain `latest`. The automatic GitHub token supplies package publication permissions; the workflow does not deploy the platform.
 
 The workflow compares the entire pushed commit range, including deletions and moves:
 
@@ -111,22 +111,38 @@ The workflow compares the entire pushed commit range, including deletions and mo
 | Docker ignore rules or publication workflow/tagging scripts | All six images |
 | Documentation, tests or Compose-only changes | None |
 
-The first push to a new branch has no previous revision and publishes all images. A manual workflow dispatch also rebuilds all images; push-based publication remains limited to `main`. Unchanged images keep their existing tags. Run detector regression checks with `npm --prefix tests run test:ci`.
+The first push to a new branch has no previous revision and publishes all images. A manual workflow dispatch also rebuilds all images; push-based publication runs on `main` and `develop`. Unchanged images keep their existing tags. Run detector regression checks with `npm --prefix tests run test:ci`.
 
 ## Automatic image tags
 
-Every affected image receives these tags automatically:
+Channel tags are assigned automatically:
 
-| Tag | Purpose |
-| --- | --- |
-| `v2026.10.10.42.1` | Pin a particular build: `vYYYY.MM.DD.RUN.ATTEMPT` |
-| `sha-<full-commit-sha>` | Locate the most recent publication of a commit |
-| `latest` | Most recently published main-branch build of that component |
+| Channel | Automatic branch | Version tag | Moving alias | Commit tag |
+| --- | --- | --- | --- | --- |
+| Stable | `main` | `v0.1.0` | `stable` and `latest` | `sha-<full-commit-sha>` |
+| Preview | `develop` | `prev-v0.1.0` | `preview` | `prev-sha-<full-commit-sha>` |
 
-The date is UTC and selected once per workflow run. GitHub supplies the workflow run number and attempt number. Each publish job reads its current attempt, so rerunning only failed jobs produces a new version suffix while keeping the original shared date. A full rerun may select a new UTC date. These are calendar versions, not semantic versions; no manual bump, repository tag or release is required. Version tags are unique per run/attempt under this workflow; the registry does not enforce immutability. Use a version tag or image digest to pin deployments, rather than the moving `latest` or commit aliases.
+`stable` points to the most recently published stable image of each component; `preview` points to its most recently published preview image. Preview builds do not update stable aliases. The workflow still publishes only affected components, so an unchanged image's channel alias remains on its previous version.
 
-All affected components in the same attempt share a version. Components that did not change retain their previous published versions; workflow numbers can therefore have gaps for an individual image. Documentation-only pushes do not publish or move image tags. Manual publication outside main produces the version and commit tags without updating `latest`. The OCI `org.opencontainers.image.version` label records the generated calendar version.
+Manual workflow runs offer a **channel** choice, defaulting to preview. Preview publication is allowed from any selected branch, including main. Stable publication requires main and is rejected from other branches before publishing. `latest` remains a compatibility alias for stable.
 
-For example: `ghcr.io/<owner>/<repository>-portal:v2026.10.10.42.1`.
+The release series is configured in `.github/image-version.json`:
 
-The workflow uses GitHub's [run and attempt variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables) and Docker's [metadata action](https://github.com/docker/metadata-action) to generate tags and image labels.
+```json
+{
+  "major": 0,
+  "minor": 1,
+  "patch": 0,
+  "first_run": 1
+}
+```
+
+Patch is calculated as `patch + GITHUB_RUN_NUMBER - first_run`. The default series therefore produces `v0.1.0`, `v0.1.1`, `v0.1.2`, and so on. All affected images in one workflow share a version. Retries reuse that version, including reruns of only failed jobs. Stable versions use exactly `vMAJOR.MINOR.PATCH`; preview versions add the requested `prev-` prefix, producing `prev-vMAJOR.MINOR.PATCH`.
+
+For a planned minor or major release, update major/minor and set `first_run` to the next publication workflow's run number, with patch set to 0. For example, major 1, minor 0 and first_run 42 produces `v1.0.0` on run 42 and `v1.0.1` on run 43. Changing the version configuration republishes all six images.
+
+Workflow numbers are shared across both channels and include documentation-only runs and failed runs, so patches can have gaps. Unchanged components retain their previous versions. No repository tag or GitHub release is required. Manual preview publication updates only preview tags, even when run from main. The OCI `org.opencontainers.image.version` label records the same semantic version.
+
+Use a version tag or image digest to pin deployments. Registry tags remain mutable, and retries may replace a version tag; an image digest pins exact bytes. Examples: `ghcr.io/<owner>/<repository>-portal:stable`, `ghcr.io/<owner>/<repository>-portal:preview`, and `ghcr.io/<owner>/<repository>-portal:prev-v0.1.0`.
+
+The workflow uses GitHub's [run variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables) and Docker's [metadata action](https://github.com/docker/metadata-action) to generate tags and image labels.

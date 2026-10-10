@@ -1,35 +1,49 @@
 #!/usr/bin/env python3
-"""Generate a shared UTC build date and version each publication attempt."""
-import argparse
-from datetime import date, datetime, timezone
+"""Generate vMAJOR.MINOR.PATCH from a release series and workflow counter."""
+import json
 import os
+from pathlib import Path
 import re
 
+CONFIG = Path(__file__).resolve().parents[1] / 'image-version.json'
 
-def image_version(build_date, run_number, run_attempt):
-    day = date.fromisoformat(build_date)
-    if day.isoformat() != build_date:
-        raise ValueError('Build date must use YYYY-MM-DD.')
-    for number in (run_number, run_attempt):
-        if not re.fullmatch(r'[1-9][0-9]*', str(number)):
-            raise ValueError('Run and attempt numbers must be positive integers.')
-    value = f'v{day:%Y.%m.%d}.{run_number}.{run_attempt}'
+
+def image_version(config, run_number):
+    if set(config) != {'major', 'minor', 'patch', 'first_run'}:
+        raise ValueError('Configure major, minor, patch and first_run.')
+    for key, number in config.items():
+        if type(number) is not int or number < (1 if key == 'first_run' else 0):
+            raise ValueError(f'{key} must be a valid nonnegative integer (first_run starts at 1).')
+    if not re.fullmatch(r'[1-9][0-9]*', str(run_number)):
+        raise ValueError('Workflow run number must be a positive integer.')
+    offset = int(run_number) - config['first_run']
+    if offset < 0:
+        raise ValueError('Workflow run number is earlier than the release series first_run.')
+    patch = config['patch'] + offset
+    value = f"v{config['major']}.{config['minor']}.{patch}"
     if len(value) > 128:
         raise ValueError('Image tag exceeds the Docker tag length limit.')
     return value
 
 
+def publication_version(config, run_number, channel, ref):
+    if channel not in {'stable', 'preview'}:
+        raise ValueError('Publication channel must be stable or preview.')
+    if channel == 'stable' and ref != 'refs/heads/main':
+        raise ValueError('Stable images can only be published from main.')
+    version = image_version(config, run_number)
+    version = 'prev-' + version if channel == 'preview' else version
+    if len(version) > 128:
+        raise ValueError('Image tag exceeds the Docker tag length limit.')
+    return version
+
+
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--date-only', action='store_true')
-    args = parser.parse_args()
-    if args.date_only:
-        key, value = 'date', datetime.now(timezone.utc).date().isoformat()
-    else:
-        key, value = 'version', image_version(os.environ['IMAGE_BUILD_DATE'], os.environ['GITHUB_RUN_NUMBER'], os.environ['GITHUB_RUN_ATTEMPT'])
+    channel = os.environ['IMAGE_CHANNEL']
+    version = publication_version(json.loads(CONFIG.read_text()), os.environ['GITHUB_RUN_NUMBER'], channel, os.environ['GITHUB_REF'])
     with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-        output.write(f'{key}={value}\n')
-    print(f'Image {key}: {value}')
+        output.write(f'version={version}\nchannel={channel}\n')
+    print(f'Image version: {version} ({channel})')
 
 
 if __name__ == '__main__':
