@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "crp-validation",
+  "version": "1.0.0",
+  "name": "Validar certidões prediais",
+  "description": "Consulta documentos na NewSpring e atualiza os dados do imóvel e a validade no Excel.",
+  "publisher": "mouralx",
+  "platform": {
+    "os": "win32",
+    "arch": "x64"
+  },
+  "execution": {
+    "executable": "CRPValidation.exe",
+    "arguments": [],
+    "homeEnvironmentVariable": "CRP_VALIDATION_HOME",
+    "packagePaths": {
+      "PLAYWRIGHT_BROWSERS_PATH": "browsers"
+    },
+    "workspaceResources": [
+      "data"
+    ],
+    "isolation": "fresh-directory",
+    "browser": "headless-with-manual-login",
+    "statusProtocol": "stdio"
+  },
+  "authentication": {
+    "mode": "manual",
+    "captcha": false
+  },
+  "inputs": [
+    {
+      "id": "workbook",
+      "label": "Ficheiro Excel",
+      "description": "Selecione o Excel a processar. Quando o Excel é alterado, será guardada uma cópia antes do processamento.",
+      "type": "file",
+      "required": true,
+      "extensions": [
+        ".xlsx"
+      ],
+      "columns": [
+        "Ref Processo"
+      ],
+      "binding": {
+        "argument": "--workbook"
+      }
+    },
+    {
+      "id": "limit",
+      "label": "Número máximo de linhas",
+      "description": "Opcional: limite a execução a um pequeno conjunto de linhas.",
+      "type": "integer",
+      "required": false,
+      "minimum": 1,
+      "binding": {
+        "argument": "--limit"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Cópias de segurança",
+      "path": "backups/",
+      "description": "Originais preservados antes de sobrescrever ficheiros."
+    },
+    {
+      "label": "Documentos",
+      "path": "downloads/",
+      "description": "Documentos descarregados nesta execução."
+    }
+  ],
+  "effects": {
+    "modifiesInput": true,
+    "publishesComments": false,
+    "createsPaidRequests": false
+  }
+}

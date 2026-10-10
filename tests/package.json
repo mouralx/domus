@@ -1,0 +1,23 @@
+{
+  "name": "domus",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "build": "npm --prefix ../src/portal run build",
+    "check": "npm --prefix ../src/portal run check",
+    "test": "node integration.mjs",
+    "test:automations": "node --test automations/*.test.mjs",
+    "test:backend": "cd ../src && dotnet test ../tests/Automations.Tests/Automations.Tests.csproj",
+    "start": "../infra/scripts/compose.sh up --build -d --wait",
+    "test:boards": "python3 ../infra/scripts/test-boards.py",
+    "test:ci": "python3 -m unittest discover -s . -p test_image_matrix.py -v"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "yazl": "^3.3.1"
+  }
+}

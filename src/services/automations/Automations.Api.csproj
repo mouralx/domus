@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <Compile Remove="Core/**/*.cs" />
+    <Content Remove="Core/**" />
+    <None Remove="Core/**" />
+    <Content Include="../../../docs/schemas/automation.schema.json" Link="schemas/automation.schema.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <ProjectReference Include="Core/Automations.Core.csproj" />
+  </ItemGroup>
+</Project>

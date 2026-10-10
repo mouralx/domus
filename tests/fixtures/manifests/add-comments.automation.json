@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "add-comments",
+  "version": "1.0.0",
+  "name": "Adicionar comentários",
+  "description": "Publica o texto da coluna Estado nos processos da NewSpring.",
+  "publisher": "mouralx",
+  "platform": {
+    "os": "win32",
+    "arch": "x64"
+  },
+  "execution": {
+    "executable": "AddComments.exe",
+    "arguments": [],
+    "homeEnvironmentVariable": "ADD_COMMENTS_HOME",
+    "packagePaths": {
+      "PLAYWRIGHT_BROWSERS_PATH": "browsers"
+    },
+    "workspaceResources": [],
+    "isolation": "fresh-directory",
+    "browser": "headless-with-manual-login",
+    "statusProtocol": "stdio",
+    "stateDirectoryArgument": "--state-dir"
+  },
+  "authentication": {
+    "mode": "manual",
+    "captcha": false
+  },
+  "inputs": [
+    {
+      "id": "workbook",
+      "label": "Ficheiro Excel",
+      "description": "Selecione o Excel a processar. Quando o Excel é alterado, será guardada uma cópia antes do processamento.",
+      "type": "file",
+      "required": true,
+      "extensions": [
+        ".xlsx"
+      ],
+      "columns": [
+        "Ref Processo",
+        "Estado"
+      ],
+      "binding": {
+        "argument": "--workbook"
+      }
+    },
+    {
+      "id": "limit",
+      "label": "Número máximo de linhas",
+      "description": "Opcional: limite a execução a um pequeno conjunto de linhas.",
+      "type": "integer",
+      "required": false,
+      "minimum": 1,
+      "binding": {
+        "argument": "--limit"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Cópias de segurança",
+      "path": "backups/",
+      "description": "Originais preservados antes de sobrescrever ficheiros."
+    },
+    {
+      "label": "Resultados",
+      "path": "results.xlsx",
+      "description": "Estado e detalhe dos comentários desta execução."
+    }
+  ],
+  "effects": {
+    "modifiesInput": false,
+    "publishesComments": true,
+    "createsPaidRequests": false
+  }
+}

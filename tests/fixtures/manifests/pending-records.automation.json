@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "pending-records",
+  "version": "1.0.0",
+  "name": "Verificar registos pendentes",
+  "description": "Consulta chaves no Predial Online, guarda PDFs e atualiza os comentários no Excel.",
+  "publisher": "mouralx",
+  "platform": {
+    "os": "win32",
+    "arch": "x64"
+  },
+  "execution": {
+    "executable": "PendingRecords.exe",
+    "arguments": [],
+    "homeEnvironmentVariable": "PENDING_RECORDS_HOME",
+    "packagePaths": {
+      "PLAYWRIGHT_BROWSERS_PATH": "browsers"
+    },
+    "workspaceResources": [],
+    "isolation": "fresh-directory",
+    "browser": "headless-with-manual-login",
+    "statusProtocol": "stdio",
+    "stateDirectoryArgument": "--state-dir"
+  },
+  "authentication": {
+    "mode": "none",
+    "captcha": false
+  },
+  "inputs": [
+    {
+      "id": "workbook",
+      "label": "Ficheiro Excel",
+      "description": "Selecione o Excel a processar. Quando o Excel é alterado, será guardada uma cópia antes do processamento.",
+      "type": "file",
+      "required": true,
+      "extensions": [
+        ".xlsx"
+      ],
+      "columns": [
+        "Chave Válida",
+        "Ref Processo"
+      ],
+      "binding": {
+        "argument": "--workbook"
+      }
+    },
+    {
+      "id": "limit",
+      "label": "Número máximo de linhas",
+      "description": "Opcional: limite a execução a um pequeno conjunto de linhas.",
+      "type": "integer",
+      "required": false,
+      "minimum": 1,
+      "binding": {
+        "argument": "--limit"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Cópias de segurança",
+      "path": "backups/",
+      "description": "Originais preservados antes de sobrescrever ficheiros."
+    },
+    {
+      "label": "Documentos",
+      "path": "downloads/",
+      "description": "Documentos descarregados nesta execução."
+    },
+    {
+      "label": "Falhas",
+      "path": "failed-rows.xlsx",
+      "description": "Linhas que exigem revisão."
+    }
+  ],
+  "effects": {
+    "modifiesInput": true,
+    "publishesComments": false,
+    "createsPaidRequests": false
+  }
+}

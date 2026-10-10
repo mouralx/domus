@@ -1,0 +1,154 @@
+name: domus
+services:
+  portal:
+    build:
+      context: ..
+      dockerfile: infra/containers/portal.Dockerfile
+    ports: ["${DOMUS_BIND_HOST:-127.0.0.1}:${DOMUS_PORT:-8088}:80"]
+    depends_on:
+      work-api: {condition: service_healthy}
+      membership: {condition: service_healthy}
+      automation-api: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1/]
+      interval: 5s
+      retries: 30
+    restart: unless-stopped
+  work-api:
+    build:
+      context: ..
+      dockerfile: infra/containers/boards-api.Dockerfile
+    environment: &work-environment
+      ASPNETCORE_URLS: http://+:5180
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__ApplyMigrationsOnStartup: "true"
+      AllowedHosts: "${DOMUS_ALLOWED_HOSTS:-localhost;127.0.0.1}"
+      DOMUS_MEMBERSHIP_URL: http://membership:5190
+      PortalOrigin: "${DOMUS_PUBLIC_URL:-http://localhost:8088}"
+      POSTGRES_DB: boards
+      POSTGRES_USER: domus_boards
+      POSTGRES_PASSWORD: "${WORK_DB_PASSWORD:-domus-work-local-change-me}"
+      Platform__AdminEmails: "${PLATFORM_ADMIN_EMAILS:-}"
+      Jira__AllowedHosts: "${JIRA_ALLOWED_HOSTS:-}"
+    volumes: [work-keys:/app/.data-protection]
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, dotnet, Kanbada.Api.dll, --healthcheck]
+      interval: 5s
+      retries: 40
+    restart: unless-stopped
+  membership:
+    build:
+      context: ..
+      dockerfile: infra/containers/membership.Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:5190
+      ASPNETCORE_ENVIRONMENT: Production
+      AllowedHosts: "${DOMUS_ALLOWED_HOSTS:-localhost;127.0.0.1}"
+      PortalOrigin: "${DOMUS_PUBLIC_URL:-http://localhost:8088}"
+      Platform__AdminEmails: "${PLATFORM_ADMIN_EMAILS:-}"
+      ConnectionStrings__Postgres: "Host=postgres;Database=membership;Username=domus_membership;Password=${MEMBERSHIP_DB_PASSWORD:-domus-membership-local-change-me}"
+      ConnectionStrings__Boards: "Host=postgres;Database=boards;Username=domus_boards;Password=${WORK_DB_PASSWORD:-domus-work-local-change-me}"
+    volumes: [work-keys:/app/.data-protection]
+    depends_on:
+      postgres: {condition: service_healthy}
+      work-api: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, dotnet, Domus.Membership.Api.dll, --healthcheck]
+      interval: 5s
+      retries: 40
+    restart: unless-stopped
+  jira-worker:
+    build:
+      context: ..
+      dockerfile: infra/containers/boards-worker.Dockerfile
+    environment:
+      <<: *work-environment
+      POSTGRES_HOST: postgres
+    volumes: [work-keys:/app/.data-protection]
+    depends_on:
+      work-api: {condition: service_healthy}
+    restart: unless-stopped
+  automation-api:
+    build:
+      context: ..
+      dockerfile: infra/containers/automations-api.Dockerfile
+    environment: &automation-environment
+      ASPNETCORE_URLS: http://+:4310
+      AUTOMATIONS_DATA_DIR: /data
+      DATABASE_HOST: postgres
+      DATABASE_NAME: automations
+      DATABASE_USER: domus_automations
+      DATABASE_PASSWORD: "${AUTOMATION_DB_PASSWORD:-domus-automations-local-change-me}"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: domus
+      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD:-domus-rabbit-local-change-me}"
+      PORTAL_PUBLIC_URL: "${DOMUS_PUBLIC_URL:-http://localhost:8088}"
+      ENCRYPTION_KEY_DIR: /keys
+      DOMUS_MEMBERSHIP_URL: http://membership:5190
+      DOMUS_WORK_API_URL: http://work-api:5180
+    volumes: [automation-data:/data, automation-keys:/keys]
+    depends_on:
+      postgres: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+      automation-worker: {condition: service_healthy}
+      work-api: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, dotnet, Automations.Api.dll, --healthcheck]
+      interval: 5s
+      retries: 30
+    restart: unless-stopped
+  automation-worker:
+    build:
+      context: ..
+      dockerfile: infra/containers/automations-worker.Dockerfile
+    environment:
+      <<: *automation-environment
+      ASPNETCORE_URLS: http://+:4320
+      INSTALL_API_URL: http://automation-api:4310
+    volumes: [automation-data:/data]
+    depends_on:
+      postgres: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, dotnet, Automations.Worker.dll, --healthcheck]
+      interval: 5s
+      retries: 30
+    restart: unless-stopped
+  postgres:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: domus_admin
+      POSTGRES_PASSWORD: "${POSTGRES_ADMIN_PASSWORD:-domus-admin-local-change-me}"
+      MEMBERSHIP_DB_PASSWORD: "${MEMBERSHIP_DB_PASSWORD:-domus-membership-local-change-me}"
+      BOARDS_DB_PASSWORD: "${WORK_DB_PASSWORD:-domus-work-local-change-me}"
+      AUTOMATIONS_DB_PASSWORD: "${AUTOMATION_DB_PASSWORD:-domus-automations-local-change-me}"
+    volumes:
+      - platform-db:/var/lib/postgresql
+      - ./containers/postgres/init-databases.sh:/docker-entrypoint-initdb.d/10-domus-databases.sh:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U domus_admin -d postgres && psql -U domus_admin -d postgres -tAc \"SELECT count(*)=3 FROM pg_database WHERE datname IN ('boards','automations','membership')\" | grep -q t"]
+      interval: 5s
+      retries: 30
+    restart: unless-stopped
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: domus
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:-domus-rabbit-local-change-me}"
+    volumes: [rabbitmq-data:/var/lib/rabbitmq, ./containers/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro]
+    healthcheck:
+      test: [CMD, rabbitmq-diagnostics, -q, check_port_connectivity]
+      interval: 5s
+      start_period: 15s
+      retries: 30
+    restart: unless-stopped
+volumes:
+  platform-db:
+  work-keys:
+  automation-data:
+  automation-keys:
+  rabbitmq-data:

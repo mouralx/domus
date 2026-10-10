@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Automation package manifest v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8000
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "platform": {
+      "type": "object",
+      "properties": {
+        "os": {
+          "enum": [
+            "win32",
+            "darwin",
+            "linux"
+          ]
+        },
+        "arch": {
+          "enum": [
+            "x64",
+            "arm64"
+          ]
+        }
+      },
+      "required": [
+        "os",
+        "arch"
+      ],
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "executable": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*\\\\)(?!.*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.(?:/|$))[^\\u0000-\\u001f]+$"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "homeEnvironmentVariable": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "stateDirectoryArgument": {
+          "type": "string",
+          "pattern": "^--[a-z][a-z0-9-]*$"
+        },
+        "packagePaths": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!.*\\\\)(?!.*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.(?:/|$))[^\\u0000-\\u001f]+$"
+          }
+        },
+        "workspaceResources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!.*\\\\)(?!.*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.(?:/|$))[^\\u0000-\\u001f]+$"
+          }
+        },
+        "isolation": {
+          "const": "fresh-directory"
+        },
+        "browser": {
+          "const": "headless-with-manual-login"
+        },
+        "statusProtocol": {
+          "const": "stdio"
+        }
+      },
+      "required": [
+        "executable",
+        "arguments",
+        "homeEnvironmentVariable",
+        "packagePaths",
+        "workspaceResources",
+        "isolation",
+        "browser",
+        "statusProtocol"
+      ],
+      "additionalProperties": false
+    },
+    "authentication": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "none",
+            "manual",
+            "configured-or-manual"
+          ]
+        },
+        "captcha": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "mode",
+        "captcha"
+      ],
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000
+          },
+          "type": {
+            "enum": [
+              "file",
+              "string",
+              "integer",
+              "secret"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "default": {
+            "type": [
+              "string",
+              "integer"
+            ]
+          },
+          "minimum": {
+            "type": "integer"
+          },
+          "maximum": {
+            "type": "integer"
+          },
+          "extensions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^\\.[a-z0-9]+$"
+            }
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "binding": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "argument": {
+                    "type": "string",
+                    "pattern": "^--[a-z][a-z0-9-]*$"
+                  }
+                },
+                "required": [
+                  "argument"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "envFileKey": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "envFileKey"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "type",
+          "required",
+          "binding"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 64
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!.*\\\\)(?!.*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.(?:/|$))[^\\u0000-\\u001f]+$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "label",
+          "path",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 64
+    },
+    "effects": {
+      "type": "object",
+      "properties": {
+        "modifiesInput": {
+          "type": "boolean"
+        },
+        "publishesComments": {
+          "type": "boolean"
+        },
+        "createsPaidRequests": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "modifiesInput",
+        "publishesComments",
+        "createsPaidRequests"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "version",
+    "name",
+    "description",
+    "publisher",
+    "platform",
+    "execution",
+    "authentication",
+    "inputs",
+    "outputs",
+    "effects"
+  ],
+  "additionalProperties": false
+}

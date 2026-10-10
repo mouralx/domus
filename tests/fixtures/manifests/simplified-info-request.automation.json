@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "id": "simplified-info-request",
+  "version": "1.0.0",
+  "name": "Pedir informação predial simplificada",
+  "description": "Cria pedidos pagos, obtém códigos de acesso e descarrega documentos.",
+  "publisher": "mouralx",
+  "platform": {
+    "os": "win32",
+    "arch": "x64"
+  },
+  "execution": {
+    "executable": "SimplifiedInfoRequest.exe",
+    "arguments": [],
+    "homeEnvironmentVariable": "SIMPLIFIED_INFO_REQUEST_HOME",
+    "packagePaths": {
+      "PLAYWRIGHT_BROWSERS_PATH": "browsers"
+    },
+    "workspaceResources": [],
+    "isolation": "fresh-directory",
+    "browser": "headless-with-manual-login",
+    "statusProtocol": "stdio"
+  },
+  "authentication": {
+    "mode": "configured-or-manual",
+    "captcha": true
+  },
+  "inputs": [
+    {
+      "id": "workbook",
+      "label": "Ficheiro Excel",
+      "description": "Selecione o Excel a processar. Quando o Excel é alterado, será guardada uma cópia antes do processamento.",
+      "type": "file",
+      "required": true,
+      "extensions": [
+        ".xlsx"
+      ],
+      "columns": [
+        "Ref Processo",
+        "Distrito",
+        "Concelho",
+        "Freguesia",
+        "Fração",
+        "Descrição Predial",
+        "Código de Acesso"
+      ],
+      "binding": {
+        "argument": "--workbook"
+      }
+    },
+    {
+      "id": "limit",
+      "label": "Número máximo de linhas",
+      "description": "Opcional: limite a execução a um pequeno conjunto de linhas.",
+      "type": "integer",
+      "required": false,
+      "minimum": 1,
+      "binding": {
+        "argument": "--limit"
+      }
+    },
+    {
+      "id": "url",
+      "label": "Página de acesso",
+      "description": "Dados de acesso ao Predial Online. Credenciais em falta podem ser introduzidas na janela de login.",
+      "type": "string",
+      "required": true,
+      "binding": {
+        "envFileKey": "PREDONLINE_URL"
+      }
+    },
+    {
+      "id": "username",
+      "label": "Utilizador",
+      "description": "Dados de acesso ao Predial Online. Credenciais em falta podem ser introduzidas na janela de login.",
+      "type": "string",
+      "required": false,
+      "binding": {
+        "envFileKey": "PREDONLINE_USER"
+      }
+    },
+    {
+      "id": "password",
+      "label": "Palavra-passe",
+      "description": "Dados de acesso ao Predial Online. Credenciais em falta podem ser introduzidas na janela de login.",
+      "type": "secret",
+      "required": false,
+      "binding": {
+        "envFileKey": "PREDONLINE_PASSWORD"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Cópias de segurança",
+      "path": "backups/",
+      "description": "Originais preservados antes de sobrescrever ficheiros."
+    },
+    {
+      "label": "Documentos",
+      "path": "downloads/",
+      "description": "Documentos descarregados nesta execução."
+    },
+    {
+      "label": "Falhas",
+      "path": "failed-rows.xlsx",
+      "description": "Linhas que exigem revisão."
+    }
+  ],
+  "effects": {
+    "modifiesInput": true,
+    "publishesComments": false,
+    "createsPaidRequests": true
+  }
+}

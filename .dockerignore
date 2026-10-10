@@ -1,0 +1,10 @@
+.git
+.local
+**/node_modules
+**/bin
+**/obj
+**/dist
+**/.env*
+**/appsettings.Local.json
+**/.data-protection
+**/*.tsbuildinfo
