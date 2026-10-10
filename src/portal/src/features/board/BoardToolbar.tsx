@@ -2,6 +2,7 @@ import {
   Bell,
   CalendarDays,
   Columns3,
+  Tag,
   Download,
   Folder,
   LayoutDashboard,
@@ -251,6 +252,23 @@ export function BoardToolbar({
             </button>
             {menu && (
               <div className="popover options">
+                {[
+                  { label: 'Manage swimlanes', icon: Columns3 },
+                  { label: 'Manage buckets', icon: Folder },
+                  { label: 'Manage labels', icon: Tag },
+                  { label: 'Manage statuses', icon: SlidersHorizontal },
+                ].map(({ label, icon: Icon }) => (
+                  <button
+                    key={label}
+                    onClick={() => {
+                      setMenu(false);
+                      setModal(label);
+                    }}
+                  >
+                    <Icon size={15} />
+                    {t(label)}
+                  </button>
+                ))}
                 {apiEnabled && data.workspace.canManage && project.id && (
                   <button
                     onClick={() => {

@@ -10,6 +10,52 @@
 :root[data-platform-theme] .topbar {
   height: 72px;
 }
+:root[data-platform-theme] .board-toolbar {
+  height: auto;
+  min-height: 64px;
+  gap: 16px;
+  padding: 12px 0;
+  flex-wrap: wrap;
+}
+:root[data-platform-theme] .view-tabs {
+  align-self: center;
+  background: var(--ui-raised);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+:root[data-platform-theme] .view-tabs button {
+  padding: 9px 12px;
+  border-radius: 7px;
+  white-space: nowrap;
+}
+:root[data-platform-theme] .view-tabs button.active {
+  background: var(--ui-surface);
+  color: var(--ui-link);
+  box-shadow: var(--ui-card-shadow);
+}
+:root[data-platform-theme] .view-tabs button.active::after {
+  display: none;
+}
+:root[data-platform-theme] .board-actions {
+  padding: 0;
+  gap: 12px;
+}
+:root[data-platform-theme] .board-caption-list {
+  margin-block: 12px 0;
+}
+:root[data-platform-theme] .list-metrics-toolbar {
+  margin-block: 12px 16px;
+  padding: 12px 16px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 :root[data-platform-theme] .project-heading {
   margin-bottom: 28px;
   align-items: center;
