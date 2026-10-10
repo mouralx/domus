@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { readJsonResponse } from '../../infrastructure/jsonResponse';
 import { useI18n } from '../../shared/i18n';
 type Snapshot = {
   packages: unknown[];
@@ -27,8 +28,10 @@ export function AutomationOverview({
           credentials: 'include',
           signal: controller.signal,
         });
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.error || t('Could not load automation executions.'));
+        const body = await readJsonResponse<Snapshot>(
+          response,
+          t('The automation service is unavailable. Please try again later.'),
+        );
         if (!controller.signal.aborted) {
           setSnapshot(body);
           setError('');
