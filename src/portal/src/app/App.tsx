@@ -5,15 +5,11 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Columns3,
   Folder,
   Menu,
   Plus,
   Search,
-  SlidersHorizontal,
-  Tag,
   Trash2,
-  Users,
   X,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -657,11 +653,6 @@ export function App() {
                         : t('Here\u2019s what\u2019s moving across your workspace.')}
               </p>
             </div>
-            <button className="invite-button" onClick={() => setModal('Invite members')}>
-              <Users size={16} />
-              {t('Invite members')}
-              <Plus size={14} />
-            </button>
           </div>
           {page === 'Projects' && project.archived && (
             <div className="archive-banner">
@@ -773,7 +764,7 @@ export function App() {
                 setModal={setModal}
                 toggleArchive={toggleArchive}
               />
-              {page === 'Projects' && (
+              {page === 'Projects' && view === 'Board' && (
                 <div className="workflow-toolbar">
                   <label>
                     {t('Group by')}
@@ -786,37 +777,19 @@ export function App() {
                       <option value={'Bucket'}>{t('Bucket')}</option>
                     </select>
                   </label>
-                  <div>
-                    <button onClick={() => setModal('Manage swimlanes')}>
-                      <Columns3 size={14} />
-                      {t('Manage swimlanes')}
-                    </button>
-                    <button onClick={() => setModal('Manage buckets')}>
-                      <Folder size={14} />
-                      {t('Manage buckets')}
-                    </button>
-                    <button onClick={() => setModal('Manage labels')}>
-                      <Tag size={14} />
-                      {t('Manage labels')}
-                    </button>
-                    <button onClick={() => setModal('Manage statuses')}>
-                      <SlidersHorizontal size={14} />
-                      {t('Manage statuses')}
-                    </button>
-                  </div>
                 </div>
               )}
-              <div className="board-caption">
+              <div className={`board-caption ${view === 'List' ? 'board-caption-list' : ''}`}>
                 <span>
                   <span className="live-dot" />
                   {saving ? t('Saving changes\u2026') : t('Everything\u2019s up to date')}
                 </span>
-                <span>
-                  {filtered.length}
-                  {' ' + t('tasks') + ' '}
-                  <span className="caption-dot">·</span>
-                  {' ' + t('September 2026')}
-                </span>
+                {view !== 'List' && (
+                  <span>
+                    {filtered.length}
+                    {' ' + t('tasks') + ' '}
+                  </span>
+                )}
               </div>
               {view === 'Dashboard' ? (
                 <Dashboard
