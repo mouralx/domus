@@ -14,7 +14,7 @@
     "test:backend": "cd ../src && dotnet test ../tests/Automations.Tests/Automations.Tests.csproj",
     "start": "../infra/scripts/compose.sh up --build -d --wait",
     "test:boards": "python3 ../infra/scripts/test-boards.py",
-    "test:ci": "python3 -m unittest discover -s . -p test_image_matrix.py -v"
+    "test:ci": "python3 -m unittest discover -s . -p \"test_image_*.py\" -v"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.0",

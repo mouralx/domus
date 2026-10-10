@@ -31,6 +31,7 @@ class ImageSelectionTests(unittest.TestCase):
             '.dockerignore': images.ALL,
             '.github/workflows/publish-images.yml': images.ALL,
             '.github/scripts/image_matrix.py': images.ALL,
+            '.github/scripts/image_version.py': images.ALL,
         }
         for path, expected in cases.items():
             with self.subTest(path=path):

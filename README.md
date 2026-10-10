@@ -93,7 +93,7 @@ npm --prefix tests test
 
 The [architecture decision](docs/decisions/001-platform-boundaries.md) documents service boundaries. The [automation authoring guide](docs/reference/automations/manifest-authoring.md) documents manifests stored alongside each automation and the [schema](docs/schemas/automation.schema.json).
 
-`.github/workflows/publish-images.yml` publishes affected application images on every push to `main`. The six image suffixes are `portal`, `membership`, `boards`, `automations`, `boards-worker` and `automation-worker`, under `ghcr.io/<owner>/<repository>-<component>`. Images support AMD64/ARM64 and receive `latest` and commit SHA tags. The automatic GitHub token supplies package publication permissions; the workflow does not deploy the platform.
+`.github/workflows/publish-images.yml` publishes affected application images on every push to `main`. The six image suffixes are `portal`, `membership`, `boards`, `automations`, `boards-worker` and `automation-worker`, under `ghcr.io/<owner>/<repository>-<component>`. Images support AMD64/ARM64 and receive an automatic calendar version, `latest` on main, and a full commit SHA tag. The automatic GitHub token supplies package publication permissions; the workflow does not deploy the platform.
 
 The workflow compares the entire pushed commit range, including deletions and moves:
 
@@ -108,7 +108,25 @@ The workflow compares the entire pushed commit range, including deletions and mo
 | Automation worker | automation-worker |
 | A component's Dockerfile | That component |
 | Shared .NET SDK/build configuration | All five .NET images |
-| Docker ignore rules or publication workflow/detector | All six images |
+| Docker ignore rules or publication workflow/tagging scripts | All six images |
 | Documentation, tests or Compose-only changes | None |
 
 The first push to a new branch has no previous revision and publishes all images. A manual workflow dispatch also rebuilds all images; push-based publication remains limited to `main`. Unchanged images keep their existing tags. Run detector regression checks with `npm --prefix tests run test:ci`.
+
+## Automatic image tags
+
+Every affected image receives these tags automatically:
+
+| Tag | Purpose |
+| --- | --- |
+| `v2026.10.10.42.1` | Pin a particular build: `vYYYY.MM.DD.RUN.ATTEMPT` |
+| `sha-<full-commit-sha>` | Locate the most recent publication of a commit |
+| `latest` | Most recently published main-branch build of that component |
+
+The date is UTC and selected once per workflow run. GitHub supplies the workflow run number and attempt number. Each publish job reads its current attempt, so rerunning only failed jobs produces a new version suffix while keeping the original shared date. A full rerun may select a new UTC date. These are calendar versions, not semantic versions; no manual bump, repository tag or release is required. Version tags are unique per run/attempt under this workflow; the registry does not enforce immutability. Use a version tag or image digest to pin deployments, rather than the moving `latest` or commit aliases.
+
+All affected components in the same attempt share a version. Components that did not change retain their previous published versions; workflow numbers can therefore have gaps for an individual image. Documentation-only pushes do not publish or move image tags. Manual publication outside main produces the version and commit tags without updating `latest`. The OCI `org.opencontainers.image.version` label records the generated calendar version.
+
+For example: `ghcr.io/<owner>/<repository>-portal:v2026.10.10.42.1`.
+
+The workflow uses GitHub's [run and attempt variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables) and Docker's [metadata action](https://github.com/docker/metadata-action) to generate tags and image labels.
