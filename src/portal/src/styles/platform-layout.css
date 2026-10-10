@@ -65,7 +65,11 @@
   border-color: var(--ui-primary);
 }
 :root[data-platform-theme]
-  :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='color']) {
+  :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='color']):not(
+    .search input,
+    .help-search input,
+    .task-title-input
+  ) {
   background-color: var(--ui-field);
   color: var(--ui-panel-text);
   border-color: var(--ui-border);

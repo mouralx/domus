@@ -10,6 +10,52 @@
 :root[data-platform-theme] .topbar {
   height: 72px;
 }
+:root[data-platform-theme] :is(.search, .help-search) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--ui-surface);
+  color: var(--ui-muted);
+}
+:root[data-platform-theme] :is(.search, .help-search) input {
+  background: transparent;
+  color: var(--ui-panel-text);
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  min-width: 0;
+  box-shadow: none;
+  font-size: calc(13px * var(--ui-font-scale));
+}
+:root[data-platform-theme] :is(.search, .help-search) input:focus,
+:root[data-platform-theme] :is(.search, .help-search) input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+:root[data-platform-theme] :is(.search, .help-search):focus-within {
+  border-color: var(--ui-link);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-link) 15%, transparent);
+}
+:root[data-platform-theme] .card-drawer .task-title-input {
+  padding: 12px 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--ui-surface);
+  color: var(--ui-panel-text);
+  font-family: var(--ui-font-heading);
+  font-size: calc(22px * var(--ui-font-scale));
+  line-height: 1.4;
+}
+:root[data-platform-theme] .card-drawer .task-title-input:focus,
+:root[data-platform-theme] .card-drawer .task-title-input:focus-visible {
+  outline: none;
+  border-color: var(--ui-link);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-link) 15%, transparent);
+}
 :root[data-platform-theme] .board-toolbar {
   height: auto;
   min-height: 64px;
