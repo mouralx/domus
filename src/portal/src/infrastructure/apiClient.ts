@@ -1,3 +1,4 @@
+import { readJsonResponse } from './jsonResponse';
 export const apiEnabled = import.meta.env.VITE_DATA_MODE !== 'local';
 export class ApiError extends Error {
   constructor(
@@ -28,7 +29,10 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}, cached
     );
   }
   if (response.status === 204) return undefined as T;
-  return response.json();
+  return readJsonResponse<T>(
+    response,
+    'The platform service is unavailable. Please try again later.',
+  );
 }
 export async function downloadApi(path: string, name: string) {
   const response = await fetch('/api' + path, { credentials: 'include' });

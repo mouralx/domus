@@ -1,3 +1,4 @@
+import { readJsonResponse } from '../../infrastructure/jsonResponse';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Input = {
@@ -76,10 +77,10 @@ export function AutomationsModule({
         headers,
         credentials: 'include',
       });
-      const body = await response.json();
-      if (!response.ok)
-        throw new Error(body.error || body.detail || 'Não foi possível concluir o pedido.');
-      return body as T;
+      return readJsonResponse<T>(
+        response,
+        'O serviço de automações está indisponível. Tente novamente mais tarde.',
+      );
     },
     [workspace],
   );

@@ -397,7 +397,7 @@ export function Dashboard({
             <button
               className="completion-donut"
               style={{
-                background: `conic-gradient(#7494ba 0% ${completion}%, var(--chart-rest, #e8eef6) ${completion}% 100%)`,
+                background: `conic-gradient(var(--ui-primary) 0% ${completion}%, var(--ui-raised) ${completion}% 100%)`,
               }}
               aria-label={t(
                 'Completion chart: {0} completed out of {1} cards',
@@ -516,7 +516,7 @@ export function Dashboard({
           {bars(
             data.members.map((m) => ({
               name: m.name,
-              color: '#839fbe',
+              color: 'var(--ui-primary)',
               count: open.filter((t) => t.assignees.includes(m.name)).length,
             })),
             Math.max(

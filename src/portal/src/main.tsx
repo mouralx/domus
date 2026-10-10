@@ -11,6 +11,7 @@ import './styles/styles.css';
 import './styles/branding.css';
 import './styles/theme-components.css';
 import './styles/platform-layout.css';
+import './styles/refinement.css';
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <I18nProvider>

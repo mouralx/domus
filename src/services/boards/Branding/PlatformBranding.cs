@@ -11,10 +11,10 @@ public sealed class PlatformBrandingEntity
     public string? Logo { get; set; }
     public string? CollapsedLogo { get; set; }
     public bool ShowName { get; set; } = true;
-    public string Primary { get; set; } = "#0095d2";
-    public string Accent { get; set; } = "#00c6f7";
-    public string LightBackground { get; set; } = "#f1fbff";
-    public string DarkBackground { get; set; } = "#071e2a";
+    public string Primary { get; set; } = "#167d8d";
+    public string Accent { get; set; } = "#a8ded6";
+    public string LightBackground { get; set; } = "#f5f7fa";
+    public string DarkBackground { get; set; } = "#101923";
     public string DefaultTheme { get; set; } = "system";
     public string? LightSurface { get; set; }
     public string? DarkSurface { get; set; }
@@ -22,7 +22,7 @@ public sealed class PlatformBrandingEntity
     public string? DarkText { get; set; }
     public string? LightBorder { get; set; }
     public string? DarkBorder { get; set; }
-    public string? SidebarBackground { get; set; } = "#075978";
+    public string? SidebarBackground { get; set; } = "#172b3a";
     public string? SidebarText { get; set; }
     public string FontFamily { get; set; } = "default";
     public int FontScale { get; set; } = 100;
