@@ -53,19 +53,8 @@ export function App() {
   const [projectId, setProjectId] = useState('website');
 
   const [assistantOpen, setAssistantOpen] = useState(false);
-  const [assistantPromptOpen, setAssistantPromptOpen] = useState(false);
-  const [assistantDraft, setAssistantDraft] = useState('');
-  const assistantPrompt = useRef<HTMLDivElement>(null);
   const assistantLauncher = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (!assistantPromptOpen) return;
-    const close = (event: PointerEvent) => {
-      if (!assistantPrompt.current?.contains(event.target as Node)) setAssistantPromptOpen(false);
-    };
-    document.addEventListener('pointerdown', close);
-    return () => document.removeEventListener('pointerdown', close);
-  }, [assistantPromptOpen]);
   const [page, setPage] = useState('Overview');
   const [automationRun, setAutomationRun] = useState<{ workspace: string; id: string } | null>(
     null,
@@ -623,41 +612,18 @@ export function App() {
           </div>
           <div className="top-actions">
             {apiEnabled && (
-              <div ref={assistantPrompt} className="assistant-prompt-anchor">
-                <button
-                  type="button"
-                  ref={assistantLauncher}
-                  className="assistant-launcher"
-                  aria-label={t('Open assistant')}
-                  aria-haspopup="dialog"
-                  aria-expanded={assistantPromptOpen || assistantOpen}
-                  title={t('Open assistant')}
-                  onClick={() => setAssistantPromptOpen((value) => !value)}
-                >
-                  <Sparkles size={18} aria-hidden="true" />
-                </button>
-                {assistantPromptOpen && (
-                  <div className="assistant-prompt">
-                    <input
-                      autoFocus
-                      aria-label={t('Ask the assistant')}
-                      placeholder={t('Ask the assistant…')}
-                      onChange={(event) => {
-                        if (!event.target.value.trim()) return;
-                        setAssistantDraft(event.target.value);
-                        setAssistantPromptOpen(false);
-                        setAssistantOpen(true);
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Escape') {
-                          setAssistantPromptOpen(false);
-                          assistantLauncher.current?.focus();
-                        }
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              <button
+                type="button"
+                ref={assistantLauncher}
+                className="assistant-launcher"
+                aria-label={t('Open assistant')}
+                aria-haspopup="dialog"
+                aria-expanded={assistantOpen}
+                title={t('Open assistant')}
+                onClick={() => setAssistantOpen(true)}
+              >
+                <Sparkles size={18} aria-hidden="true" />
+              </button>
             )}
             <ThemeSelect compact />
             <select
@@ -1190,7 +1156,6 @@ export function App() {
           key={data.workspace.id}
           mode="workspace"
           minimal
-          initialQuestion={assistantDraft}
           workspace={data.workspace.id}
           projects={data.projects}
           initialProject="my-activities"

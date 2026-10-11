@@ -39,7 +39,7 @@ export function AvatarGate({
   return (
     <main className="enrollment-page">
       <section className="enrollment-card avatar-enrollment">
-        <div className="logo">
+        <div className="enrollment-brand">
           <Brand />
         </div>
         <h1>{t('Choose your profile photo')}</h1>

@@ -18,14 +18,17 @@ try {
   await page.route('**/ai-api/local-origin', route => route.fulfill({ json: { origin: advertisedOrigin } }));
   let generated = 0;
   let windowActionCount = 0;
+  let gateSession = null;
+  let enrollmentBranding = false;
   const provider = { provider: 'openai', model: 'test-model', enabled: true, hasKey: true };
   const workspace = { configuration: { enabled: true, provider: 'openai',  }, providers: [provider], canManage: true, usage: { requests: 0, inputTokens: 0, outputTokens: 0 } };
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname;
     let body = {};
-    if (path === '/api/auth/session') body = { user: null, providers: { google: false, microsoft: false } };
-    else if (path === '/api/platform/branding') return route.fulfill({status:401,json:{error:'Authentication required'}});
+    if (path === '/api/auth/session') body = gateSession ?? { user: null, providers: { google: false, microsoft: false } };
+    else if (path === '/api/platform/branding') return enrollmentBranding ? route.fulfill({json:{version:1,name:'Domus',logo:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48"><text x="8" y="34" fill="white" font-size="28">Domus</text></svg>'),collapsedLogo:null,showName:false,primary:'#167d8d',accent:'#a8ded6',lightBackground:'#f5f7fa',darkBackground:'#101923',defaultTheme:'light',sidebarBackground:'#172b3a',fontScale:100,cornerRadius:8}}) : route.fulfill({status:401,json:{error:'Authentication required'}});
     else if (path === '/api/mock-branding') body = { version: 0, name: 'domus', logo: null, showName: true, primary: '#167d8d', accent: '#a8ded6', lightBackground: '#f5f7fa', darkBackground: '#101923', defaultTheme: 'light', sidebarBackground: '#172b3a', fontScale: 100, cornerRadius: 8 };
+    else if (path === '/api/auth/two-factor/verify') { assert.equal(route.request().postDataJSON().code,'123456'); return route.fulfill({status:400,json:{detail:'Verification failed.'}}); }
     else if (path === '/api/platform/branding/access') body = { canManage: true };
     else if (path === '/ai-api/api/workspace') body = workspace;
     else if (path === '/ai-api/api/connection') body = { configured: true, connected: true, email: 'test@example.test', model: 'test-model', provider: 'openai' };
@@ -43,6 +46,35 @@ try {
   assert.equal(new URL(page.url()).hostname, '127.0.0.1');
   assert.equal(new URL(page.url()).search, '?workspace=test');
   assert.equal(new URL(page.url()).hash, '#view');
+  await page.getByRole('button',{name:'Continue with email',exact:true}).click();
+  const signIn=await page.getByRole('button',{name:'Sign in',exact:true}).boundingBox();
+  const createAccount=await page.getByRole('button',{name:'New here? Create an account',exact:true}).boundingBox();
+  assert.ok(createAccount.y-signIn.y-signIn.height>=16,'Account switch needs space above it');
+  gateSession={user:{id:'synthetic-owner',name:'Test member',email:'test@example.test',provider:'microsoft'},providers:{google:false,microsoft:true},avatarRequired:false,twoFactorSetupRequired:false,twoFactorVerificationRequired:true};
+  enrollmentBranding=true;
+  await page.reload();await page.getByRole('heading',{name:'Verify your sign-in',exact:true}).waitFor();
+  for(const width of [1280,390]) {
+    await page.setViewportSize({width,height:900});
+    const card=await page.locator('.verification-enrollment').boundingBox();
+    assert.ok(Math.abs(card.x+card.width/2-width/2)<2,'Verification card must be centered without sidebar margins');
+    assert.ok(card.x>=0&&card.x+card.width<=width,'Verification must fit mobile');
+    const verify=await page.getByRole('button',{name:'Verify your sign-in',exact:true}).boundingBox();
+    const signout=await page.getByRole('button',{name:'Sign out',exact:true}).boundingBox();
+    assert.ok(Math.abs(verify.width-signout.width)<2&&signout.y>=verify.y+verify.height+10);
+  }
+  await page.setViewportSize({width:1280,height:900});
+  for(const theme of ['light','dark']) {
+    await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
+    const background=await page.locator('.enrollment-brand').evaluate(el=>getComputedStyle(el).backgroundColor);
+    assert.ok(Math.max(...background.match(/\d+/g).slice(0,3).map(Number))<100,'White uploaded logo needs a contrasting background');
+    await page.screenshot({path:`/private/tmp/domus-verification-${theme}.png`});
+  }
+  await page.getByLabel('Authenticator or recovery code').fill('123456');
+  await page.getByRole('button',{name:'Verify your sign-in',exact:true}).click();
+  await page.getByRole('alert').filter({hasText:'Verification failed.'}).waitFor();
+  gateSession=null;enrollmentBranding=false;
+  await page.reload();await page.locator('.auth-page').waitFor();
+
   await page.evaluate(async () => {
     const { default: React } = await import('/node_modules/.vite/deps/react.js');
     const { default: ReactDOM } = await import('/node_modules/.vite/deps/react-dom_client.js');
@@ -165,17 +197,13 @@ try {
   assert.equal(await page.locator('.theme-menu-control .theme-icon-options button svg').count(),3);
   await page.getByRole('button',{name:'Dark',exact:true}).click();
   await launcher.click();
-  const prompt=page.getByRole('textbox',{name:'Ask the assistant',exact:true});
-  await prompt.waitFor();
-  assert.equal(await page.getByRole('dialog',{name:'Assistant',exact:true}).count(),0);
-  await prompt.focus();
-  await page.keyboard.type('Create a test card',{delay:30});
   const dialog=page.getByRole('dialog',{name:'Assistant',exact:true});
   await dialog.waitFor();
+  assert.equal(await page.locator('.assistant-prompt').count(),0);
   assert.equal(await dialog.locator('select').count(),0);
   assert.equal(await dialog.locator('.assistant-area-switch,.assistant-starters,.assistant-scope').count(),0);
   const globalComposer=dialog.getByRole('textbox',{name:'Ask the assistant',exact:true});
-  assert.equal(await globalComposer.inputValue(),'Create a test card');
+  await globalComposer.fill('Create a test card');
   await globalComposer.press('Enter');
   await page.getByText('Review the card before creating it.',{exact:true}).waitFor();
   assert.equal(windowActionCount,0,'Preparing an action must not execute it');
@@ -195,9 +223,8 @@ try {
   await helpSearch.fill('');assert.equal(await page.locator('.help-articles details').count(),65);
   await page.setViewportSize({width:390,height:844});
   const mobile=await launcher.boundingBox();assert.ok(mobile.x>=0&&mobile.x+mobile.width<=390);
-  await launcher.click();await prompt.waitFor();
-  const promptBox=await prompt.boundingBox();assert.ok(promptBox.x>=0&&promptBox.x+promptBox.width<=390);
-  await prompt.focus();await page.keyboard.type('Hello',{delay:30});await dialog.waitFor();
+  await launcher.click();await dialog.waitFor();
+  await globalComposer.fill('Hello');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:'/private/tmp/domus-header-assistant-mobile.png',fullPage:true});
   await dialog.getByRole('button',{name:'Close',exact:true}).click();
@@ -205,7 +232,7 @@ try {
   await page.goto(origin.replace('127.0.0.1', 'localhost'));
   await page.locator('.auth-page').waitFor();
   assert.equal(new URL(page.url()).hostname, 'localhost', 'Only same-port loopback aliases may redirect');
-  console.log('PASS: reviewed description/checklist suggestions, duplicate filtering, unsaved/stale guards, personal subscription settings without API keys/monthly limits, top-bar prompt, conversation-only workspace assistant, reviewed action confirmation, theme dropdown icons, focus restoration, updated help and mobile layout.');
+  console.log('PASS: reviewed description/checklist suggestions, duplicate filtering, unsaved/stale guards, personal subscription settings without API keys/monthly limits, direct-opening workspace assistant, centered verification and account switch spacing, reviewed action confirmation, theme dropdown icons, focus restoration, updated help and mobile layout.');
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');
