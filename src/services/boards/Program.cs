@@ -20,6 +20,7 @@ app.UseForwardedHeaders();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 app.UseMiddleware<RequestSecurityMiddleware>();
+app.UseMiddleware<OAuthOriginMiddleware>();
 app.UseAuthentication();
 app.UseMiddleware<TwoFactorEnrollmentMiddleware>();
 app.UseAuthorization();
