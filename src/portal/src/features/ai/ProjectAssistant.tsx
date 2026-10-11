@@ -394,7 +394,14 @@ export function ProjectAssistant({
                             });
                             setActionResults((previous) => ({
                               ...previous,
-                              [action.id]: t('Action completed'),
+                              [action.id]: t(
+                                action.tool === 'start_automation_run' ||
+                                  action.tool === 'install_automation'
+                                  ? 'Request submitted'
+                                  : action.tool === 'cancel_automation_run'
+                                    ? 'Cancellation requested'
+                                    : 'Action completed',
+                              ),
                             }));
                             await onAction?.().catch(() =>
                               setError(t('Action completed. Refresh the page to see the update.')),
