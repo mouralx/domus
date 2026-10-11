@@ -1,3 +1,4 @@
+import { ProjectIcon } from '../features/projects/ProjectIcon';
 import { Brand } from '../shared/Brand';
 import {
   Bot,
@@ -352,7 +353,11 @@ export function Sidebar({
                       navigate('Projects');
                     }}
                   >
-                    <BoardIcon index={index} activities={isActivitiesProject(item)} />
+                    {item.icon ? (
+                      <ProjectIcon name={item.icon} size={16} />
+                    ) : (
+                      <BoardIcon index={index} activities={isActivitiesProject(item)} />
+                    )}
                     <span className="project-nav-text">
                       {isActivitiesProject(item) ? t('My activities') : item.name}
                     </span>

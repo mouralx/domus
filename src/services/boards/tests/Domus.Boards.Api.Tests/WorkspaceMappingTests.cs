@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Domus.Boards.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -5,6 +6,26 @@ using Xunit;
 
 public sealed class WorkspaceMappingTests(ApiFixture fixture) : IClassFixture<ApiFixture>
 {
+    [Fact]
+    public async Task ProjectIconPersistsAcrossWorkspaceReadsAndChanges()
+    {
+        using var client = fixture.Client();
+        await using var db = new BoardsDbContext(new DbContextOptionsBuilder<BoardsDbContext>().UseNpgsql(fixture.Connection).Options);
+        var owner = new UserEntity { Id = Guid.NewGuid(), Email = Guid.NewGuid()+"@example.test", Name = "Icon Owner" };
+        db.Users.Add(owner); await db.SaveChangesAsync();
+        var store = new WorkspaceStore(db, new WorkspaceMapper(db));
+        var id = await store.Create(owner.Id, "Icons " + Guid.NewGuid());
+        var snapshot = await store.Read(id,owner.Id);
+        snapshot.State["projects"]!.AsArray().Add(JsonNode.Parse("""{"id":"icon-test","name":"Icon test","description":"","color":"#167d8d","icon":"shield","archived":false}"""));
+        var saved = await store.Save(id,owner.Id,snapshot.State,snapshot.Version);
+        var project = saved["projects"]!.AsArray().Single(p => p!["id"]!.ToString()=="icon-test")!;
+        Assert.Equal("shield", project["icon"]!.ToString());
+        project["icon"]="package";
+        await store.Save(id,owner.Id,saved,saved["version"]!.GetValue<long>());
+        var current=await store.Read(id,owner.Id);
+        Assert.Equal("package",current.State["projects"]!.AsArray().Single(p => p!["id"]!.ToString()=="icon-test")!["icon"]!.ToString());
+    }
+
     [Fact]
     public async Task LargeWorkspaceMappingPreservesHistoryOrderWithoutRepeatedGraphScans()
     {

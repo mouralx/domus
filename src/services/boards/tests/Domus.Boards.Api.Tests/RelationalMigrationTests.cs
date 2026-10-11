@@ -50,7 +50,8 @@ public sealed class RelationalMigrationTests
             var associations = await db.CardLabels.Where(l => l.WorkspaceId == workspace).ToListAsync();
             Assert.Equal(2, associations.Count);
             Assert.All(associations, l => Assert.Equal("original", l.LabelId));
-            Assert.Equal(version + 1, await db.Workspaces.Where(w => w.Id == workspace).Select(w => w.Version).SingleAsync());
+            // Both label consolidation and icon initialization change the canonical workspace.
+            Assert.Equal(version + 2, await db.Workspaces.Where(w => w.Id == workspace).Select(w => w.Version).SingleAsync());
             var state = await scope.ServiceProvider.GetRequiredService<WorkspaceStore>().Read(workspace, user.Id);
             WorkspaceValidator.Validate(state.State, false);
 
@@ -130,7 +131,7 @@ public sealed class RelationalMigrationTests
             await using var scope = fixture.Factory.Services.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<BoardsDbContext>();
             var migrated = (await scope.ServiceProvider.GetRequiredService<WorkspaceStore>().Read(workspace, user)).State;
-            Assert.Equal(18L, migrated["version"]!.GetValue<long>());
+            Assert.Equal(19L, migrated["version"]!.GetValue<long>());
             Assert.Equal("Keep this card", migrated["tasks"]![0]!["title"]!.ToString());
             Assert.Equal("Descrição", migrated["tasks"]![0]!["description"]!.ToString());
             Assert.Equal("", migrated["tasks"]![0]!["due"]!.ToString());

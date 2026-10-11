@@ -887,7 +887,9 @@ namespace Domus.Boards.Api.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Icon").HasColumnType("text").HasColumnName("icon");
+
+            b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");

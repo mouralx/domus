@@ -31,6 +31,7 @@ export type Member = {
   photo?: string;
 };
 export type Project = {
+  icon?: string;
   id: string;
   name: string;
   color: string;

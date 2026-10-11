@@ -1,8 +1,10 @@
-import { Archive, ArrowUpRight, Folder, LockKeyhole, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { ProjectIcon } from './ProjectIcon';
+import { Folder, Archive, ArrowUpRight, LockKeyhole, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { type Definition, type Project, type Task } from '../../domain/models';
 import { isActivitiesProject } from '../../domain/projectRules';
 import { useI18n } from '../../shared/i18n';
 export function ProjectDirectory({
+  onEditIcon,
   projects,
   tasks,
   statuses,
@@ -15,6 +17,7 @@ export function ProjectDirectory({
   onRestore,
   onDelete,
 }: {
+  onEditIcon: (project: Project) => void;
   projects: Project[];
   tasks: Task[];
   statuses: Definition[];
@@ -60,9 +63,17 @@ export function ProjectDirectory({
           const progress = cards.length ? Math.round((completed / cards.length) * 100) : 0;
           return (
             <article className="directory-project" key={project.id}>
-              <span className="directory-project-icon" style={{ background: project.color }}>
-                <Folder size={23} />
-              </span>
+              <button
+                type="button"
+                className="directory-project-icon"
+                aria-label={t('Project icon') + ' · ' + project.name}
+                onClick={() => onEditIcon(project)}
+              >
+                <ProjectIcon
+                  name={project.icon ?? (isActivitiesProject(project) ? 'notebook' : 'folder')}
+                  size={23}
+                />
+              </button>
               <div className="directory-project-info">
                 <button onClick={() => onOpen(project)}>
                   <h2>{isActivitiesProject(project) ? t('My activities') : project.name}</h2>

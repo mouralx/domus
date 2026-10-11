@@ -165,11 +165,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Projects & personal tasks',
     en: [
       'How do I create and open projects?',
-      'Choose New project in the sidebar, enter a name, description, and color, and choose Create project. Projects opens the directory with Live and Archived tabs. Select a project there or use its shortcut in the sidebar to open it.',
+      'Choose New project in the sidebar, enter a name and description, choose an icon, and choose Create project. Click a project’s icon in the directory to change it. Projects opens the directory with Live and Archived tabs. Select a project there or use its shortcut in the sidebar to open it.',
     ],
     pt: [
       'Como crio e abro projetos?',
-      'Escolha Novo projeto no menu lateral, introduza o nome, a descrição e a cor, e escolha Criar projeto. Projetos abre o diretório com os separadores Ativos e Arquivados. Selecione um projeto no diretório ou use o atalho no menu lateral para o abrir.',
+      'Escolha Novo projeto no menu lateral, introduza o nome e a descrição, escolha um ícone e selecione Criar projeto. Clique no ícone de um projeto no diretório para o alterar. Projetos abre o diretório com os separadores Ativos e Arquivados. Selecione um projeto no diretório ou use o atalho no menu lateral para o abrir.',
     ],
   },
   {

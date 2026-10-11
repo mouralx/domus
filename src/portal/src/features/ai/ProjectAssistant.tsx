@@ -40,6 +40,7 @@ export function ProjectAssistant({
   const [turns, setTurns] = useState<Turn[]>([]);
   const [ready, setReady] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pendingQuestion, setPendingQuestion] = useState('');
   const [error, setError] = useState('');
   const controller = useRef<AbortController | null>(null);
   const panel = useRef<HTMLElement>(null);
@@ -71,17 +72,19 @@ export function ProjectAssistant({
       active = false;
       controller.current?.abort();
       setBusy(false);
+      setPendingQuestion('');
       document.body.style.overflow = overflow;
       previous?.focus();
     };
   }, [open, workspace]);
   useEffect(() => {
     messages.current?.scrollTo({ top: messages.current.scrollHeight, behavior: 'smooth' });
-  }, [turns, busy]);
+  }, [turns, busy, pendingQuestion]);
   const reset = () => {
     controller.current?.abort();
     setBusy(false);
     setTurns([]);
+    setPendingQuestion('');
     setQuestion('');
     setError('');
   };
@@ -90,6 +93,8 @@ export function ProjectAssistant({
     const current = new AbortController();
     controller.current = current;
     setBusy(true);
+    setPendingQuestion(text.trim());
+    setQuestion('');
     setError('');
     try {
       const result = await aiRequest<Answer>(workspace, '/assistant', {
@@ -105,13 +110,17 @@ export function ProjectAssistant({
       });
       if (!current.signal.aborted) {
         setTurns((previous) => [...previous, { question: text.trim(), result }].slice(-6));
-        setQuestion('');
       }
     } catch (reason) {
-      if (!current.signal.aborted)
+      if (!current.signal.aborted) {
+        setQuestion(text.trim());
         setError(reason instanceof Error ? reason.message : String(reason));
+      }
     } finally {
-      if (controller.current === current) setBusy(false);
+      if (controller.current === current) {
+        setBusy(false);
+        setPendingQuestion('');
+      }
     }
   };
   if (!open) return null;
@@ -188,7 +197,7 @@ export function ProjectAssistant({
           </button>
         </div>
         <div ref={messages} className="assistant-messages" aria-live="polite" aria-busy={busy}>
-          {!turns.length && (
+          {!turns.length && !pendingQuestion && (
             <div className="assistant-empty">
               <MessageSquare size={30} />
               <h3>
@@ -279,6 +288,7 @@ export function ProjectAssistant({
               </div>
             </article>
           ))}
+          {pendingQuestion && <p className="assistant-question">{pendingQuestion}</p>}
           {busy && (
             <p className="assistant-note" role="status">
               {t('Thinking…')}
@@ -305,6 +315,12 @@ export function ProjectAssistant({
             maxLength={2000}
             disabled={!ready || busy}
             onChange={(event) => setQuestion(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                void send(question);
+              }
+            }}
           />
           <div className="ai-actions">
             <small>{t('Answers may be inaccurate. Check the source cards.')}</small>
@@ -314,6 +330,8 @@ export function ProjectAssistant({
                 className="secondary"
                 onClick={() => {
                   controller.current?.abort();
+                  setQuestion(pendingQuestion);
+                  setPendingQuestion('');
                   setBusy(false);
                 }}
               >

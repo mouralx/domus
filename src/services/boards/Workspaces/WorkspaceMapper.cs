@@ -67,7 +67,7 @@ public sealed class WorkspaceMapper(BoardsDbContext db)
             ["version"] = workspace.Version,
             ["workspace"] = Summary(workspace, user),
             ["members"] = Array(members.Select(x => new { x.Name, x.Email, x.Initials, x.Color, x.Photo, x.UserId, invitationToken = workspace.OwnerId == user ? x.InviteToken : null })),
-            ["projects"] = Array(Rows<ProjectEntity>().OrderBy(x => x.Position).Select(x => new { x.Id, x.Name, x.Color, x.Description, x.Archived, x.System })),
+            ["projects"] = Array(Rows<ProjectEntity>().OrderBy(x => x.Position).Select(x => new { x.Id, x.Name, x.Icon, x.Color, x.Description, x.Archived, x.System })),
             ["statuses"] = Array(Rows<StatusEntity>().OrderBy(x => x.Position).Select(x => new { x.Id, x.Name, x.Color, x.Complete })),
             ["buckets"] = Array(Rows<BucketEntity>().OrderBy(x => x.Position).Select(x => new { x.Id, x.Name, x.Color, x.Complete })),
             ["labels"] = Array(Rows<LabelEntity>().OrderBy(x => x.Position).Select(x => new { x.Id, x.Name, x.Color, x.Complete })),
@@ -173,7 +173,7 @@ public sealed class WorkspaceMapper(BoardsDbContext db)
         workspace.Name = Text(state["workspace"], "name");
         workspace.Icon = Optional(state["workspace"], "icon");
         Sync(id, WorkspaceJson.Items(state, "members").Select((x, position) => new MemberEntity { WorkspaceId = id, Position = position, Email = Text(x, "email").ToLowerInvariant(), UserId = Guid.TryParse(Text(x, "userId"), out var uid) ? uid : null, InviteToken = Optional(x, "invitationToken"), Name = Text(x, "name"), Initials = Text(x, "initials"), Color = Text(x, "color"), Photo = Optional(x, "photo") }));
-        Sync(id, WorkspaceJson.Items(state, "projects").Select((x, position) => new ProjectEntity { WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Description = Text(x, "description"), Archived = Flag(x, "archived"), System = Optional(x, "system") }));
+        Sync(id, WorkspaceJson.Items(state, "projects").Select((x, position) => new ProjectEntity { Icon = Optional(x, "icon"), WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Description = Text(x, "description"), Archived = Flag(x, "archived"), System = Optional(x, "system") }));
         Sync(id, WorkspaceJson.Items(state, "statuses").Select((x, position) => new StatusEntity { WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Complete = Flag(x, "complete") }));
         Sync(id, WorkspaceJson.Items(state, "buckets").Select((x, position) => new BucketEntity { WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Complete = Flag(x, "complete") }));
         Sync(id, WorkspaceJson.Items(state, "labels").Select((x, position) => new LabelEntity { WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Complete = Flag(x, "complete") }));

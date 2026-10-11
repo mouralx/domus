@@ -95,7 +95,21 @@ try {
     const root = ReactDOM.createRoot(node); window.renderAutomationAssistant = () => root.render(React.createElement(ProjectAssistant,{key:'automations',mode:'automations',workspace:'workspace',projects:[],initialProject:'my-activities',open:true,onClose:()=>{},onSettings:()=>{},onCard:async()=>{}}));
     root.render(React.createElement(ProjectAssistant, {workspace: 'workspace', projects: [{id:'project', name:'Project'}], initialProject:'project', open:true, onClose:()=>{}, onSettings:()=>{}, onCard:async id=>{window.openedCard=id;} }));
   });
-  await page.getByRole('button', {name:'Summarize progress', exact:true}).click();
+  let releaseAnswer;
+  const answerGate = new Promise(resolve => { releaseAnswer = resolve; });
+  await page.route('**/ai-api/api/assistant', async route => {
+    await answerGate;
+    await route.fulfill({json:{conversationId:'session',answer:'The project has one overdue card.',references:[{id:'card-one',title:'Card',project:'project',href:'/?card=card-one'}],cardsIncluded:1,totalCards:2,model:'test-model'}});
+  }, {times:1});
+  const composer = page.locator('#assistant-question');
+  await composer.fill('Which cards are at risk?');
+  await composer.press('Shift+Enter');
+  assert.equal(await composer.inputValue(), 'Which cards are at risk?\n');
+  await composer.press('Enter');
+  await page.getByRole('status').waitFor();
+  assert.equal(await composer.inputValue(), '');
+  assert.equal(await page.locator('.assistant-question').textContent(), 'Which cards are at risk?');
+  releaseAnswer();
   await page.getByText('The project has one overdue card.').waitFor();
   await page.getByRole('link', {name:'Card', exact:true}).click();
   assert.equal(await page.evaluate(()=>window.openedCard), 'card-one');
