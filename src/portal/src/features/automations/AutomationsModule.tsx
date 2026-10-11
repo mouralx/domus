@@ -1,5 +1,6 @@
 import { readJsonResponse } from '../../infrastructure/jsonResponse';
 import { Download } from 'lucide-react';
+import { useI18n } from '../../shared/i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Input = {
@@ -61,6 +62,7 @@ export function AutomationsModule({
   tab: string;
   initialRunId?: string;
 }) {
+  const { t } = useI18n();
   const pendingJob = useRef(false);
   const installingIds = useRef(new Set<string>());
   const [submitting, setSubmitting] = useState<string[]>([]);
@@ -88,10 +90,10 @@ export function AutomationsModule({
       });
       return readJsonResponse<T>(
         response,
-        'O serviço de automações está indisponível. Tente novamente mais tarde.',
+        t('The automation service is unavailable. Please try again later.'),
       );
     },
-    [workspace],
+    [workspace, t],
   );
   const refreshCatalog = useCallback(async () => {
     const value = await request<{ automations: Entry[] }>('/catalog');
@@ -224,60 +226,72 @@ export function AutomationsModule({
           {error}
         </p>
       )}
-      {!status && !error && <p>A carregar automações…</p>}
+      {!status && !error && <p>{t('Loading automations\u2026')}</p>}
       {tab === 'Automations' && status && (
         <>
-          <table>
-            <thead>
-              <tr>
-                <th>Automação</th>
-                <th>Versão</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {status.packages.map((item) => (
-                <tr key={item.key}>
-                  <td>
-                    <strong>{item.manifest.name}</strong>
-                    <p>{item.manifest.description}</p>
-                  </td>
-                  <td>{item.manifest.version}</td>
-                  <td>
-                    {canManage && (
-                      <button
-                        disabled={busy}
-                        onClick={() => {
-                          if (
-                            confirm(
-                              'Remover esta automação? O histórico e os resultados serão preservados.',
-                            )
-                          )
-                            void perform(async () => {
-                              await request('/packages/remove', {
-                                method: 'POST',
-                                body: JSON.stringify({ packageKey: item.key }),
-                              });
-                            });
-                        }}
-                      >
-                        Remover
-                      </button>
-                    )}{' '}
-                    <button
-                      disabled={busy || !item.compatible}
-                      onClick={() => setPackageKey(item.key)}
-                    >
-                      Executar
-                    </button>
-                  </td>
+          <div className="automation-table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>{t('Automation')}</th>
+                  <th>{t('Version')}</th>
+                  <th>{t('Actions')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {!status.packages.length && <p>Instale a primeira automação no Catálogo.</p>}
+              </thead>
+              <tbody>
+                {status.packages.map((item) => (
+                  <tr key={item.key}>
+                    <td>
+                      <strong>{item.manifest.name}</strong>
+                      <p>{item.manifest.description}</p>
+                    </td>
+                    <td>{item.manifest.version}</td>
+                    <td>
+                      <div className="automation-actions">
+                        {canManage && (
+                          <button
+                            disabled={busy}
+                            onClick={() => {
+                              if (
+                                confirm(
+                                  t(
+                                    'Remove this automation? History and results will be preserved.',
+                                  ),
+                                )
+                              )
+                                void perform(async () => {
+                                  await request('/packages/remove', {
+                                    method: 'POST',
+                                    body: JSON.stringify({ packageKey: item.key }),
+                                  });
+                                });
+                            }}
+                          >
+                            {t('Remove')}
+                          </button>
+                        )}
+                        <button
+                          className="automation-primary"
+                          disabled={busy || !item.compatible}
+                          onClick={() => setPackageKey(item.key)}
+                        >
+                          {t('Run')}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {!status.packages.length && (
+            <p className="automation-empty">
+              {t('Install your first automation from the catalog.')}
+            </p>
+          )}
           {pkg && (
             <form
+              className="automation-panel"
               key={pkg.key}
               onSubmit={(event) => {
                 event.preventDefault();
@@ -309,13 +323,13 @@ export function AutomationsModule({
             >
               <h2>{pkg.manifest.name}</h2>
               {pkg.manifest.effects?.modifiesInput && (
-                <p>O ficheiro será processado numa cópia de trabalho.</p>
+                <p>{t('The file will be processed in a working copy.')}</p>
               )}
               {pkg.manifest.effects?.publishesComments && (
-                <p>Esta automação publica comentários na plataforma.</p>
+                <p>{t('This automation publishes comments on the platform.')}</p>
               )}
               {pkg.manifest.effects?.createsPaidRequests && (
-                <p>Esta automação pode concluir pedidos pagos.</p>
+                <p>{t('This automation may complete paid requests.')}</p>
               )}
               {pkg.manifest.inputs.map((input) => (
                 <label key={input.id}>
@@ -341,15 +355,19 @@ export function AutomationsModule({
                   <small>
                     {input.description}
                     {input.columns?.length
-                      ? ` Colunas necessárias: ${input.columns.join(' · ')}.`
+                      ? ' ' + t('Required columns: {0}.', input.columns.join(' · '))
                       : ''}
                   </small>
                 </label>
               ))}
-              <button disabled={busy}>Iniciar execução</button>{' '}
-              <button type="button" onClick={() => setPackageKey('')}>
-                Fechar
-              </button>
+              <div className="automation-actions">
+                <button className="automation-primary" disabled={busy}>
+                  {t('Start execution')}
+                </button>
+                <button type="button" onClick={() => setPackageKey('')}>
+                  {t('Close')}
+                </button>
+              </div>
             </form>
           )}
         </>
@@ -358,20 +376,20 @@ export function AutomationsModule({
         <>
           <div className="domus-catalog-toolbar">
             <label>
-              Pesquisar automações
+              {t('Search automations')}
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Nome ou descrição"
+                placeholder={t('Name or description')}
               />
             </label>
             <button disabled={busy} onClick={() => void perform(refreshCatalog)}>
-              Atualizar catálogo
+              {t('Refresh catalog')}
             </button>
           </div>
           {pendingCount > 0 && (
-            <p role="status">{pendingCount} instalação(ões) na fila ou em processamento.</p>
+            <p role="status">{t('{0} installation(s) queued or processing.', pendingCount)}</p>
           )}
           {jobs
             .filter((job) => job.status === 'failed')
@@ -380,46 +398,53 @@ export function AutomationsModule({
                 {job.error}
               </p>
             ))}
-          <table>
-            <thead>
-              <tr>
-                <th>Automação</th>
-                <th>Disponível</th>
-                <th>Instalada</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {catalog
-                .filter((item) => text(item.name + ' ' + item.description).includes(text(query)))
-                .map((item) => (
-                  <tr key={item.assetId}>
-                    <td>
-                      <strong>{item.name}</strong>
-                      <p>{item.description}</p>
-                    </td>
-                    <td>{item.version}</td>
-                    <td>{item.installedVersion || '—'}</td>
-                    <td>
-                      <button
-                        disabled={
-                          installationPending(item) || !canManage || item.action === 'installed'
-                        }
-                        onClick={() => void install(item)}
-                      >
-                        {installationPending(item)
-                          ? 'A instalar…'
-                          : { install: 'Instalar', update: 'Atualizar', installed: 'Instalada' }[
-                              item.action
-                            ]}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          <div className="automation-table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>{t('Automation')}</th>
+                  <th>{t('Available')}</th>
+                  <th>{t('Installed')}</th>
+                  <th>{t('Action')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {catalog
+                  .filter((item) => text(item.name + ' ' + item.description).includes(text(query)))
+                  .map((item) => (
+                    <tr key={item.assetId}>
+                      <td>
+                        <strong>{item.name}</strong>
+                        <p>{item.description}</p>
+                      </td>
+                      <td>{item.version}</td>
+                      <td>{item.installedVersion || '—'}</td>
+                      <td>
+                        <button
+                          className={item.action === 'installed' ? undefined : 'automation-primary'}
+                          disabled={
+                            installationPending(item) || !canManage || item.action === 'installed'
+                          }
+                          onClick={() => void install(item)}
+                        >
+                          {installationPending(item)
+                            ? t('Installing…')
+                            : {
+                                install: t('Install'),
+                                update: t('Update'),
+                                installed: t('Installed'),
+                              }[item.action]}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
           {!catalog.length && !error && (
-            <p>Não há automações disponíveis. Verifique as definições ou atualize o catálogo.</p>
+            <p className="automation-empty">
+              {t('No automations available. Check settings or refresh the catalog.')}
+            </p>
           )}
         </>
       )}
@@ -427,49 +452,66 @@ export function AutomationsModule({
         <>
           <div className="domus-metrics">
             <div>
-              Pacotes instalados<strong>{status.packages.length}</strong>
+              {t('Installed flows')}
+              <strong>{status.packages.length}</strong>
             </div>
             <div>
-              Execuções em curso<strong>{status.metrics.running}</strong>
+              {t('Running executions')}
+              <strong>{status.metrics.running}</strong>
             </div>
             <div>
-              Execuções concluídas<strong>{status.metrics.completed}</strong>
+              {t('Completed executions')}
+              <strong>{status.metrics.completed}</strong>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Automação</th>
-                <th>Estado</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {status.runs.map((run) => (
-                <tr key={run.id}>
-                  <td>{run.name}</td>
-                  <td>
-                    {run.status === 'failed'
-                      ? 'Requer revisão'
-                      : run.status === 'completed'
-                        ? 'Concluída'
-                        : run.status === 'cancelled'
-                          ? 'Cancelada'
-                          : run.status}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() =>
-                        void perform(async () => setSelected(await request<Run>('/runs/' + run.id)))
-                      }
-                    >
-                      Ver execução
-                    </button>
-                  </td>
+          <div className="automation-table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>{t('Automation')}</th>
+                  <th>{t('Status')}</th>
+                  <th>{t('Action')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {status.runs.map((run) => (
+                  <tr key={run.id}>
+                    <td>{run.name}</td>
+                    <td>
+                      <span className="automation-status" data-status={run.status}>
+                        {t(
+                          (
+                            {
+                              queued: 'Queued',
+                              running: 'Running',
+                              'awaiting-user': 'Awaiting interaction',
+                              completed: 'Completed',
+                              failed: 'Requires review',
+                              cancelled: 'Cancelled',
+                            } as Record<string, string>
+                          )[run.status] || run.status,
+                        )}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() =>
+                          void perform(async () =>
+                            setSelected(await request<Run>('/runs/' + run.id)),
+                          )
+                        }
+                      >
+                        {t('View execution')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {!status.runs.length && (
+            <p className="automation-empty">{t('No executions in this workspace yet.')}</p>
+          )}
           {selected && (
             <article className="domus-run-detail">
               <h2>{selected.name}</h2>
@@ -487,7 +529,7 @@ export function AutomationsModule({
                     })
                   }
                 >
-                  Cancelar execução
+                  {t('Cancel execution')}
                 </button>
               )}
               {!!selected.files?.length && (
@@ -501,11 +543,11 @@ export function AutomationsModule({
                   }
                 >
                   <Download size={16} aria-hidden="true" />
-                  Descarregar resultados ZIP
+                  {t('Download results ZIP')}
                 </a>
               )}
               <details>
-                <summary>Registo da execução</summary>
+                <summary>{t('Execution log')}</summary>
                 <pre>{selected.logs?.join('\n')}</pre>
               </details>
             </article>
@@ -514,6 +556,7 @@ export function AutomationsModule({
       )}
       {tab === 'Automation settings' && canManagePlatform && (
         <form
+          className="automation-panel automation-settings-panel"
           onSubmit={(event) => {
             event.preventDefault();
             void perform(async () => {
@@ -527,32 +570,33 @@ export function AutomationsModule({
             });
           }}
         >
-          <h2>Acesso às automações</h2>
+          <h2>{t('Automation access')}</h2>
           <p>
-            Configuração partilhada por toda a plataforma. O token é guardado cifrado e nunca
-            devolvido.
+            {t('Shared configuration for the platform. Tokens are encrypted and never returned.')}
           </p>
           <label>
-            Repositório GitHub
+            {t('GitHub repository')}
             <input
               required
               value={repository}
               onChange={(event) => setRepository(event.target.value)}
-              placeholder="autor/repositorio"
+              placeholder="owner/repository"
             />
           </label>
           <label>
-            Token pessoal (opcional)
+            {t('Personal token (optional)')}
             <input
               type="password"
               autoComplete="off"
               value={token}
               onChange={(event) => setToken(event.target.value)}
-              placeholder={saved ? 'Token guardado; deixe vazio para o manter' : 'github_pat_…'}
+              placeholder={saved ? t('Token saved; leave empty to keep it') : 'github_pat_…'}
             />
           </label>
           <div className="automation-settings-actions">
-            <button disabled={busy}>Guardar definições</button>
+            <button className="automation-primary" disabled={busy}>
+              {t('Save settings')}
+            </button>
             {saved && (
               <button
                 type="button"
@@ -565,7 +609,7 @@ export function AutomationsModule({
                   })
                 }
               >
-                Remover token
+                {t('Remove token')}
               </button>
             )}
           </div>

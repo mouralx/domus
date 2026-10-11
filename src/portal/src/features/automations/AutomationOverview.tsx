@@ -80,41 +80,45 @@ export function AutomationOverview({
           </div>
           <h3>{t('Recent executions')}</h3>
           {snapshot.runs.length ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>{t('Automation')}</th>
-                  <th>{t('Started')}</th>
-                  <th>{t('Status')}</th>
-                  <th>{t('Action')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {snapshot.runs.slice(0, 5).map((run) => (
-                  <tr key={run.id}>
-                    <td>{run.name}</td>
-                    <td>{new Date(run.startedAt).toLocaleString(locale)}</td>
-                    <td>
-                      {t(
-                        (
-                          {
-                            queued: 'Queued',
-                            running: 'Running',
-                            'awaiting-user': 'Awaiting interaction',
-                            completed: 'Completed',
-                            failed: 'Requires review',
-                            cancelled: 'Cancelled',
-                          } as Record<string, string>
-                        )[run.status] || run.status,
-                      )}
-                    </td>
-                    <td>
-                      <button onClick={() => onOpen(run.id)}>{t('View execution')}</button>
-                    </td>
+            <div className="automation-table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{t('Automation')}</th>
+                    <th>{t('Started')}</th>
+                    <th>{t('Status')}</th>
+                    <th>{t('Action')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {snapshot.runs.slice(0, 5).map((run) => (
+                    <tr key={run.id}>
+                      <td>{run.name}</td>
+                      <td>{new Date(run.startedAt).toLocaleString(locale)}</td>
+                      <td>
+                        <span className="automation-status" data-status={run.status}>
+                          {t(
+                            (
+                              {
+                                queued: 'Queued',
+                                running: 'Running',
+                                'awaiting-user': 'Awaiting interaction',
+                                completed: 'Completed',
+                                failed: 'Requires review',
+                                cancelled: 'Cancelled',
+                              } as Record<string, string>
+                            )[run.status] || run.status,
+                          )}
+                        </span>
+                      </td>
+                      <td>
+                        <button onClick={() => onOpen(run.id)}>{t('View execution')}</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <p>{t('No executions in this workspace yet.')}</p>
           )}

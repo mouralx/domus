@@ -1,7 +1,6 @@
 .domus-automations {
   width: 100%;
   min-width: 0;
-  overflow-x: auto;
   padding-bottom: 24px;
 }
 .domus-automations table {
@@ -45,15 +44,17 @@
   border: 1px solid var(--ui-border, #dde2e8);
   border-radius: 12px;
   margin-top: 20px;
-  max-width: 800px;
+  max-width: none;
+  background: var(--ui-surface, #fff);
+  box-shadow: var(--ui-card-shadow);
 }
 .domus-automations pre {
   white-space: pre-wrap;
   overflow: auto;
   max-height: 400px;
   padding: 18px;
-  background: #182338;
-  color: #d1ddf2;
+  background: var(--ui-background, #182338);
+  color: var(--ui-text, #d1ddf2);
 }
 .domus-automations .domus-run-detail {
   width: 100%;
@@ -225,4 +226,133 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+}
+
+.automation-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--ui-border, #dde2e8);
+  border-radius: 12px;
+  background: var(--ui-surface, #fff);
+  box-shadow: var(--ui-card-shadow);
+}
+.domus-automations th {
+  color: var(--ui-muted, #647087);
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--ui-muted, #647087) 5%, transparent);
+}
+.domus-automations tbody tr:last-child td {
+  border-bottom: 0;
+}
+.domus-automations td {
+  vertical-align: middle;
+  line-height: 1.5;
+}
+.domus-automations td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+.domus-automations td p {
+  max-width: 64ch;
+  font-size: 0.875rem;
+}
+.domus-automations button {
+  min-height: 40px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.domus-automations button:hover:not(:disabled) {
+  border-color: var(--ui-primary, #167d8d);
+  background: color-mix(in srgb, var(--ui-primary, #167d8d) 6%, var(--ui-surface, #fff));
+}
+.domus-automations button.automation-primary {
+  background: var(--ui-primary, #167d8d);
+  color: var(--ui-on-primary, #fff);
+  border-color: var(--ui-primary, #167d8d);
+}
+.domus-automations button.automation-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ui-primary, #167d8d) 90%, black);
+}
+.automation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.automation-panel > h2 {
+  margin: 0 0 12px;
+  font-size: 1.125rem;
+}
+.automation-panel > p,
+.automation-panel small {
+  color: var(--ui-muted, #647087);
+  line-height: 1.6;
+}
+.automation-settings-panel label {
+  max-width: 640px;
+}
+.domus-automations input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+}
+.domus-catalog-toolbar label {
+  flex: 1;
+  max-width: 480px;
+  font-size: 0.875rem;
+}
+.domus-metrics > div {
+  background: var(--ui-surface, #fff);
+  box-shadow: var(--ui-card-shadow);
+  border-radius: 12px;
+}
+.automation-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--ui-muted, #647087);
+  border: 1px solid var(--ui-border, #dde2e8);
+  border-radius: 12px;
+}
+.automation-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: var(--ui-muted, #647087);
+  background: color-mix(in srgb, currentColor 9%, transparent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.automation-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.automation-status[data-status='running'],
+.automation-status[data-status='completed'] {
+  color: var(--ui-primary, #167d8d);
+}
+.automation-status[data-status='failed'],
+.automation-status[data-status='awaiting-user'] {
+  color: var(--ui-warning, #b87930);
+}
+@media (max-width: 650px) {
+  .domus-automations form,
+  .domus-automations article {
+    padding: 20px;
+  }
+  .domus-catalog-toolbar {
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .domus-catalog-toolbar label {
+    flex-basis: 100%;
+    max-width: none;
+  }
 }
