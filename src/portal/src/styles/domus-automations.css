@@ -53,8 +53,9 @@
   overflow: auto;
   max-height: 400px;
   padding: 18px;
-  background: var(--ui-background, #182338);
-  color: var(--ui-text, #d1ddf2);
+  background: var(--ui-surface, #fff);
+  color: var(--ui-text, #182338);
+  border: 1px solid var(--ui-border, #dde2e8);
 }
 .domus-automations .domus-run-detail {
   width: 100%;
@@ -279,6 +280,13 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+}
+.domus-automations td .automation-actions {
+  flex-wrap: nowrap;
+  width: max-content;
+}
+.domus-automations td .automation-actions button {
+  flex-shrink: 0;
 }
 .automation-panel > h2 {
   margin: 0 0 12px;
