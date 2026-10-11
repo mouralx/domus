@@ -52,6 +52,11 @@ public sealed class SqlAiStore : IDisposable
                 await using var command = Command(connection, "INSERT INTO ai_workspaces VALUES(@workspace,@enabled,@provider) ON CONFLICT DO NOTHING", ("workspace", workspace), ("enabled", config.Enabled), ("provider", config.Provider));
                 await command.ExecuteNonQueryAsync();
             }
+            foreach (var key in legacy.UsedTransfers)
+            {
+                await using var receipt = Command(connection, "INSERT INTO ai_metadata(key,value) VALUES(@key,'legacy-transfer') ON CONFLICT DO NOTHING", ("key", key));
+                await receipt.ExecuteNonQueryAsync();
+            }
             foreach (var row in legacy.Usage) await InsertUsage(connection, row);
             await using var marker = Command(connection, "INSERT INTO ai_metadata VALUES('legacy_imported','true')");
             await marker.ExecuteNonQueryAsync();
@@ -72,7 +77,13 @@ public sealed class SqlAiStore : IDisposable
         if (!await reader.ReadAsync()) return (null, Guid.Empty);
         return (reader.IsDBNull(0) ? null : JsonSerializer.Deserialize<ChatGptConnection>(protector.CreateProtector(actor.ToString()).Unprotect(reader.GetString(0))), reader.GetGuid(1));
     }
-    public async Task SaveConnection(Guid actor, ChatGptConnection? credential, Guid expected)
+    public async Task<bool> TransferUsed(string key)
+    {
+        await using var connection = await data.OpenConnectionAsync();
+        await using var command = Command(connection, "SELECT EXISTS(SELECT 1 FROM ai_metadata WHERE key=@key)", ("key", key));
+        return (bool)(await command.ExecuteScalarAsync())!;
+    }
+    public async Task SaveConnection(Guid actor, ChatGptConnection? credential, Guid expected, string? transferKey = null)
     {
         await using var connection = await data.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
@@ -80,6 +91,11 @@ public sealed class SqlAiStore : IDisposable
         await using var read = Command(connection, "SELECT revision FROM ai_connections WHERE actor=@actor", ("actor", actor));
         var revision = (Guid?)await read.ExecuteScalarAsync() ?? Guid.Empty;
         if (revision != expected) throw new AiError(409, "A ligação mudou. Tente novamente.");
+        if (transferKey is not null)
+        {
+            await using var consume = Command(connection, "INSERT INTO ai_metadata(key,value) VALUES(@key,@actor) ON CONFLICT DO NOTHING", ("key", transferKey), ("actor", actor.ToString()));
+            if (await consume.ExecuteNonQueryAsync() != 1) throw new AiError(409, "Esta transferência já foi utilizada.");
+        }
         var encrypted = credential is null ? null : protector.CreateProtector(actor.ToString()).Protect(JsonSerializer.Serialize(credential));
         await using var save = Command(connection, "INSERT INTO ai_connections VALUES(@actor,@encrypted,@revision) ON CONFLICT(actor) DO UPDATE SET encrypted=EXCLUDED.encrypted, revision=EXCLUDED.revision", ("actor", actor), ("encrypted", encrypted), ("revision", Guid.NewGuid()));
         await save.ExecuteNonQueryAsync();

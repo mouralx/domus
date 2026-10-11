@@ -80,6 +80,8 @@ app.MapGet("/api/connection", async (HttpContext context, AiStore store, ChatGpt
     return Results.Ok(new { configured = oauth.Configured, connected = connection is not null, email = connection?.Email, model = connection?.Model ?? "", provider = "openai" });
 });
 app.MapPost("/api/connection/start", async (HttpContext context, ChatGptOAuth oauth) => Results.Ok(new { url = await oauth.Begin((Identity)context.Items["actor"]!, context) })).RequireRateLimiting("ai");
+app.MapPost("/api/connection/export", async (TransferExport input, HttpContext context, ChatGptOAuth oauth) => Results.Ok(await oauth.Export(((Identity)context.Items["actor"]!).UserId, input.Destination, context.RequestAborted))).RequireRateLimiting("ai");
+app.MapPost("/api/connection/import", async (TransferImport input, HttpContext context, ChatGptOAuth oauth) => { await oauth.Import(((Identity)context.Items["actor"]!).UserId, input, context.RequestAborted); return Results.Ok(new { connected = true }); }).RequireRateLimiting("ai");
 app.MapDelete("/api/connection", async (HttpContext context, ChatGptOAuth oauth) => { await oauth.Disconnect(((Identity)context.Items["actor"]!).UserId); return Results.Ok(new { connected = false }); });
 app.MapGet("/api/connection/models", async (HttpContext context, ChatGptOAuth oauth) => await oauth.Models(((Identity)context.Items["actor"]!).UserId, context.RequestAborted)).RequireRateLimiting("ai");
 app.MapPut("/api/connection/model", async (JsonObject input, HttpContext context, AiStore store, ChatGptOAuth oauth) =>

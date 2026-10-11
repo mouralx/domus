@@ -4,6 +4,7 @@ import { apiEnabled } from '../../infrastructure/apiClient';
 import { useI18n } from '../../shared/i18n';
 import { aiRequest, type AiModel, type Connection, type WorkspaceAi } from './aiClient';
 import './ai.css';
+import { ConnectionTransfer } from './ConnectionTransfer';
 export function AiSettings({ workspace }: { workspace: string }) {
   const { t } = useI18n();
   const [data, setData] = useState<WorkspaceAi | null>(null);
@@ -124,7 +125,7 @@ export function AiSettings({ workspace }: { workspace: string }) {
                 </button>
               </div>
             </>
-          ) : (
+          ) : connection.configured ? (
             <button
               type="button"
               className="primary"
@@ -150,14 +151,22 @@ export function AiSettings({ workspace }: { workspace: string }) {
               <Sparkles size={16} />
               {t('Continue with ChatGPT')}
             </button>
-          )}
-          {!connection.configured && (
-            <p role="status">
-              {t(
-                'ChatGPT connection requires eligible OAuth client registration for Domus. Server setup is pending.',
-              )}
-            </p>
-          )}
+          ) : null}
+          <ConnectionTransfer
+            workspace={workspace}
+            connected={connection.connected}
+            configured={connection.configured}
+            onChanged={async () => {
+              const account = await aiRequest<Connection>(workspace, '/connection');
+              setConnection(account);
+              setModel(account.model);
+              setModels(
+                account.connected
+                  ? await aiRequest<AiModel[]>(workspace, '/connection/models')
+                  : [],
+              );
+            }}
+          />
           <small>{t('Your ChatGPT plan applies. Domus has no monthly limit.')}</small>
         </section>
       )}

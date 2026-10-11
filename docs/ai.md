@@ -85,11 +85,20 @@ Tests cover personal encrypted credentials, access isolation, more than 100 requ
 
 The new image is `ghcr.io/mouralx/domus-ai`; the MCP image is `ghcr.io/mouralx/domus-mcp`. Image selection follows changed components and their build dependencies. A separate homelab Compose must add AI and MCP services, the AI database, protection-key volume and internal network configuration before using this architecture.
 
-A loopback callback reaches the computer running the browser, not a remote homelab server. The current browser flow supports local OSS testing only. Do not turn on OSS mode at a public hostname and expect a browser redirect to reach the server. OpenAI documents completing OAuth locally and securely transferring the selected registration to a self-hosted runtime; a protected import/transfer workflow is future work for Domus. Remote OSS connection will remain unavailable until that workflow is implemented. An approved registered-client deployment may instead use its exact registered callback.
+A loopback callback reaches the computer running the browser, not a remote homelab server. Local OSS sign-in is followed by the protected connection-transfer flow for self-hosted servers:
+
+1. In local AI settings, connect ChatGPT and choose a model.
+2. Expand **Move connection to another Domus**, enter the server’s HTTPS origin and choose **Export and disconnect here**.
+3. Keep the encrypted JSON download and generated transfer code separate.
+4. In the server’s AI settings, upload the protected file and enter its code within 30 minutes.
+5. The server validates the transfer destination and expiry, obtains a live refreshed grant, verifies the OpenAI-signed identity, and stores the connection encrypted for the currently authenticated Domus member. Choose a model if needed and enable workspace AI.
+
+Export clears the source connection atomically so only the destination rotates this session’s refresh tokens. Import preserves the destination host ID and records a consumed transfer ID atomically with the connection, preventing replay across Domus members. The transfer is never a model/MCP tool. Both endpoints require the normal session, workspace access, same-origin CSRF header and rate limit. No API key or monthly cap is introduced. An approved registered-client deployment can still use its exact registered callback. Existing confidential OAuth clients with a client secret are not portable through this public-client flow.
 
 ## Official references
 
 - [OpenAI — Sign in with ChatGPT quickstart](https://developers.openai.com/siwc/quickstart)
+- [OpenAI — Self-hosted VM credential transfer](https://developers.openai.com/siwc/token-sharing-open-source/self-hosted-vms)
 - [OpenAI — Open-source registration and sign-in](https://developers.openai.com/siwc/token-sharing-open-source/sign-in)
 - [OpenAI — Models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference)
 - [OpenAI — Preview limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations)

@@ -920,5 +920,22 @@
   "Team": "Equipa",
   "Open assistant": "Abrir assistente",
   "Assistant area": "Área do assistente",
-  "Cancel": "Cancelar"
+  "Cancel": "Cancelar",
+  "Move connection to another Domus": "Mover ligação para outro Domus",
+  "Import a protected connection": "Importar uma ligação protegida",
+  "This moves your ChatGPT connection. This installation disconnects; the destination manages future renewals. The file is encrypted and expires in 30 minutes.": "Esta ação move a sua ligação ChatGPT. Esta instalação desliga-se; o destino passa a gerir as renovações. O ficheiro é cifrado e expira em 30 minutos.",
+  "Connect ChatGPT in your local Domus, then export a protected connection for this installation. Upload the file and enter its separate transfer code.": "Ligue o ChatGPT no Domus local e exporte uma ligação protegida para esta instalação. Carregue o ficheiro e introduza o código de transferência separado.",
+  "Destination address": "Endereço de destino",
+  "Connection exported for {0}. Keep the code separate from the file.": "Ligação exportada para {0}. Guarde o código separado do ficheiro.",
+  "Transfer code": "Código de transferência",
+  "Transfer code copied.": "Código de transferência copiado.",
+  "Copy the transfer code from the field.": "Copie o código de transferência do campo.",
+  "Copy code": "Copiar código",
+  "Download protected file": "Descarregar ficheiro protegido",
+  "Destination Domus URL": "URL do Domus de destino",
+  "Export and disconnect here": "Exportar e desligar aqui",
+  "ChatGPT connection imported.": "Ligação ChatGPT importada.",
+  "Protected connection file": "Ficheiro de ligação protegido",
+  "Invalid protected connection file.": "Ficheiro de ligação protegido inválido.",
+  "Import ChatGPT connection": "Importar ligação ChatGPT"
 }

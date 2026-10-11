@@ -155,6 +155,7 @@ try
     Console.WriteLine("PASS: subscription Responses SSE/JSON transport, validated completion and streamed usage-limit failure.");
 }
 finally { Directory.Delete(directory, true); }
+await TransferChecks.Run();
 if (Environment.GetEnvironmentVariable("AI_TEST_POSTGRES") is { Length: > 0 } sqlConnection) await SqlStoreChecks.Run(sqlConnection);
 if (Environment.GetEnvironmentVariable("MCP_TEST_URL") is { Length: > 0 } mcpUrl) await McpClientChecks.Run(mcpUrl, Guid.Parse(Environment.GetEnvironmentVariable("MCP_TEST_WORKSPACE")!));
 sealed class StubHandler(Func<HttpRequestMessage, Task<HttpResponseMessage>> respond) : HttpMessageHandler

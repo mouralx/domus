@@ -707,11 +707,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'AI & assistants',
     en: [
       'How do I connect my AI subscription?',
-      'Open Settings → Workspace → AI settings, or AI settings from the assistant when setup is needed. Connect ChatGPT using subscription sign-in, choose a model and save it. Each member connects their own account; connections are not shared. The workspace owner enables AI for the workspace. Domus asks for no API key and sets no monthly spending limit; your subscription provider’s usage limits apply. Subscription sign-in must be configured by the installation administrator. Claude and Gemini subscription connections are not currently available.',
+      'In the local Domus, open Settings → Workspace → AI settings and Continue with ChatGPT. Choose and save a model. For a self-hosted server, expand Move connection to another Domus, enter the server’s HTTPS address and choose Export and disconnect here. Keep the downloaded encrypted file and its transfer code separate. In the server’s AI settings, use Import a protected connection, upload the file and enter the code within 30 minutes. This moves token renewals to the server and preserves its own host identity. Each member imports their own connection; the workspace owner enables AI. No API key or Domus monthly spending limit is required. Claude and Gemini subscription connections are not currently available.',
     ],
     pt: [
       'Como ligo a minha subscrição de IA?',
-      'Abra Definições → Espaço de trabalho → Definições de IA, ou as Definições de IA no assistente quando falta configurar. Ligue o ChatGPT pelo início de sessão da subscrição, escolha um modelo e guarde. Cada membro liga a própria conta; as ligações não são partilhadas. O proprietário ativa a IA no espaço. O Domus não pede chave de API nem define um limite mensal de despesa; aplicam-se os limites do fornecedor da subscrição. O administrador da instalação tem de configurar o início de sessão da subscrição. As ligações por subscrição Claude e Gemini ainda não estão disponíveis.',
+      'No Domus local, abra Definições → Espaço de trabalho → Definições de IA e Continuar com ChatGPT. Escolha e guarde um modelo. Para um servidor próprio, expanda Mover ligação para outro Domus, introduza o endereço HTTPS do servidor e escolha Exportar e desligar aqui. Guarde separadamente o ficheiro cifrado descarregado e o código de transferência. Nas definições de IA do servidor, use Importar uma ligação protegida, carregue o ficheiro e introduza o código em 30 minutos. A renovação dos tokens passa para o servidor, preservando a identidade própria dessa instalação. Cada membro importa a sua ligação; o proprietário ativa a IA no espaço. Não precisa de chave de API nem existe limite mensal de despesa no Domus. As ligações por subscrição Claude e Gemini ainda não estão disponíveis.',
     ],
   },
   {
@@ -743,11 +743,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'AI & assistants',
     en: [
       'Why is AI unavailable or a question incomplete?',
-      'Check that your ChatGPT account is connected, a model is saved and AI is enabled for this workspace. If subscription sign-in is unavailable, contact the installation administrator. Reconnect an expired connection or choose a model available to your plan. After an error or cancellation the question is restored for retry. For incomplete answers, narrow the question or choose the relevant project. New conversation starts fresh; provider limits may require waiting. Review source records before acting on an answer.',
+      'Check that your ChatGPT account is connected, a model is saved and AI is enabled for this workspace. On a self-hosted server, import a protected local connection when direct subscription sign-in is unavailable. Reconnect an expired connection or choose a model available to your plan. After an error or cancellation the question is restored for retry. For incomplete answers, narrow the question or choose the relevant project. New conversation starts fresh; provider limits may require waiting. Review source records before acting on an answer.',
     ],
     pt: [
       'Porque está a IA indisponível ou uma resposta incompleta?',
-      'Confirme que a sua conta ChatGPT está ligada, existe um modelo guardado e a IA está ativa neste espaço. Se o início de sessão da subscrição não estiver disponível, contacte o administrador da instalação. Volte a ligar uma ligação expirada ou escolha um modelo disponível no seu plano. Depois de um erro ou cancelamento, a pergunta é reposta para repetir. Para respostas incompletas, restrinja a pergunta ou escolha o projeto relevante. Nova conversa começa de novo; os limites do fornecedor podem exigir esperar. Reveja os registos de origem antes de agir sobre uma resposta.',
+      'Confirme que a sua conta ChatGPT está ligada, existe um modelo guardado e a IA está ativa neste espaço. Num servidor próprio, importe uma ligação local protegida quando o início de sessão direto da subscrição não está disponível. Volte a ligar uma ligação expirada ou escolha um modelo disponível no seu plano. Depois de um erro ou cancelamento, a pergunta é reposta para repetir. Para respostas incompletas, restrinja a pergunta ou escolha o projeto relevante. Nova conversa começa de novo; os limites do fornecedor podem exigir esperar. Reveja os registos de origem antes de agir sobre uma resposta.',
     ],
   },
   {
