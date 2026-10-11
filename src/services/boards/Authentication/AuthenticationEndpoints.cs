@@ -12,12 +12,14 @@ public static class AuthenticationEndpoints
         api.MapPost("/api/auth/register", async (Credentials input, Auth auth, HttpContext ctx) =>
         {
             var user = await auth.Register(input);
+            await auth.PrepareSession(user);
             await auth.Session(ctx, user);
             return Results.Ok(new { id = user, avatarRequired = true, twoFactorSetupRequired = true });
         }).RequireRateLimiting("auth").AllowAnonymous();
         api.MapPost("/api/auth/login", async (Credentials input, Auth auth, TwoFactor twoFactor, HttpContext ctx) =>
         {
             var user = await auth.Login(input);
+            await auth.PrepareSession(user);
             if (!await twoFactor.Login(user, input.Password, input.Code, () => auth.Session(ctx, user, twoFactorVerified: true)))
                 return Results.Ok(new { twoFactorRequired = true });
             return Results.NoContent();
@@ -70,7 +72,9 @@ public static class AuthenticationEndpoints
             var external = await ctx.AuthenticateAsync("external");
             if (!external.Succeeded || external.Principal is null)
                 throw new ApiError(401, "Sign-in failed.");
-            await auth.Session(ctx, await auth.External(provider, external.Principal));
+            var user = await auth.External(provider, external.Principal);
+            await auth.PrepareSession(user);
+            await auth.Session(ctx, user);
             await ctx.SignOutAsync("external");
             return Results.Redirect(returnUrl?.StartsWith('/') == true && !returnUrl.StartsWith("//") && !returnUrl.Contains('\\') ? returnUrl : "/");
         }).AllowAnonymous();

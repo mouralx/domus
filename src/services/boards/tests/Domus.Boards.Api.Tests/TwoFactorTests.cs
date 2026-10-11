@@ -16,6 +16,18 @@ public sealed class TwoFactorTests : IAsyncLifetime
     private readonly ApiFixture fixture = new();
     private WebApplicationFactory<Program> factory = null!;
     private readonly TestClock clock = new();
+    // Match membership's directory boundary: delivery opens an independent
+    // relational transaction, while two-factor verification locks the user row.
+    private sealed class TransactionalDirectory(BoardsDbContext db) : IIdentityDirectory
+    {
+        public Task Sync(Guid id) => Task.CompletedTask;
+        public async Task Flush(Guid id)
+        {
+            Assert.Null(db.Database.CurrentTransaction);
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            await transaction.CommitAsync();
+        }
+    }
     private sealed class TestClock : TimeProvider
     {
         public DateTimeOffset Now = new(2026, 9, 10, 12, 0, 0, TimeSpan.Zero);
@@ -28,6 +40,7 @@ public sealed class TwoFactorTests : IAsyncLifetime
         {
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(clock);
+            services.AddScoped<IIdentityDirectory, TransactionalDirectory>();
         }));
     }
     public async Task DisposeAsync() { await factory.DisposeAsync(); await fixture.DisposeAsync(); }

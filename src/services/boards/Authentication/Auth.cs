@@ -11,9 +11,12 @@ public sealed class Auth(BoardsDbContext db, WorkspaceStore? workspaces = null, 
     public static string Token() => Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
     public static string Hash(string token) => Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(token)));
     public static Guid User(HttpContext ctx) => Guid.TryParse(ctx.User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : throw new ApiError(401, "Please sign in.");
+    // Directory delivery owns its transaction. Complete it before entering the
+    // two-factor row lock; session creation must stay atomic with code consumption.
+    public Task PrepareSession(Guid user) => directory?.Flush(user) ?? Task.CompletedTask;
+
     public async Task Session(HttpContext ctx, Guid user, bool twoFactorVerified = false)
     {
-        if (directory is not null) await directory.Flush(user);
         var previous = ctx.User.FindFirstValue("sid");
         await db.Sessions.Where(x => x.Id == previous || x.ExpiresAt < DateTimeOffset.UtcNow).ExecuteDeleteAsync();
         var sid = Hash(Token());
