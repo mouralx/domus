@@ -43,6 +43,16 @@ public sealed class PlatformAdmins
 
     public async Task Initialize(IConfiguration configuration, BoardsDbContext db)
     {
+        var configuredIds = (configuration["Platform:AdminUserIds"] ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (configuredIds.Length > 0)
+        {
+            if (configuredIds.Any(value => !Guid.TryParse(value, out _))) throw new InvalidOperationException("Platform:AdminUserIds must contain existing account UUIDs.");
+            var requested = configuredIds.Select(Guid.Parse).Distinct().ToArray();
+            var existing = await db.Users.AsNoTracking().Where(user => requested.Contains(user.Id)).Select(user => user.Id).ToArrayAsync();
+            if (existing.Length != requested.Length) throw new InvalidOperationException("Every Platform:AdminUserIds entry must match an existing account.");
+            ids = existing.ToHashSet();
+            return;
+        }
         var emails = (configuration["Platform:AdminEmails"] ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(e => e.ToLowerInvariant()).Distinct().ToArray();
         var users = await db.Users.AsNoTracking().Where(u => emails.Contains(u.Email)).Select(u => new { u.Id, u.Email }).ToListAsync();
