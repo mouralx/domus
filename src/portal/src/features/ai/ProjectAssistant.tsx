@@ -1,6 +1,7 @@
 import { ArrowUpRight, MessageSquare, MessageSquarePlus, Send, Sparkles, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../../domain/models';
+import { isActivitiesProject } from '../../domain/projectRules';
 import { useI18n } from '../../shared/i18n';
 import { aiRequest, type Connection, type WorkspaceAi } from './aiClient';
 import './ai.css';
@@ -24,6 +25,7 @@ export function ProjectAssistant({
   onClose,
   onSettings,
   onCard,
+  onModeChange,
 }: {
   workspace: string;
   mode?: 'project' | 'automations';
@@ -32,6 +34,7 @@ export function ProjectAssistant({
   open: boolean;
   onClose: () => void;
   onSettings: () => void;
+  onModeChange?: (mode: 'project' | 'automations') => void;
   onCard: (id: string) => Promise<void>;
 }) {
   const { t, locale } = useI18n();
@@ -131,7 +134,13 @@ export function ProjectAssistant({
         className="modal card-drawer assistant-panel"
         role="dialog"
         aria-modal="true"
-        aria-label={t(mode === 'automations' ? 'Automation assistant' : 'Project assistant')}
+        aria-label={t(
+          onModeChange
+            ? 'Assistant'
+            : mode === 'automations'
+              ? 'Automation assistant'
+              : 'Project assistant',
+        )}
         onClick={(event) => event.stopPropagation()}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
@@ -158,12 +167,33 @@ export function ProjectAssistant({
         <div className="modal-heading assistant-heading">
           <h2>
             <Sparkles size={19} />
-            {t(mode === 'automations' ? 'Automation assistant' : 'Project assistant')}
+            {t(
+              onModeChange
+                ? 'Assistant'
+                : mode === 'automations'
+                  ? 'Automation assistant'
+                  : 'Project assistant',
+            )}
           </h2>
           <button type="button" className="icon-button" aria-label={t('Close')} onClick={onClose}>
             <X size={18} />
           </button>
         </div>
+        {onModeChange && (
+          <div className="assistant-area-switch" role="group" aria-label={t('Assistant area')}>
+            {(['project', 'automations'] as const).map((area) => (
+              <button
+                key={area}
+                type="button"
+                aria-pressed={mode === area}
+                disabled={busy}
+                onClick={() => onModeChange(area)}
+              >
+                {t(area === 'project' ? 'Projects' : 'Automations')}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="assistant-scope">
           {mode === 'project' && (
             <label>
@@ -180,7 +210,7 @@ export function ProjectAssistant({
                   .filter((project) => !project.archived)
                   .map((project) => (
                     <option key={project.id} value={project.id}>
-                      {project.name}
+                      {isActivitiesProject(project) ? t(project.name) : project.name}
                     </option>
                   ))}
               </select>

@@ -260,6 +260,7 @@ nav button.active {
 .sidebar-bottom {
   margin-top: auto;
   padding-top: 35px;
+  padding-bottom: 8px;
 }
 .upgrade-card {
   background: linear-gradient(120deg, #2e353f, #2a2f36);

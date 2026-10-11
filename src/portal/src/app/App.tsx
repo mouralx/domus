@@ -14,7 +14,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { recordChanges } from '../domain/cardHistory';
 import {
   type Definition,
@@ -53,6 +53,8 @@ export function App() {
   const [projectId, setProjectId] = useState('website');
   const [assistantMode, setAssistantMode] = useState<'project' | 'automations'>('project');
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const assistantLauncher = useRef<HTMLButtonElement>(null);
+  const [assistantProject, setAssistantProject] = useState('my-activities');
   const [page, setPage] = useState('Overview');
   const [automationRun, setAutomationRun] = useState<{ workspace: string; id: string } | null>(
     null,
@@ -680,20 +682,6 @@ export function App() {
                 <p>{isActivitiesProject(project) ? t(project.description) : project.description}</p>
               )}
             </div>
-            {apiEnabled && ['Automations', 'Catalog', 'Executions'].includes(page) && (
-              <button
-                type="button"
-                className="secondary assistant-trigger"
-                aria-expanded={assistantOpen}
-                onClick={() => {
-                  setAssistantMode('automations');
-                  setAssistantOpen(true);
-                }}
-              >
-                <Sparkles size={16} />
-                {t('Assistant')}
-              </button>
-            )}
           </div>
           {page === 'Projects' && project.archived && (
             <div className="archive-notice">
@@ -708,15 +696,6 @@ export function App() {
           {(page === 'Projects' || page === 'My tasks') && (
             <>
               <BoardToolbar
-                onAssistant={
-                  apiEnabled && page === 'Projects' && !project.archived
-                    ? () => {
-                        setAssistantMode('project');
-                        setAssistantOpen(true);
-                      }
-                    : undefined
-                }
-                assistantOpen={assistantOpen}
                 view={view}
                 setView={setView}
                 t={t}
@@ -1158,14 +1137,45 @@ export function App() {
         />
       )}
       {apiEnabled && (
+        <button
+          type="button"
+          ref={assistantLauncher}
+          className="assistant-launcher"
+          aria-label={t('Open assistant')}
+          aria-haspopup="dialog"
+          aria-expanded={assistantOpen}
+          hidden={assistantOpen}
+          title={t('Open assistant')}
+          onClick={() => {
+            setAssistantMode(
+              ['Automations', 'Catalog', 'Executions', 'Automation settings'].includes(page)
+                ? 'automations'
+                : 'project',
+            );
+            setAssistantProject(
+              !project.archived
+                ? project.id
+                : (data.projects.find((p) => !p.archived)?.id ?? 'my-activities'),
+            );
+            setAssistantOpen(true);
+          }}
+        >
+          <Sparkles size={22} aria-hidden="true" />
+        </button>
+      )}
+      {apiEnabled && (
         <ProjectAssistant
-          key={assistantMode + data.workspace.id + (assistantMode === 'project' ? project.id : '')}
+          key={assistantMode + data.workspace.id + assistantProject}
           mode={assistantMode}
           workspace={data.workspace.id}
           projects={data.projects}
-          initialProject={project.id}
+          initialProject={assistantProject}
+          onModeChange={setAssistantMode}
           open={assistantOpen}
-          onClose={() => setAssistantOpen(false)}
+          onClose={() => {
+            setAssistantOpen(false);
+            requestAnimationFrame(() => assistantLauncher.current?.focus());
+          }}
           onSettings={() => {
             setAssistantOpen(false);
             setModal('AI settings');

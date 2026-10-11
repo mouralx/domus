@@ -10,7 +10,6 @@ import {
   MoreHorizontal,
   Plus,
   SlidersHorizontal,
-  Sparkles,
   Trash2,
 } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
@@ -19,8 +18,6 @@ import { isActivitiesProject } from '../../domain/projectRules';
 import { apiEnabled } from '../../infrastructure/apiClient';
 
 type BoardToolbarProps = {
-  onAssistant?: () => void;
-  assistantOpen?: boolean;
   view: string;
   setView: React.Dispatch<React.SetStateAction<string>>;
   t: (value: unknown, ...values: unknown[]) => string;
@@ -58,8 +55,6 @@ type BoardToolbarProps = {
 };
 
 export function BoardToolbar({
-  onAssistant,
-  assistantOpen = false,
   view,
   setView,
   t,
@@ -270,17 +265,6 @@ export function BoardToolbar({
           )}
         </div>
         <span className="toolbar-divider" />
-        {onAssistant && (
-          <button
-            type="button"
-            className="secondary assistant-trigger"
-            aria-expanded={assistantOpen}
-            onClick={onAssistant}
-          >
-            <Sparkles size={16} />
-            {t('Assistant')}
-          </button>
-        )}
         <button className="primary" onClick={() => newTask()}>
           <Plus size={16} />
           {t('Add task')}

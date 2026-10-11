@@ -13,6 +13,8 @@ export const helpCategories = [
   ['Workflow & organization', 'Processo e organização'],
   ['Dashboards & exports', 'Painéis e exportações'],
   ['Links & sharing', 'Ligações e partilha'],
+  ['AI & assistants', 'IA e assistentes'],
+  ['Automations', 'Automações'],
   ['Jira synchronization', 'Sincronização Jira'],
 ];
 export const helpArticles: HelpArticle[] = [
@@ -33,11 +35,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I log out?',
-      'Choose Sign out beside Settings in the sidebar, or open your profile and choose Sign out. On a small screen, open the navigation menu or use the profile avatar in the header. You return to the sign-in screen; saved work remains available when you sign in again.',
+      'Choose Sign out at the bottom of the sidebar or open your avatar in the header and choose Sign out. On a small screen, open the navigation menu or use the avatar. You return to sign-in; saved work remains available when you return.',
     ],
     pt: [
       'Como termino a sessão?',
-      'Escolha Terminar sessão junto de Definições no menu lateral, ou abra o perfil e escolha Terminar sessão. Num ecrã pequeno, abra o menu de navegação ou use o avatar do perfil no cabeçalho. Regressa ao início de sessão; o trabalho guardado continua disponível quando voltar a entrar.',
+      'Escolha Terminar sessão no fundo do menu lateral ou abra o avatar no cabeçalho e escolha Terminar sessão. Num ecrã pequeno, abra o menu de navegação ou use o avatar. Regressa ao início de sessão; o trabalho guardado continua disponível quando voltar a entrar.',
     ],
   },
   {
@@ -45,11 +47,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I change my name, email, or profile picture?',
-      'Open your avatar in the header or your profile at the bottom of the sidebar. Edit your name or use Change photo. Your sign-in email is read-only. Preview the image, then choose Save profile. JPG, PNG, WebP, and GIF files up to 2 MB are supported. A profile photo is required for server accounts; it can be replaced, not removed. SVG uploads are available for the platform logo, not profile photos.',
+      'Open your avatar in the header. Edit your name or use Change photo, review the preview and choose Save profile. Your sign-in email is read-only. JPG, PNG, WebP and GIF up to 2 MB are supported. Server accounts require a photo, which can be replaced. SVG is supported for the platform logo.',
     ],
     pt: [
       'Como altero o nome, o email ou a fotografia de perfil?',
-      'Abra o avatar no cabeçalho ou o perfil no fundo do menu lateral. Edite o nome ou use Alterar fotografia. O email de início de sessão é apenas de leitura. Veja a pré-visualização e escolha Guardar perfil. São aceites imagens JPG, PNG, WebP e GIF até 2 MB. A fotografia é obrigatória nas contas do servidor: pode substituí-la, mas não removê-la. O carregamento de SVG está disponível para o logótipo da plataforma, não para fotografias de perfil.',
+      'Abra o avatar no cabeçalho. Edite o nome ou use Alterar fotografia, confirme a pré-visualização e escolha Guardar perfil. O email de início de sessão é apenas de leitura. São aceites JPG, PNG, WebP e GIF até 2 MB. As contas do servidor exigem uma fotografia, que pode ser substituída. O SVG é aceite para o logótipo da plataforma.',
     ],
   },
   {
@@ -81,11 +83,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I collapse the sidebar or use keyboard shortcuts?',
-      'Use the arrow on the edge of the sidebar to collapse it to icons; use it again to expand. On mobile, use the navigation button in the header. Press Ctrl+K or Command+K to focus task search. Escape closes the top dialog or the card panel.',
+      'Use the arrow at the sidebar edge to collapse it to icons or expand it. Drag that edge to resize, or double-click to fit the labels. With the resize handle focused, Left/Right adjusts width, Home collapses and End fits the text. Your width is remembered. On mobile, use the header navigation button. Ctrl+K or Command+K focuses search; Escape closes the top dialog.',
     ],
     pt: [
       'Como recolho o menu lateral ou uso atalhos de teclado?',
-      'Use a seta na margem do menu lateral para o reduzir a ícones; volte a premir para expandir. No telemóvel, use o botão de navegação no cabeçalho. Ctrl+K ou Command+K coloca o foco na pesquisa de tarefas. Escape fecha a caixa de diálogo superior ou o painel do cartão.',
+      'Use a seta na margem do menu lateral para o reduzir a ícones ou expandir. Arraste essa margem para ajustar a largura ou faça duplo clique para mostrar os textos completos. Com o foco na margem de redimensionamento, Esquerda/Direita ajusta a largura, Home recolhe e End adapta ao texto. A largura fica guardada. No telemóvel, use o botão de navegação no cabeçalho. Ctrl+K ou Command+K coloca o foco na pesquisa; Escape fecha a caixa de diálogo superior.',
     ],
   },
   {
@@ -117,11 +119,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workspaces & members',
     en: [
       'How do I change the workspace icon?',
-      'Open Settings → Workspace appearance. Choose Change icon, upload a JPG, PNG, or WebP image up to 10 MB, and review the preview. Choose Save workspace images. Remove icon restores the default after saving.',
+      'Open Settings → Workspace → Workspace appearance. Choose Change icon, upload a JPG, PNG, or WebP image up to 10 MB, and review the preview. Choose Save workspace images. Remove icon restores the default after saving.',
     ],
     pt: [
       'Como altero o ícone do espaço?',
-      'Abra Definições → Aparência do espaço de trabalho. Escolha Alterar ícone, carregue uma imagem JPG, PNG ou WebP até 10 MB e confirme a pré-visualização. Escolha Guardar imagens do espaço de trabalho. Remover ícone repõe a aparência inicial depois de guardar.',
+      'Abra Definições → Espaço de trabalho → Aparência do espaço de trabalho. Escolha Alterar ícone, carregue uma imagem JPG, PNG ou WebP até 10 MB e confirme a pré-visualização. Escolha Guardar imagens do espaço de trabalho. Remover ícone repõe a aparência inicial depois de guardar.',
     ],
   },
   {
@@ -141,11 +143,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workspaces & members',
     en: [
       'How do I add or remove workspace members?',
-      'Use Invite members, enter a name and email, and choose Add teammate. Open Members to see everyone and remove a member with confirmation. Removing someone clears their card assignments while preserving the cards. The workspace owner cannot be removed. Use Copy invitation link on the new member’s card and send it to them. They must sign in with the invited email and accept the invitation to access the workspace.',
+      'Open Members and use the + Better, together. card to invite a teammate. Enter their name and email, confirm, then copy the invitation link from their member card and send it to them. They must sign in with the invited email and accept the invitation. Invitations are not sent automatically. Remove a member from their card with confirmation: their assignments are cleared and the cards are preserved. The owner cannot be removed.',
     ],
     pt: [
       'Como adiciono ou removo membros do espaço?',
-      'Use Adicionar membros, introduza o nome e o email e confirme a adição. Abra Membros para ver a lista e remover uma pessoa mediante confirmação. A remoção limpa as atribuições dessa pessoa e preserva os cartões. O proprietário do espaço não pode ser removido. Use Copiar ligação de convite no cartão do novo membro e envie-a à pessoa. Para aceder ao espaço, tem de iniciar sessão com o email convidado e aceitar o convite.',
+      'Abra Membros e use o cartão + Melhor, em conjunto. para convidar uma pessoa. Introduza o nome e o email, confirme e copie a ligação de convite no cartão do membro para a enviar. A pessoa tem de iniciar sessão com o email convidado e aceitar o convite. Os convites não são enviados automaticamente. Remova um membro no respetivo cartão mediante confirmação: as atribuições são limpas e os cartões preservados. O proprietário não pode ser removido.',
     ],
   },
   {
@@ -177,11 +179,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Projects & personal tasks',
     en: [
       'What is the difference between My tasks and My activities?',
-      'My tasks lists cards assigned to you across all active projects in the current workspace, grouped by project by default. My activities is a permanent project for your everyday work. New cards created from My tasks go into My activities. Archived projects are excluded from My tasks.',
+      'My tasks shows cards assigned to you across active projects in this workspace. My activities is your permanent project for everyday work. Both open in Board view; use the tabs for List, Calendar or Dashboard. Cards created from My tasks go into My activities. Archived projects are excluded.',
     ],
     pt: [
       'Qual é a diferença entre As minhas tarefas e As minhas atividades?',
-      'As minhas tarefas lista os cartões atribuídos a si em todos os projetos ativos do espaço atual, agrupados por projeto por predefinição. As minhas atividades é um projeto permanente para o trabalho do dia a dia. Os novos cartões criados a partir de As minhas tarefas ficam em As minhas atividades. Os projetos arquivados não aparecem em As minhas tarefas.',
+      'As minhas tarefas mostra os cartões que lhe estão atribuídos nos projetos ativos deste espaço. As minhas atividades é o projeto permanente para o trabalho diário. Ambos abrem na vista Quadro; use os separadores para Lista, Calendário ou Painel. Os cartões criados em As minhas tarefas ficam em As minhas atividades. Os projetos arquivados são excluídos.',
     ],
   },
   {
@@ -297,11 +299,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workflow & organization',
     en: [
       'How do Board, List, and Calendar differ?',
-      'Board arranges cards in columns and swimlanes. List provides a compact view that can group cards by project, bucket, or swimlane, with counts for each group. Calendar places dated cards on their due dates; use its arrows to change month. Use the view tabs to switch.',
+      'Projects and My tasks open in Board view. Board arranges cards in columns and project swimlanes; choose Group by for Status or Bucket. List is a compact alternative with grouping controls. Calendar places dated cards on their due dates; use its arrows to change month. Dashboard shows metrics. The tabs let you switch while working.',
     ],
     pt: [
       'Qual é a diferença entre Quadro, Lista e Calendário?',
-      'Quadro organiza os cartões em colunas e faixas. Lista oferece uma vista compacta que pode agrupar por projeto, grupo ou faixa, com contagens em cada conjunto. Calendário coloca os cartões com data nos respetivos dias; use as setas para mudar de mês. Use os separadores para alternar entre vistas.',
+      'Os projetos e As minhas tarefas abrem na vista Quadro. O quadro organiza cartões em colunas e faixas dos projetos; escolha Agrupar por Estado ou Grupo. Lista é uma alternativa compacta com opções de agrupamento. Calendário coloca os cartões com data nos respetivos dias; use as setas para mudar de mês. Painel mostra métricas. Pode alternar nos separadores enquanto trabalha.',
     ],
   },
   {
@@ -309,11 +311,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workflow & organization',
     en: [
       'How do I define statuses and mark work as completed?',
-      'Open a project and choose Manage statuses. Add, rename, color, and reorder statuses, then save. Mark the statuses that represent completed work: dashboards use this setting to decide which cards are done. Move a card to a status by dragging it on a status-grouped board or editing its Status. At least one status must remain.',
+      'Open the ⋯ options beside Add task and choose Manage statuses. Add, rename, color and reorder statuses, then save. Mark the statuses that represent completed work so dashboards count cards correctly. Drag a card to a status column or edit its Status. The destination is highlighted while dragging. At least one status must remain.',
     ],
     pt: [
       'Como defino estados e marco trabalho como concluído?',
-      'Abra um projeto e escolha Gerir estados. Adicione, renomeie, altere cores e ordene os estados; depois guarde. Assinale os estados que representam trabalho concluído: os painéis usam essa definição para contar os cartões concluídos. Mova um cartão arrastando-o num quadro agrupado por estado ou editando o respetivo Estado. Tem de existir pelo menos um estado.',
+      'Abra as opções ⋯ junto de Adicionar tarefa e escolha Gerir estados. Adicione, renomeie, escolha cores e ordene os estados; guarde. Marque os estados que representam trabalho concluído para que os painéis contem os cartões corretamente. Arraste um cartão para uma coluna de estado ou edite o Estado. O destino fica realçado durante o arrasto. Tem de permanecer pelo menos um estado.',
     ],
   },
   {
@@ -321,11 +323,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workflow & organization',
     en: [
       'How do buckets work?',
-      'Choose Manage buckets in a project to add, rename, color, or reorder buckets. Buckets are shared across the workspace and are independent of status. Set a card’s bucket in its details, or group the board by Bucket and drag the card to a column. An in-use bucket must be cleared from its cards before it can be deleted.',
+      'Open ⋯ beside Add task → Manage buckets to add, rename, color or reorder groups. Buckets are shared by the workspace and independent of status. When buckets exist, cards without one move to the first bucket and no No bucket column is shown, including in My tasks. Reordering changes which bucket is first. Group the board by Bucket to drag cards between columns, or choose the bucket in card Details. Clear an in-use bucket from its cards before deleting it.',
     ],
     pt: [
       'Como funcionam os grupos?',
-      'Escolha Gerir grupos num projeto para adicionar, renomear, alterar cores ou ordenar grupos. Os grupos são partilhados no espaço e independentes do estado. Defina o grupo nos detalhes do cartão ou agrupe o quadro por Grupo e arraste o cartão para uma coluna. Antes de eliminar um grupo em uso, retire-o dos cartões.',
+      'Abra ⋯ junto de Adicionar tarefa → Gerir grupos para adicionar, renomear, escolher cores ou ordenar. Os grupos pertencem ao espaço e são independentes do estado. Quando existem grupos, os cartões sem grupo passam para o primeiro e deixa de aparecer a coluna Sem grupo, incluindo em As minhas tarefas. A ordenação define qual é o primeiro. Agrupe o quadro por Grupo para arrastar cartões entre colunas ou escolha o grupo nos Detalhes do cartão. Retire os cartões de um grupo em uso antes de o eliminar.',
     ],
   },
   {
@@ -345,11 +347,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workflow & organization',
     en: [
       'How do I add, collapse, or move cards between swimlanes?',
-      'Choose Manage swimlanes in the project. Add and name rows, then save. Rows start expanded; click a row heading to collapse or expand it. Drag cards between rows or choose a swimlane in card Details. Swimlanes belong to their project and expand again when you revisit or reload it.',
+      'Open ⋯ beside Add task → Manage swimlanes. Add, name and order rows, then save. Swimlanes belong to their project. When configured, cards without a row move to their project’s first swimlane; projects without rows receive an initial row when the workspace uses swimlanes. No unassigned row is shown on any board, including My tasks. Without swimlanes, no empty row heading is displayed. Click a heading to collapse or expand a row. Drag cards between rows or choose a row in card Details.',
     ],
     pt: [
       'Como adiciono ou recolho faixas e movo cartões entre elas?',
-      'Escolha Gerir faixas no projeto. Adicione e dê nome às linhas; depois guarde. As faixas começam expandidas; clique no cabeçalho para recolher ou expandir. Arraste cartões entre faixas ou escolha uma faixa em Detalhes. As faixas pertencem ao respetivo projeto e voltam a expandir quando o reabre ou recarrega.',
+      'Abra ⋯ junto de Adicionar tarefa → Gerir faixas. Adicione, nomeie e ordene as linhas; guarde. As faixas pertencem ao respetivo projeto. Quando estão configuradas, os cartões sem faixa passam para a primeira do seu projeto; os projetos sem faixas recebem uma linha inicial quando o espaço usa faixas. Não aparece uma linha sem faixa em nenhum quadro, incluindo As minhas tarefas. Sem faixas, não aparece um cabeçalho de linha vazio. Clique no cabeçalho para recolher ou expandir. Arraste cartões entre linhas ou escolha a faixa nos Detalhes do cartão.',
     ],
   },
   {
@@ -357,11 +359,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Workflow & organization',
     en: [
       'How do I find or filter cards?',
-      'Use header search to match card titles, IDs, or labels. Open Filter to narrow by priority, assignee, bucket, swimlane, status, or card metrics such as open, completed, and overdue. Clear filters restores the view. My tasks starts with your assignments across active projects and resets project filters when opened.',
+      'Header search matches card titles, IDs or labels. Open Filter to narrow by priority, assignee, bucket, swimlane, status or completion/overdue metrics. Click outside the filter or options menu, or press Escape, to close it. Clear filters restores the view. My tasks starts with your assignments across active projects and resets project filters when opened.',
     ],
     pt: [
       'Como encontro ou filtro cartões?',
-      'Use a pesquisa do cabeçalho para procurar títulos, identificadores ou etiquetas. Abra Filtrar para restringir por prioridade, responsável, grupo, faixa, estado ou métricas como em aberto, concluídos e em atraso. Limpar filtros repõe a vista. As minhas tarefas começa com as suas atribuições nos projetos ativos e repõe os filtros do projeto ao abrir.',
+      'A pesquisa do cabeçalho encontra títulos, IDs ou etiquetas dos cartões. Abra Filtrar para restringir por prioridade, responsável, grupo, faixa, estado ou métricas de conclusão e atraso. Clique fora do filtro ou menu de opções, ou prima Escape, para o fechar. Limpar filtros repõe a vista. As minhas tarefas começa com as suas atribuições nos projetos ativos e repõe os filtros de projeto ao abrir.',
     ],
   },
   {
@@ -369,11 +371,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Dashboards & exports',
     en: [
       'Where can I see project and workspace metrics?',
-      'Open the Dashboard tab inside a project for that project’s cards. Overview shows metrics across active projects in the current workspace. My tasks also offers a dashboard for your assignments. Click a KPI, a chart day, a status bar, or a bucket/swimlane row to inspect matching cards.',
+      'Overview is the workspace home page and shows metrics across active projects. Its Bucket and Swimlane filters sit beside the card count and Export PDF. A project’s Dashboard tab covers its cards; My tasks has a dashboard for your assignments. Click a KPI, chart day, status bar or performance row to inspect matching cards.',
     ],
     pt: [
       'Onde vejo as métricas dos projetos e do espaço?',
-      'Abra o separador Painel de um projeto para ver os respetivos cartões. Visão geral apresenta métricas dos projetos ativos do espaço atual. As minhas tarefas também tem um painel das suas atribuições. Clique num indicador, num dia do gráfico, numa barra de estado ou numa linha de grupo/faixa para ver os cartões correspondentes.',
+      'Visão geral é a página inicial do espaço e mostra métricas dos projetos ativos. Os filtros Grupo e Faixa ficam junto da contagem de cartões e de Exportar PDF. O separador Painel de um projeto cobre os seus cartões; As minhas tarefas tem um painel das suas atribuições. Clique num indicador, dia do gráfico, barra de estado ou linha de desempenho para consultar os cartões correspondentes.',
     ],
   },
   {
@@ -525,11 +527,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I customize the platform name, colors and typography?',
-      'A platform administrator opens Settings → Platform appearance. Set the name, primary and accent colors, light/dark backgrounds, panel colors, text and borders, plus sidebar background and text. Use color pickers or #RRGGBB hexadecimal values; Automatic removes an optional override. Choose the default, system, DM Sans or Manrope font, text size from 90–120%, and corner rounding from 0–16. Text colors are adjusted for readability. These controls style navigation, views, forms, dialogs and sign-in screens; status, priority, label and other content colors remain independent.',
+      'A platform administrator opens Settings → Workspace → Platform appearance. Set the name, primary and accent colors, light/dark backgrounds, panel colors, text and borders, plus sidebar background and text. Use color pickers or #RRGGBB hexadecimal values; Automatic removes an optional override. Choose the default, system, DM Sans or Manrope font, text size from 90–120%, and corner rounding from 0–16. Text colors are adjusted for readability. These controls style navigation, views, forms, dialogs and sign-in screens; status, priority, label and other content colors remain independent.',
     ],
     pt: [
       'Como personalizo o nome, as cores e a tipografia da plataforma?',
-      'Um administrador da plataforma abre Definições → Aparência da plataforma. Defina o nome, as cores principal e de destaque, fundos claros/escuros, painéis, texto e contornos, além do fundo e texto do menu lateral. Use os seletores de cor ou valores hexadecimais #RRGGBB; Automático remove uma personalização opcional. Escolha a tipografia predefinida, do sistema, DM Sans ou Manrope, o tamanho do texto entre 90–120% e o arredondamento entre 0–16. As cores do texto são ajustadas para legibilidade. Estas opções aplicam-se à navegação, vistas, formulários, diálogos e início de sessão; as cores de estados, prioridades, etiquetas e outros conteúdos permanecem independentes.',
+      'Um administrador da plataforma abre Definições → Espaço de trabalho → Aparência da plataforma. Defina o nome, as cores principal e de destaque, fundos claros/escuros, painéis, texto e contornos, além do fundo e texto do menu lateral. Use os seletores de cor ou valores hexadecimais #RRGGBB; Automático remove uma personalização opcional. Escolha a tipografia predefinida, do sistema, DM Sans ou Manrope, o tamanho do texto entre 90–120% e o arredondamento entre 0–16. As cores do texto são ajustadas para legibilidade. Estas opções aplicam-se à navegação, vistas, formulários, diálogos e início de sessão; as cores de estados, prioridades, etiquetas e outros conteúdos permanecem independentes.',
     ],
   },
   {
@@ -537,11 +539,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'Which logo formats can I upload, including SVG?',
-      'In Settings → Platform appearance, upload an Expanded sidebar logo and an optional Collapsed sidebar logo. Without a collapsed upload, the main logo is reused. Other screens and mobile navigation use the main logo. Both accept PNG, JPG, GIF, WebP or SVG up to 2 MB; SVG is converted to transparent PNG with a 1024-pixel longest edge. Turn off Show name beside logo for a centered logo without visible text. The name remains required for the browser title and accessibility. Review the preview, then Save platform appearance. Remove logo restores the built-in symbol; removing the collapsed logo restores the main-logo fallback. Workspace icons are configured separately under Workspace appearance.',
+      'In Settings → Workspace → Platform appearance, upload an Expanded sidebar logo and an optional Collapsed sidebar logo. Without a collapsed upload, the main logo is reused. Other screens and mobile navigation use the main logo. Both accept PNG, JPG, GIF, WebP or SVG up to 2 MB; SVG is converted to transparent PNG with a 1024-pixel longest edge. Turn off Show name beside logo for a centered logo without visible text. The name remains required for the browser title and accessibility. Review the preview, then Save platform appearance. Remove logo restores the built-in symbol; removing the collapsed logo restores the main-logo fallback. Workspace icons are configured separately under Workspace appearance.',
     ],
     pt: [
       'Que formatos de logótipo posso carregar, incluindo SVG?',
-      'Em Definições → Aparência da plataforma, carregue um Logótipo do menu lateral expandido e, opcionalmente, um Logótipo do menu lateral recolhido. Sem este último, é reutilizado o principal. Os outros ecrãs e a navegação móvel usam o principal. Ambos aceitam PNG, JPG, GIF, WebP ou SVG até 2 MB; o SVG é convertido para PNG transparente com 1024 píxeis no lado maior. Desative Mostrar nome junto do logótipo para um logótipo centrado sem texto visível. O nome continua obrigatório para o título do navegador e acessibilidade. Confirme a pré-visualização e escolha Guardar aparência da plataforma. Remover logótipo repõe o símbolo original; remover o recolhido repõe a utilização do principal. Os ícones e capas dos espaços configuram-se separadamente em Aparência do espaço de trabalho.',
+      'Em Definições → Espaço de trabalho → Aparência da plataforma, carregue um Logótipo do menu lateral expandido e, opcionalmente, um Logótipo do menu lateral recolhido. Sem este último, é reutilizado o principal. Os outros ecrãs e a navegação móvel usam o principal. Ambos aceitam PNG, JPG, GIF, WebP ou SVG até 2 MB; o SVG é convertido para PNG transparente com 1024 píxeis no lado maior. Desative Mostrar nome junto do logótipo para um logótipo centrado sem texto visível. O nome continua obrigatório para o título do navegador e acessibilidade. Confirme a pré-visualização e escolha Guardar aparência da plataforma. Remover logótipo repõe o símbolo original; remover o recolhido repõe a utilização do principal. Os ícones dos espaços configuram-se separadamente em Aparência do espaço de trabalho.',
     ],
   },
   {
@@ -686,6 +688,114 @@ export const helpArticles: HelpArticle[] = [
     pt: [
       'Como pauso a sincronização Jira ou altero a configuração em segurança?',
       'Desative Ativar sincronização e guarde; deixe terminar qualquer execução em curso antes de alterações importantes. Arquivar um projeto pausa execuções agendadas e manuais. Eliminar um projeto remove a ligação e associações, não os pedidos Jira, mas a eliminação é impedida se remover cartões apenas de leitura. Um token em branco preserva a credencial guardada. Depois de existirem ligações a pedidos, não pode mudar a instância Jira, edição ou projeto de destino nessa ligação. Altere JQL, mapeamentos ou direção com cuidado: a resolução de conflitos pela origem mantém-se e pausar não remove bloqueios nem ligações Abrir no Jira.',
+    ],
+  },
+  {
+    id: 'assistant',
+    category: 'AI & assistants',
+    en: [
+      'Where is the assistant and how do I send a question?',
+      'Use the sparkle button in the bottom-right corner on any platform page. The assistant opens with the current project or automation area. Switch between Projects and Automations in the window, and choose a project when needed. Enter or Send submits the question; Shift+Enter adds a line. Your question appears immediately while the assistant thinks. Cancel stops the request and restores the text; New conversation clears the current exchange. Close or Escape returns to the page.',
+    ],
+    pt: [
+      'Onde está o assistente e como envio uma pergunta?',
+      'Use o botão com brilhos no canto inferior direito de qualquer página da plataforma. O assistente abre com o projeto atual ou a área de automações. Alterne entre Projetos e Automações na janela e escolha um projeto quando necessário. Enter ou Enviar submete a pergunta; Shift+Enter acrescenta uma linha. A pergunta aparece logo na conversa enquanto o assistente pensa. Cancelar interrompe o pedido e repõe o texto; Nova conversa limpa a troca atual. Fechar ou Escape regressa à página.',
+    ],
+  },
+  {
+    id: 'ai-connection',
+    category: 'AI & assistants',
+    en: [
+      'How do I connect my AI subscription?',
+      'Open Settings → Workspace → AI settings, or AI settings from the assistant when setup is needed. Connect ChatGPT using subscription sign-in, choose a model and save it. Each member connects their own account; connections are not shared. The workspace owner enables AI for the workspace. Domus asks for no API key and sets no monthly spending limit; your subscription provider’s usage limits apply. Subscription sign-in must be configured by the installation administrator. Claude and Gemini subscription connections are not currently available.',
+    ],
+    pt: [
+      'Como ligo a minha subscrição de IA?',
+      'Abra Definições → Espaço de trabalho → Definições de IA, ou as Definições de IA no assistente quando falta configurar. Ligue o ChatGPT pelo início de sessão da subscrição, escolha um modelo e guarde. Cada membro liga a própria conta; as ligações não são partilhadas. O proprietário ativa a IA no espaço. O Domus não pede chave de API nem define um limite mensal de despesa; aplicam-se os limites do fornecedor da subscrição. O administrador da instalação tem de configurar o início de sessão da subscrição. As ligações por subscrição Claude e Gemini ainda não estão disponíveis.',
+    ],
+  },
+  {
+    id: 'ai-context',
+    category: 'AI & assistants',
+    en: [
+      'Can the assistant find all cards, logs and results?',
+      'The assistant searches the selected project and reads workspace automation data on demand. It can retrieve complete card fields, comments, checklist, attachments and history, as well as automation manifests, execution and installation history, retained logs and result files, through authenticated MCP tools. Data arrives in pages or chunks; Domus does not send every card to the model at once. A question has a bounded research budget, so an answer may be partial and should say so. Select the right project, refine the question and check source cards. Access follows your current permissions. Temporary secret execution inputs are deleted; discarded log output cannot be recovered.',
+    ],
+    pt: [
+      'O assistente encontra todos os cartões, registos e resultados?',
+      'O assistente pesquisa o projeto selecionado e consulta as automações do espaço quando precisa. Pode obter campos completos dos cartões, comentários, listas de verificação, anexos e histórico, bem como manifestos de automações, histórico de execuções e instalações, registos guardados e ficheiros de resultado, através de ferramentas MCP autenticadas. Os dados chegam em páginas ou partes; o Domus não envia todos os cartões ao modelo de uma vez. Cada pergunta tem um limite de pesquisa, pelo que uma resposta pode ser parcial e deve indicá-lo. Escolha o projeto correto, refine a pergunta e consulte os cartões de origem. O acesso segue as suas permissões atuais. Os dados secretos temporários das execuções são eliminados; a saída dos registos já descartada não pode ser recuperada.',
+    ],
+  },
+  {
+    id: 'ai-suggestions',
+    category: 'AI & assistants',
+    en: [
+      'How do I review AI suggestions for a card?',
+      'Save the card before requesting assistance. In the card’s AI controls choose Improve description, Summarize card or Generate checklist, then Generate suggestion. Review the result. Apply to draft updates only the editable draft; Save task keeps it. Dismiss ignores it. Existing checklist items are not duplicated. If the card changes, generate a fresh suggestion. The chat assistant answers questions but does not install automations, start runs or save card changes for you.',
+    ],
+    pt: [
+      'Como revejo sugestões de IA para um cartão?',
+      'Guarde o cartão antes de pedir assistência. Nos controlos de IA do cartão, escolha Melhorar descrição, Resumir cartão ou Gerar checklist e depois Gerar sugestão. Reveja o resultado. Aplicar ao rascunho altera apenas o rascunho editável; Guardar tarefa conserva a alteração. Dispensar ignora-a. Os itens existentes da lista não são duplicados. Se o cartão mudar, gere uma nova sugestão. O assistente de conversa responde a perguntas, mas não instala automações, inicia execuções nem guarda alterações nos cartões por si.',
+    ],
+  },
+  {
+    id: 'ai-troubleshooting',
+    category: 'AI & assistants',
+    en: [
+      'Why is AI unavailable or a question incomplete?',
+      'Check that your ChatGPT account is connected, a model is saved and AI is enabled for this workspace. If subscription sign-in is unavailable, contact the installation administrator. Reconnect an expired connection or choose a model available to your plan. After an error or cancellation the question is restored for retry. For incomplete answers, narrow the question or choose the relevant project. New conversation starts fresh; provider limits may require waiting. Review source records before acting on an answer.',
+    ],
+    pt: [
+      'Porque está a IA indisponível ou uma resposta incompleta?',
+      'Confirme que a sua conta ChatGPT está ligada, existe um modelo guardado e a IA está ativa neste espaço. Se o início de sessão da subscrição não estiver disponível, contacte o administrador da instalação. Volte a ligar uma ligação expirada ou escolha um modelo disponível no seu plano. Depois de um erro ou cancelamento, a pergunta é reposta para repetir. Para respostas incompletas, restrinja a pergunta ou escolha o projeto relevante. Nova conversa começa de novo; os limites do fornecedor podem exigir esperar. Reveja os registos de origem antes de agir sobre uma resposta.',
+    ],
+  },
+  {
+    id: 'automation-catalog',
+    category: 'Automations',
+    en: [
+      'How do I install several automations at once?',
+      'Open Automations → Catalog, search by name or description and choose Install or Update on each desired row. You can queue several installations without waiting for the first to finish. Each row shows its own progress or failure. The workspace owner manages installations. Refresh catalog to check available versions; a platform administrator configures the source repository in automation settings.',
+    ],
+    pt: [
+      'Como instalo várias automações em simultâneo?',
+      'Abra Automações → Catálogo, pesquise pelo nome ou descrição e escolha Instalar ou Atualizar em cada linha pretendida. Pode colocar várias instalações na fila sem esperar que a primeira termine. Cada linha mostra o próprio progresso ou erro. O proprietário do espaço gere as instalações. Atualizar catálogo consulta as versões disponíveis; um administrador da plataforma configura o repositório de origem nas definições de automações.',
+    ],
+  },
+  {
+    id: 'automation-run',
+    category: 'Automations',
+    en: [
+      'How do I execute or cancel an automation?',
+      'Open Automations → Flows and choose an installed compatible automation. Fill its required inputs, review the effects and start the execution. Executions shows status; View execution opens details. Queued means waiting, not completed. Cancel execution requests cancellation while the run is active and does not undo effects already performed. The assistant can explain installed automations and failures; starting or cancelling still uses these controls.',
+    ],
+    pt: [
+      'Como executo ou cancelo uma automação?',
+      'Abra Automações → Fluxos e escolha uma automação instalada e compatível. Preencha os dados obrigatórios, reveja os efeitos e inicie a execução. Execuções mostra o estado; Ver execução abre os detalhes. Na fila significa à espera, não concluída. Cancelar execução pede a interrupção enquanto está ativa e não desfaz efeitos já realizados. O assistente pode explicar automações instaladas e erros; iniciar ou cancelar continua a fazer-se nestes controlos.',
+    ],
+  },
+  {
+    id: 'automation-results',
+    category: 'Automations',
+    en: [
+      'Where are execution logs and ZIP results?',
+      'Open Automations → Executions → View execution. Expand Execution log to inspect the retained output. When a finished run has result files, use Download ZIP results. Failed or cancelled runs can also have useful results. The assistant can inspect authorized retained logs and result files; it cannot reconstruct deleted inputs or discarded output.',
+    ],
+    pt: [
+      'Onde vejo os registos de execução e resultados ZIP?',
+      'Abra Automações → Execuções → Ver execução. Expanda Registo da execução para consultar a saída guardada. Quando uma execução terminada tem ficheiros de resultado, use Descarregar resultados ZIP. As execuções com erro ou canceladas também podem ter resultados úteis. O assistente pode consultar registos guardados e resultados autorizados; não consegue reconstruir dados de entrada eliminados ou saída descartada.',
+    ],
+  },
+  {
+    id: 'automation-settings',
+    category: 'Automations',
+    en: [
+      'Who configures the automation catalog and repository?',
+      'A platform administrator opens Settings → Automations to configure the GitHub repository and its access credential when needed. The credential is stored protected and is never shown to the AI assistant. Workspace owners install, update or remove automation packages. Workspace members can run installed automations with valid inputs. Every request and MCP read uses your current session and workspace permissions.',
+    ],
+    pt: [
+      'Quem configura o catálogo e o repositório das automações?',
+      'Um administrador da plataforma abre Definições → Automações para configurar o repositório GitHub e a credencial de acesso quando necessária. A credencial fica protegida e nunca é mostrada ao assistente de IA. Os proprietários dos espaços instalam, atualizam ou removem os pacotes. Os membros podem executar automações instaladas com dados válidos. Cada pedido e consulta MCP usa a sua sessão e as permissões do espaço.',
     ],
   },
 ];
