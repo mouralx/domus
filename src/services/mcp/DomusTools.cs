@@ -40,6 +40,15 @@ public sealed class DomusTools(IHttpContextAccessor accessor, IConfiguration con
     public Task<string> Validate(CancellationToken ct) => Read("context?includeMetrics=false", ct);
     [McpServerTool(Name = "get_project_metrics", ReadOnly = true), Description("Read the selected project's identity, current member and exact aggregate counts across all its cards. Use for progress and count questions; no card list is loaded.")]
     public Task<string> Metrics(CancellationToken cancellationToken) => Read("context", cancellationToken);
+    [McpServerTool(Name = "list_workspace_data", ReadOnly = true), Description("Read bounded pages of projects, members, statuses, buckets, labels or swimlanes in the selected workspace. Returns the current workspace version for change_workspace_item. Offset starts at zero; limit is 1–50. Follow nextOffset. Does not load cards or disclose invitation tokens.")]
+    public Task<string> WorkspaceData(string collection, int offset, int limit, CancellationToken cancellationToken) => Send("boards", HttpMethod.Get, $"/api/domus/workspaces/{Uri.EscapeDataString(Workspace)}/data?collection={Uri.EscapeDataString(collection)}&offset={offset}&limit={limit}", null, cancellationToken);
+    [McpServerTool(Name = "change_workspace_item", ReadOnly = false, Destructive = true), Description("After explicit review, create, update or delete a workspace item. collection: tasks, projects, members, statuses, buckets, labels, swimlanes. operation: create/update/delete. id: exact item ID (member email), null for create. expectedVersion: version from list_workspace_data. fieldsJson: JSON object of changed fields only. Task fields include title, description, priority, status (name), project (ID), due (YYYY-MM-DD), bucket/swimlane (ID), labels/assignees (name arrays), comments (string array), checklist ({text,done} array). Project fields: name, description, icon, archived. Definitions: name,color,complete; swimlanes also project. Members: name,email,initials,color. IDs, audit history, roles, invitation tokens and readOnly flags are server-controlled. Use create_card for new cards. Owner permissions and stale-version checks are enforced by boards.")]
+    public Task<string> ChangeItem(string collection, string operation, string? id, long expectedVersion, string fieldsJson, CancellationToken cancellationToken)
+    {
+        if (fieldsJson.Length > 8000) throw new InvalidOperationException("Change fields are too large.");
+        var fields = JsonNode.Parse(fieldsJson)?.AsObject() ?? throw new InvalidOperationException("Invalid change fields.");
+        return Send("boards", HttpMethod.Post, $"/api/domus/workspaces/{Uri.EscapeDataString(Workspace)}/items/change", new JsonObject { ["collection"] = collection, ["operation"] = operation, ["id"] = id, ["expectedVersion"] = expectedVersion, ["fields"] = fields }, cancellationToken);
+    }
     [McpServerTool(Name = "search_cards", ReadOnly = true), Description("Search all cards in the selected project by title/description keywords and optional filters. Extract a few relevant keywords, rather than the full question. Returns a bounded page and next cursor; an empty keyword query lists cards. Follow cursors or refine the search when needed. Null filters mean unrestricted. Never assume one page is exhaustive.")]
     public Task<string> Search([Description("Title/description keywords, or null to list cards.")] string? query,
         [Description("Exact status name or null.")] string? status, [Description("High, Medium, Low, or null.")] string? priority,
@@ -60,8 +69,8 @@ public sealed class DomusTools(IHttpContextAccessor accessor, IConfiguration con
     public Task<string> CardAttachment(string cardId, Guid fileId, int offset, int length, CancellationToken cancellationToken) => Read($"cards/{Uri.EscapeDataString(cardId)}/attachments/{fileId:D}/data?offset={offset}&length={length}", cancellationToken);
 
     [McpServerTool(Name = "create_card", ReadOnly = false, Destructive = false), Description("Create a card in the selected project. Call only for an explicit, reviewed user action. Identity and audit metadata are set by boards.")]
-    public Task<string> CreateCard(string title, string description, string? status, string priority, CancellationToken cancellationToken) =>
-        Send("boards", HttpMethod.Post, $"/api/workspaces/{Uri.EscapeDataString(Workspace)}/cards", new JsonObject { ["title"] = title, ["description"] = description, ["project"] = Project, ["status"] = status, ["priority"] = priority }, cancellationToken);
+    public Task<string> CreateCard(string title, string description, string? status, string priority, string? projectId, CancellationToken cancellationToken) =>
+        Send("boards", HttpMethod.Post, $"/api/workspaces/{Uri.EscapeDataString(Workspace)}/cards", new JsonObject { ["title"] = title, ["description"] = description, ["project"] = projectId ?? (Project == "$workspace" ? "my-activities" : Project), ["status"] = status, ["priority"] = priority }, cancellationToken);
 
     [McpServerTool(Name = "get_my_profile", ReadOnly = true), Description("Read the currently authenticated member's profile and enrollment state from membership.")]
     public Task<string> Profile(CancellationToken cancellationToken) => Send("membership", HttpMethod.Get, "/api/membership/session/context", null, cancellationToken);

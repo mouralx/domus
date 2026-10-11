@@ -551,22 +551,24 @@ export function AutomationsModule({
               placeholder={saved ? 'Token guardado; deixe vazio para o manter' : 'github_pat_…'}
             />
           </label>
-          <button disabled={busy}>Guardar definições</button>
-          {saved && (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() =>
-                void perform(async () => {
-                  await request('/settings/github/remove', { method: 'POST', body: '{}' });
-                  setSaved(false);
-                  setToken('');
-                })
-              }
-            >
-              Remover token
-            </button>
-          )}
+          <div className="automation-settings-actions">
+            <button disabled={busy}>Guardar definições</button>
+            {saved && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  void perform(async () => {
+                    await request('/settings/github/remove', { method: 'POST', body: '{}' });
+                    setSaved(false);
+                    setToken('');
+                  })
+                }
+              >
+                Remover token
+              </button>
+            )}
+          </div>
         </form>
       )}
     </section>

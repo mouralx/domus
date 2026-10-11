@@ -108,16 +108,12 @@ Export clears the source connection atomically so only the destination rotates t
 
 ## Phase 2: project assistant with MCP
 
-Open a project and select **Assistant**. The assistant uses read-only MCP tools to search all authorized project cards, retrieve relevant details and query exact database metrics. It no longer loads the full workspace or depends on an initial 80-card sample. Searches return bounded cursor pages; the model can refine its query or request another page. Source references are validated against tool results and current access before returning an answer.
+Click the sparkle button in the top bar to open a small prompt. Start typing to move the draft into a conversation-only sidebar. Enter sends; Shift+Enter adds a line. The workspace assistant searches across projects and automations using authenticated MCP tools, bounded pages and exact aggregate metrics. It does not send the full workspace to the model. Source references are validated against tool results and current access.
 
-The AI API owns OAuth, configuration and usage metadata in a dedicated PostgreSQL database. A separate `mcp-server` container exposes tools and forwards reads to the domain API with the user's session and fixed project scope. No API keys or monthly caps are introduced. Conversations remain in memory and expire after 30 minutes.
+The AI API owns personal OAuth, configuration and usage metadata in its dedicated PostgreSQL database. The independent MCP server delegates each operation to its owning domain API with the current member session. No API keys or monthly caps are introduced. Conversations expire after 30 minutes.
 
-See [architecture, migration, execution bounds and verification](ai-architecture.md). Search is keyword-based on title/description; attachment contents and semantic search are not supported. Replies may be inaccurate or partial and should be checked against the source cards.
+### Reviewed workspace actions
 
-### MCP domain actions
+The assistant can prepare changes to cards, projects, members, statuses, buckets, labels, swimlanes, the current profile, automation installations/executions and AI settings. Mutation tools return a proposal rather than execute it. The conversation shows the proposed fields and a **Confirm action** button. Confirmation rechecks the current session/workspace permissions, executes the server-stored arguments once and records the result in the conversation. Proposals expire after 30 minutes and are bound to their actor, workspace and conversation. Changed workspace versions are rejected rather than overwritten. A proposal or queued automation is not completed work. Unsupported operations are reported honestly; credentials and interactive authentication are not model tools.
 
-The separate MCP server supports reads and explicit actions through boards, membership, automations and AI APIs. See [the tool catalog and permission boundary](ai-architecture.md). Chat currently uses the sixteen read tools only; writes require a client that presents an explicit review step. Automation and boards workers remain behind their domain APIs.
-
-### Automation assistant
-
-A fixed sparkle button in the bottom-right corner opens **Assistant** from every authenticated platform page. It selects the current project or automation area. The window offers Projects and Automations tabs; in Projects, choose the project to consult. Enter sends, Shift+Enter adds a line, and the question appears immediately while waiting. Cancel restores the question for retry. This conversation uses only MCP automation tools: installed packages/runs/metrics, catalog, execution details and installation status. Paginated tools expose complete manifests, all execution history, logs and result files; long text and file content can be retrieved in chunks. It has its own conversation scope, no project selector and no board search tools. Each member uses their own subscription connection and workspace AI must be enabled. Chat can explain and inspect work; installation, execution and cancellation still use the reviewed platform controls. Queued work is distinguished from completed work.
+The same conversation can inspect complete automation manifests, execution history, logs and result-file chunks. Workers stay behind their owning domain API. See [architecture, bounds and verification](ai-architecture.md).

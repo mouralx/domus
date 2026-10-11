@@ -17,6 +17,7 @@ try {
   let advertisedOrigin = origin;
   await page.route('**/ai-api/local-origin', route => route.fulfill({ json: { origin: advertisedOrigin } }));
   let generated = 0;
+  let windowActionCount = 0;
   const provider = { provider: 'openai', model: 'test-model', enabled: true, hasKey: true };
   const workspace = { configuration: { enabled: true, provider: 'openai',  }, providers: [provider], canManage: true, usage: { requests: 0, inputTokens: 0, outputTokens: 0 } };
   await page.route('**/api/**', async route => {
@@ -28,7 +29,8 @@ try {
     else if (path === '/api/platform/branding/access') body = { canManage: true };
     else if (path === '/ai-api/api/workspace') body = workspace;
     else if (path === '/ai-api/api/connection') body = { configured: true, connected: true, email: 'test@example.test', model: 'test-model', provider: 'openai' };
-    else if (path === '/ai-api/api/assistant') { const input = route.request().postDataJSON(); assert.equal(input.projectId, input.scope==='automations'?'my-activities':'project'); assert.ok(input.question); if(input.scope==='automations') return route.fulfill({json:{conversationId:'automation-session',answer:'Two automations are installed.',references:[],cardsIncluded:0,totalCards:0,model:'test-model'}}); body = { conversationId: 'session', answer: 'The project has one overdue card.', references: [{id: 'card-one', title: 'Card', project: 'project', href: '/?workspace=workspace&card=card-one'}], cardsIncluded: 1, totalCards: 2, model: 'test-model' }; }
+    else if (path === '/ai-api/api/assistant') { const input = route.request().postDataJSON(); assert.equal(input.projectId, input.scope==='automations'||input.scope==='workspace'?'my-activities':'project'); assert.ok(input.question); if(input.scope==='workspace') return route.fulfill({json:{conversationId:'workspace-session',answer:'Review the card before creating it.',references:[],cardsIncluded:0,totalCards:0,model:'test-model',actions:[{id:'action-one',tool:'create_card',arguments:{title:'Test card',description:'',priority:'Medium',status:null,projectId:'project'}}]}}); if(input.scope==='automations') return route.fulfill({json:{conversationId:'automation-session',answer:'Two automations are installed.',references:[],cardsIncluded:0,totalCards:0,model:'test-model'}}); body = { conversationId: 'session', answer: 'The project has one overdue card.', references: [{id: 'card-one', title: 'Card', project: 'project', href: '/?workspace=workspace&card=card-one'}], cardsIncluded: 1, totalCards: 2, model: 'test-model' }; }
+    else if (path === '/ai-api/api/assistant/actions/action-one') { windowActionCount++; body = {ok:true}; }
     else if (path === '/ai-api/api/connection/models') body = [{ id: 'test-model', name: 'Test model' }]; else if (path === '/ai-api/api/suggestions') {
       const request = route.request().postDataJSON(); generated++;
       assert.deepEqual(Object.keys(request).sort(), ['action', 'cardId', 'locale']);
@@ -155,38 +157,55 @@ try {
   const launcher=page.getByRole('button',{name:'Open assistant',exact:true});
   await launcher.waitFor();
   assert.deepEqual(await page.locator('.sidebar-bottom button').allTextContents(),['Help','Sign out']);
-  for (const theme of ['light','dark']) {
-    await page.evaluate(theme=>document.documentElement.setAttribute('data-theme',theme),theme);
-    const box=await launcher.boundingBox();assert.ok(box.x+box.width<=1280&&box.y+box.height<=900);assert.ok(box.width>=44&&box.height>=44);
-  }
+  assert.equal(await page.locator('.top-actions .assistant-launcher').count(),1);
+  assert.equal(await launcher.evaluate(el=>getComputedStyle(el).position==='fixed'),false);
+  assert.equal((await launcher.boundingBox()).height,(await page.locator('.language-switch').boundingBox()).height);
+  assert.equal(await page.locator('.theme-control > svg').count(),0);
+  await page.locator('.theme-menu-control .theme-icon-trigger').click();
+  assert.equal(await page.locator('.theme-menu-control .theme-icon-options button svg').count(),3);
+  await page.getByRole('button',{name:'Dark',exact:true}).click();
   await launcher.click();
-  await page.getByRole('dialog',{name:'Assistant',exact:true}).waitFor();
-  await page.getByRole('group',{name:'Assistant area'}).getByRole('button',{name:'Automations',exact:true}).click();
-  await page.getByRole('button',{name:'Which automations are installed?',exact:true}).waitFor();
-  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
-  await launcher.waitFor();await page.waitForFunction(()=>document.activeElement?.classList.contains('assistant-launcher'));assert.equal(await launcher.evaluate(el=>el===document.activeElement),true);
+  const prompt=page.getByRole('textbox',{name:'Ask the assistant',exact:true});
+  await prompt.waitFor();
+  assert.equal(await page.getByRole('dialog',{name:'Assistant',exact:true}).count(),0);
+  await prompt.focus();
+  await page.keyboard.type('Create a test card',{delay:30});
+  const dialog=page.getByRole('dialog',{name:'Assistant',exact:true});
+  await dialog.waitFor();
+  assert.equal(await dialog.locator('select').count(),0);
+  assert.equal(await dialog.locator('.assistant-area-switch,.assistant-starters,.assistant-scope').count(),0);
+  const globalComposer=dialog.getByRole('textbox',{name:'Ask the assistant',exact:true});
+  assert.equal(await globalComposer.inputValue(),'Create a test card');
+  await globalComposer.press('Enter');
+  await page.getByText('Review the card before creating it.',{exact:true}).waitFor();
+  assert.equal(windowActionCount,0,'Preparing an action must not execute it');
+  await page.getByRole('button',{name:'Confirm action',exact:true}).click();
+  await page.getByText('Action completed',{exact:true}).waitFor();
+  assert.equal(windowActionCount,1);
+  await dialog.getByRole('button',{name:'Close',exact:true}).click();
+  await page.waitForFunction(()=>document.activeElement?.classList.contains('assistant-launcher'));
   const navigation=page.getByRole('navigation',{name:'Workspace navigation'});
   await navigation.getByRole('button',{name:'Management',exact:true}).click();
   await navigation.getByRole('button',{name:'Members',exact:true}).click();await launcher.waitFor();
-  await page.getByRole('button',{name:'Help',exact:true}).click();await launcher.waitFor();
+  await page.getByRole('button',{name:'Help',exact:true}).click();
   const helpSearch=page.getByLabel('Search help');
   for (const query of ['MCP','Shift+Enter','several automations','resize','icon']) {
     await helpSearch.fill(query);assert.ok(await page.locator('.help-articles details').count()>0,'Missing help: '+query);
   }
   await helpSearch.fill('');assert.equal(await page.locator('.help-articles details').count(),65);
-  await navigation.locator('.nav-group-toggle').filter({hasText:'Automations'}).click();
-  await navigation.getByRole('button',{name:'Flows',exact:true}).click();await launcher.click();
-  await page.getByRole('button',{name:'Which automations are installed?',exact:true}).waitFor();
-  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
-  await page.setViewportSize({width:390,height:844});const mobile=await launcher.boundingBox();assert.ok(mobile.x+mobile.width<=390&&mobile.y+mobile.height<=844);
-  await launcher.click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-  await page.screenshot({path:'/private/tmp/domus-global-assistant-mobile.png',fullPage:true});
-  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+  await page.setViewportSize({width:390,height:844});
+  const mobile=await launcher.boundingBox();assert.ok(mobile.x>=0&&mobile.x+mobile.width<=390);
+  await launcher.click();await prompt.waitFor();
+  const promptBox=await prompt.boundingBox();assert.ok(promptBox.x>=0&&promptBox.x+promptBox.width<=390);
+  await prompt.focus();await page.keyboard.type('Hello',{delay:30});await dialog.waitFor();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:'/private/tmp/domus-header-assistant-mobile.png',fullPage:true});
+  await dialog.getByRole('button',{name:'Close',exact:true}).click();
   advertisedOrigin = 'https://untrusted.example';
   await page.goto(origin.replace('127.0.0.1', 'localhost'));
   await page.locator('.auth-page').waitFor();
   assert.equal(new URL(page.url()).hostname, 'localhost', 'Only same-port loopback aliases may redirect');
-  console.log('PASS: reviewed description/checklist suggestions, duplicate filtering, unsaved/stale guards, personal subscription settings without API keys/monthly limits, persistent platform assistant, area switching, focus restoration, updated help and mobile layout.');
+  console.log('PASS: reviewed description/checklist suggestions, duplicate filtering, unsaved/stale guards, personal subscription settings without API keys/monthly limits, top-bar prompt, conversation-only workspace assistant, reviewed action confirmation, theme dropdown icons, focus restoration, updated help and mobile layout.');
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');

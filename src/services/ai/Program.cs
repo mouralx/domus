@@ -19,6 +19,7 @@ var directory = builder.Configuration["AI_DATA_DIR"] ?? ".local/ai";
 builder.Services.AddDataProtection().SetApplicationName("Domus.AI").PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(directory, "keys")));
 builder.Services.AddSingleton<AiStore>();
 builder.Services.AddSingleton<AssistantConversations>();
+builder.Services.AddSingleton<AssistantActions>();
 builder.Services.AddSingleton<DomusIdentity>();
 builder.Services.AddSingleton(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false }) { Timeout = TimeSpan.FromSeconds(90) });
 builder.Services.AddSingleton<OpenAiProvider>();

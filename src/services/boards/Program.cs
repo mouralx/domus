@@ -37,6 +37,7 @@ WorkspaceEndpoints.Map(api);
 AutomationContext.Map(api);
 CardEndpoints.Map(api);
 AssistantReadEndpoints.Map(api);
+AssistantWorkspaceEndpoints.Map(api);
 CardDataEndpoints.Map(api);
 JiraEndpoints.Map(api);
 JiraHostApproval.Map(api);

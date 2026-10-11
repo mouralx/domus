@@ -937,5 +937,9 @@
   "ChatGPT connection imported.": "Ligação ChatGPT importada.",
   "Protected connection file": "Ficheiro de ligação protegido",
   "Invalid protected connection file.": "Ficheiro de ligação protegido inválido.",
-  "Import ChatGPT connection": "Importar ligação ChatGPT"
+  "Import ChatGPT connection": "Importar ligação ChatGPT",
+  "Ask the assistant": "Pergunte ao assistente",
+  "Ask the assistant…": "Pergunte ao assistente…",
+  "Confirm action": "Confirmar ação",
+  "Action completed": "Ação concluída"
 }

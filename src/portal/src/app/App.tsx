@@ -51,10 +51,21 @@ export function App() {
   const { branding } = useBranding();
   const { t, locale, setLocale } = useI18n();
   const [projectId, setProjectId] = useState('website');
-  const [assistantMode, setAssistantMode] = useState<'project' | 'automations'>('project');
+
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [assistantPromptOpen, setAssistantPromptOpen] = useState(false);
+  const [assistantDraft, setAssistantDraft] = useState('');
+  const assistantPrompt = useRef<HTMLDivElement>(null);
   const assistantLauncher = useRef<HTMLButtonElement>(null);
-  const [assistantProject, setAssistantProject] = useState('my-activities');
+
+  useEffect(() => {
+    if (!assistantPromptOpen) return;
+    const close = (event: PointerEvent) => {
+      if (!assistantPrompt.current?.contains(event.target as Node)) setAssistantPromptOpen(false);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [assistantPromptOpen]);
   const [page, setPage] = useState('Overview');
   const [automationRun, setAutomationRun] = useState<{ workspace: string; id: string } | null>(
     null,
@@ -611,6 +622,43 @@ export function App() {
             )}
           </div>
           <div className="top-actions">
+            {apiEnabled && (
+              <div ref={assistantPrompt} className="assistant-prompt-anchor">
+                <button
+                  type="button"
+                  ref={assistantLauncher}
+                  className="assistant-launcher"
+                  aria-label={t('Open assistant')}
+                  aria-haspopup="dialog"
+                  aria-expanded={assistantPromptOpen || assistantOpen}
+                  title={t('Open assistant')}
+                  onClick={() => setAssistantPromptOpen((value) => !value)}
+                >
+                  <Sparkles size={18} aria-hidden="true" />
+                </button>
+                {assistantPromptOpen && (
+                  <div className="assistant-prompt">
+                    <input
+                      autoFocus
+                      aria-label={t('Ask the assistant')}
+                      placeholder={t('Ask the assistant…')}
+                      onChange={(event) => {
+                        if (!event.target.value.trim()) return;
+                        setAssistantDraft(event.target.value);
+                        setAssistantPromptOpen(false);
+                        setAssistantOpen(true);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Escape') {
+                          setAssistantPromptOpen(false);
+                          assistantLauncher.current?.focus();
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
             <ThemeSelect compact />
             <select
               className="language-switch"
@@ -1136,41 +1184,17 @@ export function App() {
           avatar={avatar}
         />
       )}
-      {apiEnabled && (
-        <button
-          type="button"
-          ref={assistantLauncher}
-          className="assistant-launcher"
-          aria-label={t('Open assistant')}
-          aria-haspopup="dialog"
-          aria-expanded={assistantOpen}
-          hidden={assistantOpen}
-          title={t('Open assistant')}
-          onClick={() => {
-            setAssistantMode(
-              ['Automations', 'Catalog', 'Executions', 'Automation settings'].includes(page)
-                ? 'automations'
-                : 'project',
-            );
-            setAssistantProject(
-              !project.archived
-                ? project.id
-                : (data.projects.find((p) => !p.archived)?.id ?? 'my-activities'),
-            );
-            setAssistantOpen(true);
-          }}
-        >
-          <Sparkles size={22} aria-hidden="true" />
-        </button>
-      )}
+
       {apiEnabled && (
         <ProjectAssistant
-          key={assistantMode + data.workspace.id + assistantProject}
-          mode={assistantMode}
+          key={data.workspace.id}
+          mode="workspace"
+          minimal
+          initialQuestion={assistantDraft}
           workspace={data.workspace.id}
           projects={data.projects}
-          initialProject={assistantProject}
-          onModeChange={setAssistantMode}
+          initialProject="my-activities"
+          onAction={async () => setData(await repository.load())}
           open={assistantOpen}
           onClose={() => {
             setAssistantOpen(false);

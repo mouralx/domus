@@ -23,7 +23,7 @@ There is **one Compose file**, `infra/compose.yaml`. It starts ten services:
 | `boards-worker` | External synchronization for boards |
 | `automations-worker` | Queued package installation and execution |
 | `ai` | Model connections, personal OAuth, settings and assistant orchestration |
-| `mcp-server` | Independent MCP server exposing read-only domain tools |
+| `mcp-server` | Independent MCP server exposing authenticated reads and reviewed actions |
 | `postgres` | One PostgreSQL 18 instance with `membership`, `boards`, `automations` and `ai` databases |
 | `rabbitmq` | Persistent installation and execution queues |
 
@@ -153,6 +153,6 @@ The workflow uses GitHub's [run variables](https://docs.github.com/en/actions/re
 
 ## AI assistance
 
-Card suggestions and the read-only project and automation assistants use a personal ChatGPT subscription connected through OAuth in workspace AI settings. See [AI configuration and deployment](docs/ai.md) and [the separate MCP service architecture](docs/ai-architecture.md). There are no API-key fields or monthly limits. Workspace AI is disabled until enabled by its owner. For the local open-source flow, use `http://127.0.0.1:8088` and `AI_OPENAI_OAUTH_MODE=opensource`.
+Card suggestions and the workspace assistant use a personal ChatGPT subscription connected through OAuth in workspace AI settings. See [AI configuration and deployment](docs/ai.md) and [the separate MCP service architecture](docs/ai-architecture.md). There are no API-key fields or monthly limits. Workspace AI is disabled until enabled by its owner. For the local open-source flow, use `http://127.0.0.1:8088` and `AI_OPENAI_OAUTH_MODE=opensource`.
 
 See [service boundaries and identity delivery](docs/domain-boundaries.md) for domain ownership, service names and upgrade steps.

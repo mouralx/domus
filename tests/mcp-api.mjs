@@ -35,11 +35,11 @@ async function rpc(method,params={},options={}) {
 try {
   for(let i=0;i<100;i++){try{if((await fetch(origin+'/health')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
   const init=await rpc('initialize',{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'domus-tests',version:'1'}});assert.equal(init.status,200,logs);assert.ok(init.body.result.capabilities.tools);
-  const listed=await rpc('tools/list');assert.equal(listed.body.result.tools.length,23);
+  const listed=await rpc('tools/list');assert.equal(listed.body.result.tools.length,25);
   for (const name of ['get_my_profile','get_automation_status','get_automation_catalog','get_my_ai_connection','get_ai_settings']) {
     const result=await rpc('tools/call',{name,arguments:{}});assert.ok(!result.body.result.isError,name);
   }
-  const writes=[['create_card',{title:'Reviewed task',description:'Details',status:null,priority:'Medium'}],['update_my_profile',{name:'New name'}],['install_automation',{assetId:'asset'}],['start_automation_run',{packageKey:'package',values:{target:'test'}}],['cancel_automation_run',{runId:randomUUID()}],['set_workspace_ai_enabled',{enabled:true}],['set_my_ai_model',{model:'available-model'}]];
+  const writes=[['create_card',{title:'Reviewed task',description:'Details',status:null,priority:'Medium',projectId:null}],['update_my_profile',{name:'New name'}],['install_automation',{assetId:'asset'}],['start_automation_run',{packageKey:'package',values:{target:'test'}}],['cancel_automation_run',{runId:randomUUID()}],['set_workspace_ai_enabled',{enabled:true}],['set_my_ai_model',{model:'available-model'}]];
   for (const [name,args] of writes) {
     assert.equal(listed.body.result.tools.find(t=>t.name===name).annotations.readOnlyHint,false);
     const result=await rpc('tools/call',{name,arguments:args});assert.ok(!result.body.result.isError,name);
