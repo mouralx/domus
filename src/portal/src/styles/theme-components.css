@@ -282,8 +282,7 @@
     --ui-text: var(--ui-panel-text)
 }
 :is(:root, [data-platform-theme])[data-platform-theme] .kanban-column.drag-over {
-    background: var(--ui-selection);
-    outline: 2px dashed var(--ui-link)
+    background: var(--ui-selection)
 }
 :is(:root, [data-platform-theme])[data-platform-theme] .column-heading h2 {
     font-size: calc(11px * var(--ui-font-scale))

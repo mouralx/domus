@@ -113,6 +113,11 @@ try {
   const searchProject = searchState.projects[0].id;
   const template = searchState.tasks[0] ?? {description:'',status:searchState.statuses[0].name,priority:'Medium',labels:[],assignees:[],due:'',comments:[],checklist:[]};
   searchState.tasks = Array.from({length:105}, (_, index) => ({...template,id:'KB-SEARCH-'+String(index).padStart(3,'0'),project:searchProject,title:index===104?'Steering Sonae beyond the old limit':'Synthetic card '+index}));
+  searchState.tasks[104].description = 'Complete description '.repeat(450);
+  searchState.tasks[104].comments = Array.from({length:12},(_,i)=>'Comment '+i+' '+ 'full text '.repeat(70));
+  searchState.tasks[104].checklist = Array.from({length:25},(_,i)=>({text:'Checklist '+i,done:i%2===0}));
+  const uploadedResponse=await owner.api.post(`/api/workspaces/${workspace}/files`,{multipart:{file:{name:'card-note.txt',mimeType:'text/plain',buffer:Buffer.from('Complete attachment content')}}});assert.equal(uploadedResponse.status(),200);
+  const uploaded=await uploadedResponse.json();searchState.tasks[104].attachments=[uploaded];
   const seeded = await owner.api.put('/api/workspaces/' + workspace, {headers:{'If-Match':String(searchState.version)},data:searchState}); assert.equal(seeded.status(),200,await seeded.text());
   const readBase = `/api/domus/workspaces/${workspace}/projects/${searchProject}`;
   const found = await (await owner.api.get(readBase+'/cards/search?q=steering%20Sonae')).json();assert.equal(found.cards.length,1);assert.equal(found.cards[0].id,'KB-SEARCH-104');
@@ -125,6 +130,28 @@ try {
   const cardDetail = await (await owner.api.get(readBase+'/cards/KB-SEARCH-104/context')).json();assert.equal(cardDetail.id,'KB-SEARCH-104');
   assert.equal((await owner.api.get(`/api/domus/workspaces/${workspace}/projects/hidden/cards/KB-SEARCH-104/context`)).status(),404);
 
+  async function readAllCardSection(section) {
+    let itemOffset=0, items=[];
+    do {
+      let textOffset=0, text='', page;
+      do {
+        const response=await owner.api.get(readBase+'/cards/KB-SEARCH-104/data?'+new URLSearchParams({section,itemOffset,itemLimit:10,textOffset,textLength:1000}));assert.equal(response.status(),200,await response.text());
+        page=await response.json();text+=page.data;textOffset=page.nextTextOffset;
+      } while(textOffset!==null);
+      items.push(...JSON.parse(text));itemOffset=page.nextItemOffset;
+    } while(itemOffset!==null);
+    return items;
+  }
+  assert.equal((await readAllCardSection('card'))[0].description,searchState.tasks[104].description);
+  assert.deepEqual((await readAllCardSection('comments')).map(c=>c.text),searchState.tasks[104].comments);
+  assert.equal((await readAllCardSection('checklist')).length,25);
+  assert.equal((await outsider.api.get(readBase+'/cards/KB-SEARCH-104/data?section=card')).status(),404);
+  assert.equal((await owner.api.get(readBase+'/cards/KB-SEARCH-104/data?section=card&itemLimit=1000')).status(),400);
+  const completeViaMcp=await mcpCall(owner.api,'read_card_data',{cardId:'KB-SEARCH-104',section:'comments',itemOffset:10,itemLimit:10,textOffset:0,textLength:8000});assert.ok(!completeViaMcp.body.result.isError);assert.equal(JSON.parse(completeViaMcp.body.result.content[0].text).totalItems,12);
+
+  const attachments=await readAllCardSection('attachments');assert.equal(attachments[0].id,uploaded.id);
+  const attachmentResponse=await owner.api.get(readBase+`/cards/KB-SEARCH-104/attachments/${uploaded.id}/data?offset=0&length=8`);assert.equal(attachmentResponse.status(),200);const attachment=await attachmentResponse.json();assert.equal(Buffer.from(attachment.data,'base64').toString(),'Complete');assert.equal(attachment.nextOffset,8);
+  assert.equal((await owner.api.get(readBase+`/cards/KB-SEARCH-103/attachments/${uploaded.id}/data`)).status(),404);
   const cardWrite=await mcpCall(owner.api,'create_card',{title:'Reviewed MCP card',description:'Created through the boards API',status:null,priority:'Medium'});
   assert.ok(!cardWrite.body.result.isError);const mcpCard=JSON.parse(cardWrite.body.result.content[0].text);assert.equal(mcpCard.project,searchProject);
 
@@ -151,6 +178,15 @@ try {
   assert.equal(job.initiatedBy, member.userId);
   await until(async () => (await (await auto(owner.api, workspace, '/runs/' + job.id)).json()).status === 'completed');
   const detail = await (await auto(owner.api, workspace, '/runs/' + job.id)).json(); assert.ok(detail.files.length > 0);
+  const packageData=await (await auto(owner.api,workspace,'/mcp/data?kind=package&id='+encodeURIComponent(installed.key))).json();assert.equal(JSON.parse(packageData.data).manifest.name,manifest.name);
+  const logData=await (await auto(owner.api,workspace,'/mcp/data?kind=logs&id='+job.id)).json();assert.ok(JSON.parse(logData.data).some(line=>line.includes('complete')));
+  const fullLog=await (await auto(owner.api,workspace,'/mcp/data?kind=logFile&id='+job.id)).json();assert.equal(JSON.parse(fullLog.data).available,true);assert.ok(JSON.parse(fullLog.data).text.includes('complete'));
+  const results=await (await auto(owner.api,workspace,'/mcp/data?kind=files&id='+job.id)).json();const resultFile=JSON.parse(results.data).find(file=>file.name==='result.txt');assert.ok(resultFile);
+  const fileData=await (await auto(member.api,workspace,`/mcp/runs/${job.id}/files/${resultFile.id}?offset=0&length=5`)).json();assert.equal(Buffer.from(fileData.data,'base64').toString(),'DOMUS');assert.equal(fileData.nextOffset,5);
+  assert.equal((await auto(owner.api,'studio',`/mcp/data?kind=run&id=${job.id}`)).status(),404);
+  await compose('exec','-T','postgres','psql','-U','domus_automations','-d','automations','-c',`INSERT INTO executions(id,user_id,status,record) SELECT gen_random_uuid(),'${workspace}','completed',jsonb_build_object('id',gen_random_uuid(),'name','Historical fixture','status','completed','packageKey','fixture','startedAt',now()) FROM generate_series(1,120)`);
+  const oldRuns=await (await auto(owner.api,workspace,'/mcp/list?kind=runs&offset=100&limit=10')).json();assert.equal(oldRuns.items.length,10);assert.equal(oldRuns.hasMore,true);
+  await compose('exec','-T','postgres','psql','-U','domus_automations','-d','automations','-c',`DELETE FROM executions WHERE user_id='${workspace}' AND record->>'name'='Historical fixture'`);
   const download = await member.api.get('/automations-api/api/runs/' + job.id + '/results.zip?workspace=' + workspace); assert.equal(download.status(), 200); assert.equal((await download.body()).subarray(0, 2).toString(), 'PK');
   assert.equal((await outsider.api.get('/automations-api/api/runs/' + job.id + '/results.zip?workspace=' + workspace)).status(), 404);
   assert.equal((await auto(owner.api, 'studio', '/runs/' + job.id)).status(), 404, 'personal workspace must remain isolated');

@@ -709,7 +709,7 @@ h1 .title-dot:last-child {
 }
 .kanban-column.drag-over {
   background: #d2ddeb;
-  outline: 2px dashed #5f7a9d;
+  outline: none;
 }
 .column-heading {
   display: flex;

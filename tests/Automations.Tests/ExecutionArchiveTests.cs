@@ -28,4 +28,23 @@ public sealed class ExecutionArchiveTests
         }
         finally { directory.Delete(true); }
     }
+    [Fact]
+    public void McpEnumerationCanReadResultsBeyondTheUiPageLimit()
+    {
+        var directory = Directory.CreateTempSubdirectory("domus-results-test-");
+        try
+        {
+            var storage = new Storage(directory.FullName); var user = Guid.NewGuid();
+            var run = new RunRecord { Id = Guid.NewGuid(), Status = "completed" };
+            var root = Path.Combine(storage.RunDirectory(user, run.Id), "workspace");
+            Directory.CreateDirectory(root);
+            for (var i = 0; i < 10001; i++) File.WriteAllText(Path.Combine(root, $"result-{i:D5}.txt"), "");
+            var files = new ExecutionFiles(storage);
+            var last = files.Enumerate(user, run).Skip(10000).Single();
+            Assert.Equal("result-10000.txt", last.Name);
+            Assert.Equal(Path.Combine(root, last.Name), files.Resolve(user, run, last.Id));
+        }
+        finally { directory.Delete(true); }
+    }
+
 }

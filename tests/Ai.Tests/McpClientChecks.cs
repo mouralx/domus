@@ -11,7 +11,7 @@ public static class McpClientChecks
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string,string?>{["DOMUS_MCP_URL"]=url}).Build();
         await using var mcp=await DomusMcpClient.Connect(context,new(Guid.NewGuid(),workspace,false,false),"one",config,http,default);
         var tools=await mcp.Tools(default);
-        if(tools[0]?["type"]?.GetValue<string>()!="namespace"||tools[0]?["tools"]?.AsArray().Count!=10)throw new Exception("Invalid function namespace from MCP discovery.");
+        if(tools[0]?["type"]?.GetValue<string>()!="namespace"||tools[0]?["tools"]?.AsArray().Count!=AssistantReadTools.Names.Count)throw new Exception("Invalid function namespace from MCP discovery.");
         if (tools[0]!["tools"]!.AsArray().Any(t => !AssistantReadTools.Names.Contains(t!["name"]!.GetValue<string>()))) throw new Exception("Write tool leaked to assistant.");
         try { await mcp.Call("create_card", new JsonObject(), default); throw new Exception("Assistant accepted a write tool."); }
         catch (AiError) { }
@@ -21,7 +21,7 @@ public static class McpClientChecks
         if(detail["checklistDone"]?.GetValue<int>()!=3)throw new Exception("MCP SDK detail mismatch.");
         await using var automation = await DomusMcpClient.Connect(context, new(Guid.NewGuid(),workspace,false,false), "one", config, http, default, true);
         var automationTools = await automation.Tools(default);
-        if (automationTools[0]!["tools"]!.AsArray().Count != 4) throw new Exception("Invalid automation tool discovery.");
+        if (automationTools[0]!["tools"]!.AsArray().Count != AssistantReadTools.AutomationNames.Count) throw new Exception("Invalid automation tool discovery.");
         await automation.Call("get_automation_status", new JsonObject(), default);
         try { await automation.Call("search_cards", new JsonObject(), default); throw new Exception("Automation scope accepted board tools."); }
         catch (AiError) { }

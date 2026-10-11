@@ -74,7 +74,11 @@ public sealed class Database : IAsyncDisposable
         await using var reader = await cmd.ExecuteReaderAsync(); var list = new List<Package>();
         while (await reader.ReadAsync()) list.Add(new(reader.GetString(0), System.Text.Json.Nodes.JsonNode.Parse(reader.GetString(1))!.AsObject(), reader.GetString(2))); return list;
     }
-    public async Task<Package?> Package(Guid user, string key) => (await Packages(user)).FirstOrDefault(pkg => pkg.Key == key);
+    public async Task<Package?> Package(Guid user, string key)
+    {
+        await using var cmd = Source.CreateCommand("SELECT manifest::text,digest FROM packages WHERE user_id=$1 AND key=$2"); cmd.Parameters.AddWithValue(user); cmd.Parameters.AddWithValue(key);
+        await using var reader = await cmd.ExecuteReaderAsync(); return await reader.ReadAsync() ? new(key, System.Text.Json.Nodes.JsonNode.Parse(reader.GetString(0))!.AsObject(), reader.GetString(1)) : null;
+    }
     public async Task SavePackage(Guid user, Package pkg)
     {
         await using var cmd = Source.CreateCommand("INSERT INTO packages VALUES($1,$2,$3,$4) ON CONFLICT(user_id,key) DO UPDATE SET manifest=excluded.manifest");
@@ -163,6 +167,26 @@ public sealed class Database : IAsyncDisposable
     {
         await using var cmd = Source.CreateCommand("SELECT record::text FROM executions WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100"); cmd.Parameters.AddWithValue(user);
         await using var reader = await cmd.ExecuteReaderAsync(); var runs = new List<RunRecord>(); while (await reader.ReadAsync()) runs.Add(Json.Read<RunRecord>(reader.GetString(0))); return runs;
+    }
+    public async Task<object> McpCounts(Guid user)
+    {
+        await using var cmd = Source.CreateCommand("SELECT (SELECT count(*) FROM packages WHERE user_id=$1),(SELECT count(*) FROM executions WHERE user_id=$1),(SELECT count(*) FROM installations WHERE user_id=$1)"); cmd.Parameters.AddWithValue(user);
+        await using var reader = await cmd.ExecuteReaderAsync(); await reader.ReadAsync();
+        return new { packages = reader.GetInt64(0), runs = reader.GetInt64(1), installations = reader.GetInt64(2) };
+    }
+    public async Task<object> McpList(Guid user, string kind, int offset, int limit)
+    {
+        var sql = kind switch
+        {
+            "packages" => "SELECT jsonb_build_object('id',key,'name',manifest->>'name','version',manifest->>'version')::text FROM packages WHERE user_id=$1 ORDER BY key OFFSET $2 LIMIT $3",
+            "runs" => "SELECT jsonb_build_object('id',id,'name',record->>'name','status',status,'packageKey',record->>'packageKey','startedAt',record->>'startedAt')::text FROM executions WHERE user_id=$1 ORDER BY created_at DESC,id OFFSET $2 LIMIT $3",
+            "installations" => "SELECT jsonb_build_object('id',id,'status',status,'automationId',automation_id,'createdAt',created_at)::text FROM installations WHERE user_id=$1 ORDER BY created_at DESC,id OFFSET $2 LIMIT $3",
+            _ => throw new AppError(400, "Coleção inválida.")
+        };
+        await using var cmd = Source.CreateCommand(sql); cmd.Parameters.AddWithValue(user); cmd.Parameters.AddWithValue(offset); cmd.Parameters.AddWithValue(limit + 1);
+        await using var reader = await cmd.ExecuteReaderAsync(); var rows = new List<System.Text.Json.Nodes.JsonNode>();
+        while (await reader.ReadAsync()) rows.Add(System.Text.Json.Nodes.JsonNode.Parse(reader.GetString(0))!);
+        return new { items = rows.Take(limit).ToArray(), nextOffset = rows.Count > limit ? (int?)(offset + limit) : null, hasMore = rows.Count > limit };
     }
     public async Task<bool> Claim(Guid id)
     {

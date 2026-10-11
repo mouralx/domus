@@ -162,6 +162,7 @@ app.MapGet("/api/runs/{id:guid}/results.zip", async (Guid id, HttpContext contex
 });
 var workerTokenFile = Path.Combine(storage.Root,"worker-token"); Directory.CreateDirectory(storage.Root);
 try { await Storage.PrivateFile(workerTokenFile,Convert.ToHexString(RandomNumberGenerator.GetBytes(32))); } catch (IOException) when (File.Exists(workerTokenFile)) { }
+McpReadEndpoints.Map(app);
 GitHubCredentials.Map(app);
 Catalog.Map(app, database, packages, app.Services.GetRequiredService<GitHubCredentials>());
 app.MapFallback(() => Results.NotFound(new { error = "Não encontrado." }));

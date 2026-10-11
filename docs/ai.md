@@ -107,8 +107,8 @@ See [architecture, migration, execution bounds and verification](ai-architecture
 
 ### MCP domain actions
 
-The separate MCP server supports reads and explicit actions through boards, membership, automations and AI APIs. See [the tool catalog and permission boundary](ai-architecture.md). Chat currently uses the ten read tools only; writes require a client that presents an explicit review step. Automation and boards workers remain behind their domain APIs.
+The separate MCP server supports reads and explicit actions through boards, membership, automations and AI APIs. See [the tool catalog and permission boundary](ai-architecture.md). Chat currently uses the sixteen read tools only; writes require a client that presents an explicit review step. Automation and boards workers remain behind their domain APIs.
 
 ### Automation assistant
 
-Flows, Catalog and Executions expose **Assistant** for the selected workspace. This conversation uses only MCP automation tools: installed packages/runs/metrics, catalog, execution details and installation status. It has its own conversation scope, no project selector and no board search tools. Each member uses their own subscription connection and workspace AI must be enabled. Chat can explain and inspect work; installation, execution and cancellation still use the reviewed platform controls. Queued work is distinguished from completed work.
+Flows, Catalog and Executions expose **Assistant** for the selected workspace. This conversation uses only MCP automation tools: installed packages/runs/metrics, catalog, execution details and installation status. Paginated tools expose complete manifests, all execution history, logs and result files; long text and file content can be retrieved in chunks. It has its own conversation scope, no project selector and no board search tools. Each member uses their own subscription connection and workspace AI must be enabled. Chat can explain and inspect work; installation, execution and cancellation still use the reviewed platform controls. Queued work is distinguished from completed work.

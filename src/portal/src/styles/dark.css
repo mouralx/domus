@@ -183,8 +183,7 @@
     border: 1px solid #383b42
 }
 :root[data-theme="dark"] .kanban-column.drag-over {
-    background: #2c2f35;
-    outline: 2px dashed #686d78
+    background: #2c2f35
 }
 :root[data-theme="dark"] .status-icon {
     border: 1.5px solid #686d78

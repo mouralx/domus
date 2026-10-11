@@ -20,18 +20,18 @@ flowchart TB
     Automation --> AutomationDB[(Automations database)]
 ```
 
-`mcp-server` exposes 17 explicit tools through the four domain APIs. It never reads another service's database, publishes directly to the queue or forwards provider tokens. Workers are invoked through their owning domain API.
+`mcp-server` exposes 23 explicit tools through the four domain APIs. It never reads another service's database, publishes directly to the queue or forwards provider tokens. Workers are invoked through their owning domain API.
 
 | API | Read tools | Action tools |
 | --- | --- | --- |
-| boards | `search_cards`, `get_card`, `get_project_metrics` | `create_card` |
+| boards | `search_cards`, `get_card`, `read_card_data`, `read_card_attachment`, `get_project_metrics` | `create_card` |
 | membership | `get_my_profile` | `update_my_profile` |
-| automations | `get_automation_status`, `get_automation_catalog`, `get_automation_run`, `get_automation_installation` | `install_automation`, `start_automation_run`, `cancel_automation_run` |
+| automations | `get_automation_status`, `get_automation_catalog`, `get_automation_run`, `get_automation_installation`, `list_automation_data`, `read_automation_data`, `read_automation_result`, `read_automation_catalog` | `install_automation`, `start_automation_run`, `cancel_automation_run` |
 | ai | `get_ai_settings`, `get_my_ai_connection` | `set_workspace_ai_enabled`, `set_my_ai_model` |
 
-Every tool forwards the caller's session and fixed workspace scope. Card creation also fixes the selected project. The owning API rechecks authentication, permissions and input rules on each request; MCP supplies the same-origin CSRF headers for writes. A tool annotation is descriptive, not permission or user approval. MCP clients must request explicit user review before invoking actions, especially automation execution with external effects. The current chat assistant discovers only the ten allowlisted read tools and rejects action calls independently in its orchestration loop and MCP client. A reviewed chat action UI is a separate step; this change does not silently grant the model write access.
+Every tool forwards the caller's session and fixed workspace scope. Card creation also fixes the selected project. The owning API rechecks authentication, permissions and input rules on each request; MCP supplies the same-origin CSRF headers for writes. A tool annotation is descriptive, not permission or user approval. MCP clients must request explicit user review before invoking actions, especially automation execution with external effects. The current chat assistant discovers only the sixteen allowlisted read tools and rejects action calls independently in its orchestration loop and MCP client. A reviewed chat action UI is a separate step; this change does not silently grant the model write access.
 
-Action replies come from the domain API. A queued installation or execution is not a claim of completed work; use status/run reads to track its lifecycle. Tool results are capped at 64 KiB and requests at 16 KiB. Status/catalog may exceed the response cap in very large workspaces; the call fails instead of sending an unbounded result. Use a specific execution lookup when possible. Secrets, password changes and OAuth connection flows are not exposed as model tools.
+Action replies come from the domain API. A queued installation or execution is not a claim of completed work; use status/run reads to track its lifecycle. Tool results are capped at 64 KiB and requests at 16 KiB. The status tool returns metrics without loading execution logs. Complete card sections, installed manifests, execution logs, installation history and catalog details are reachable through item pages and resumable JSON text chunks. Concatenate text chunks for one unchanged page before following its next item offset. Card attachment and execution-result bytes are available in base64 chunks. Cards remain project scoped and automations workspace scoped. No 100-run history cutoff or catalog release-page cutoff applies to these reads; internal runtime files and provider credentials are excluded. If records change during pagination, restart the relevant read. Secrets, password changes and OAuth connection flows are not exposed as model tools.
 
 ## Request flow
 
@@ -76,3 +76,11 @@ The new mount must be available in the PostgreSQL container; on an old container
 - `PLAYWRIGHT_CHANNEL=chrome node tests/integration.mjs`: fresh ten-service stack, four databases, actual indexed search beyond the former 80-card sample, cursor pagination and isolated workspaces.
 
 Sources: [OpenAI subscription tool limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations), [Responses function calling](https://developers.openai.com/api/docs/guides/function-calling), [MCP C# SDK](https://github.com/modelcontextprotocol/csharp-sdk).
+
+## Complete data access
+
+`get_card` remains a small overview. `read_card_data` retrieves all scalar fields, comments, checklist, labels, assignees, attachment metadata, history entries and history changes. Each section exposes `totalItems`, `nextItemOffset`, `totalCharacters` and `nextTextOffset`; long text is resumable rather than silently omitted. Attachment bytes use `read_card_attachment`.
+
+`list_automation_data` traverses installed packages, every execution and installation attempt through owning-service SQL pages. `read_automation_data` provides manifests, execution metadata, recent log records (`logs`), the complete retained redacted execution log (`logFile`) and result-file metadata. The worker keeps 300 recent log lines in the run record and caps the persisted log at 10 MiB; MCP can retrieve every retained byte but cannot recover output already discarded by these storage limits. `read_automation_result` reads authorized result bytes; `read_automation_catalog` traverses the available catalog. These tools do not retain historical secret execution inputs: the worker deliberately deletes temporary job credentials on completion. Runtime dependencies, environment files and symlinks are excluded from results.
+
+Availability through MCP does not mean the assistant sends every record to the model. It chooses relevant reads; the per-question tool/context limits still apply, and the answer must disclose incomplete research.
