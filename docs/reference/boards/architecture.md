@@ -25,8 +25,8 @@ Views receive state and typed callbacks; the workspace shell coordinates changes
 ## Backend boundaries
 
 The API is a deployable assembly with feature folders. The separate
-`worker/Kanbada.Worker.csproj` process references it to share persistence and Jira
-synchronization logic without running HTTP endpoints. The public namespace remains `Kanbada.Api`.
+`worker/Domus.Boards.Worker.csproj` process references it to share persistence and Jira
+synchronization logic without running HTTP endpoints. The public namespace remains `Domus.Boards.Api`.
 
 - `Program.cs`: configuration entry point, middleware order, route composition, startup migration.
 - `Configuration/`: dependency injection and validated options.
@@ -44,7 +44,7 @@ synchronization logic without running HTTP endpoints. The public namespace remai
   schedules and claims connections using session advisory locks.
 - `tests/`: API integration tests with isolated database schemas.
 
-Endpoint modules translate HTTP into feature operations. `WorkspaceStore` owns the atomic workspace transaction. Validators and history generation do not know about HTTP or database connections. `WorkspaceMapper` translates the transport contract into tracked entities; `KanbadaDbContext` owns persistence configuration. `WorkspaceResolver` resolves the personal-workspace alias. `WorkspaceMetrics` executes database-side aggregates.
+Endpoint modules translate HTTP into feature operations. `WorkspaceStore` owns the atomic workspace transaction. Validators and history generation do not know about HTTP or database connections. `WorkspaceMapper` translates the transport contract into tracked entities; `BoardsDbContext` owns persistence configuration. `WorkspaceResolver` resolves the personal-workspace alias. `WorkspaceMetrics` executes database-side aggregates.
 
 File, invitation, and sharing modules use EF queries and permission checks. If these workflows grow or gain another transport, extract services/repositories alongside the feature rather than adding unrelated logic to `Program.cs` or `WorkspaceStore`.
 

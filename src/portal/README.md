@@ -1,4 +1,4 @@
-# Kanbada portal
+# Domus portal
 
 Start the whole application using the [root README](../README.md).
 

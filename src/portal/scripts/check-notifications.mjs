@@ -25,13 +25,13 @@ export async function checkNotifications(browser) {
   await page.getByLabel('Priority', { exact: true }).selectOption('Low');
   await page.getByRole('button', { name: 'Save task', exact: true }).click();
   await expect(page.locator('.unread-indicator')).toHaveCount(1);
-  const before = await page.evaluate(() => JSON.parse(localStorage.getItem('kanbada-v1')));
+  const before = await page.evaluate(() => JSON.parse(localStorage.getItem('domus-v1')));
   await page.getByRole('button', { name: 'Notifications', exact: true }).click();
   await expect(page.locator('.notification-item')).toHaveCount(1);
   await page.locator('.notification-item .icon-button').click();
   await expect(page.locator('.notification-item')).toHaveCount(0);
   await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
-  const after = await page.evaluate(() => JSON.parse(localStorage.getItem('kanbada-v1')));
+  const after = await page.evaluate(() => JSON.parse(localStorage.getItem('domus-v1')));
   assert.deepEqual(after.activity, before.activity);
   assert.deepEqual(after.tasks, before.tasks);
   assert.deepEqual(after.notifications, []);
@@ -42,7 +42,7 @@ export async function checkNotifications(browser) {
   await page.getByRole('button', { name: 'Save labels', exact: true }).click();
   await page.getByRole('button', { name: 'Notifications', exact: true }).click();
   await expect(page.locator('.notification-item')).toHaveCount(2);
-  await page.screenshot({ path: '/private/tmp/kanbada-notifications.png' });
+  await page.screenshot({ path: '/private/tmp/domus-notifications.png' });
   await page.getByRole('button', { name: 'Clear notifications', exact: true }).click();
   await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
   await page.getByLabel('Interface language').selectOption('pt-PT');

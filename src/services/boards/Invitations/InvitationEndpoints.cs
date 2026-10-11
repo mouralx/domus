@@ -1,20 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class InvitationEndpoints
 {
     public static void Map(RouteGroupBuilder api)
     {
         api = api.MapGroup("").WithTags("Invitations");
-        api.MapGet("/invitations/{token}", async (string token, KanbadaDbContext db) =>
+        api.MapGet("/invitations/{token}", async (string token, BoardsDbContext db) =>
             await (from member in db.Members
                    join workspace in db.Workspaces on member.WorkspaceId equals workspace.Id
                    where member.InviteToken == token && member.UserId == null
                    select new { workspace = workspace.Name, email = member.Email }).SingleOrDefaultAsync()
             ?? throw new ApiError(404, "Invitation unavailable."));
-        api.MapPost("/invitations/{token}/accept", async (string token, HttpContext ctx, KanbadaDbContext db) =>
+        api.MapPost("/invitations/{token}/accept", async (string token, HttpContext ctx, BoardsDbContext db) =>
         {
             await using var transaction = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead);
             var user = Auth.User(ctx);

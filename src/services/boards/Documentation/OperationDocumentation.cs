@@ -3,7 +3,7 @@ using Microsoft.OpenApi;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 /// <summary>Adds usable examples and transport semantics without coupling documentation to handlers.</summary>
 public static class OperationDocumentation
@@ -20,14 +20,14 @@ public static class OperationDocumentation
         operation.Summary = example.Summary;
         operation.OperationId ??= method.ToLowerInvariant() + Regex.Replace(path, "[^a-zA-Z0-9]", "_");
         operation.Description = example.Description + "\n\n### Example request\n```http\n" + method + " " + example.ExampleUrl
-            + (mutation ? "\nX-Kanbada-Request: 1" : "")
+            + (mutation ? "\nX-Domus-Request: 1" : "")
             + (workspaceVersion ? "\nIf-Match: 1" : "")
             + "\n```\n"
             + (example.Request is null ? "This request has no body. Use the path/query examples above." : "Use the request-body examples below. Values are illustrative; replace IDs, tokens, and identities with values returned by your API.");
 
         operation.Parameters ??= [];
         if (mutation)
-            operation.Parameters.Add(Parameter("X-Kanbada-Request", ParameterLocation.Header, "Required same-origin mutation marker; not an authentication token.", "1", required: true));
+            operation.Parameters.Add(Parameter("X-Domus-Request", ParameterLocation.Header, "Required same-origin mutation marker; not an authentication token.", "1", required: true));
         if (workspaceVersion)
             operation.Parameters.Add(Parameter("If-Match", ParameterLocation.Header, "Version from the last workspace GET. Missing=428; stale=409. Reconcile changes instead of blindly retrying.", "1", required: true));
 
@@ -63,13 +63,13 @@ public static class OperationDocumentation
         "provider" => ("google", "External provider: google or microsoft. Both client ID and client secret must be configured."),
         "returnUrl" => ("/", "Local portal path after sign-in. For example /?workspace=studio&card=KB-A1B2C3D4. External destinations are rejected in favor of /."),
         "project" => ("my-activities", "Optional exact project ID. Omit for all active projects."),
-        "projectId" => ("my-activities", "Exact Kanbada project ID in this workspace."),
+        "projectId" => ("my-activities", "Exact Domus project ID in this workspace."),
         "linkId" => ("73716be0-a56b-4589-a5f6-2bf96a531132", "Pending synchronization link UUID from connection.problems, not a Jira issue ID."),
         "bucket" => ("Discovery", "Optional exact stored bucket name. Omit for all buckets."),
         "swimlane" => ("Research", "Optional exact stored swimlane name; combine with project to disambiguate. Omit for all swimlanes."),
         "collection" => ("tasks", "One of projects, tasks, members, statuses, buckets, labels, swimlanes, notifications, activity. Responses below include examples of every collection."),
         "If-Match" => ("1", "Version from your latest workspace GET (not a fixed constant). Missing=428; stale=409."),
-        "X-Kanbada-Request" => ("1", "Required custom header on every mutation. Cookies provide authentication."),
+        "X-Domus-Request" => ("1", "Required custom header on every mutation. Cookies provide authentication."),
         _ => throw new InvalidOperationException("Add a parameter example for " + name)
     };
 

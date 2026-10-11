@@ -17,7 +17,7 @@ export const avatarPhoto =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAO0lEQVR4AezXwQkAMAgDwOIw3bV7dS8dwacgF8g/3C9x38/JxhmOAQQIECBAgAABAgQIECBAYL9Ad74LAAD//6p1CZ0AAAAGSURBVAMAUaROge/nJygAAAAASUVORK5CYII=';
 
 export async function enrollApiAccount(request, password) {
-  const headers = { 'X-Kanbada-Request': '1' };
+  const headers = { 'X-Domus-Request': '1' };
   const avatar = await request.post('http://localhost:4173/api/auth/avatar', {
     headers,
     data: { photo: avatarPhoto },

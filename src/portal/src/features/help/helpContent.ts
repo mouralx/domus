@@ -57,11 +57,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I switch between Light, Dark, and System?',
-      'Use the theme selector in the header, in Settings, or on the sign-in screen. Light and Dark stay fixed. System follows your device appearance, including changes while Kanbada is open. Your choice is remembered across reloads.',
+      'Use the theme selector in the header, in Settings, or on the sign-in screen. Light and Dark stay fixed. System follows your device appearance, including changes while Domus is open. Your choice is remembered across reloads.',
     ],
     pt: [
       'Como alterno entre Claro, Escuro e Sistema?',
-      'Use o seletor de tema no cabeçalho, em Definições ou no ecrã de início de sessão. Claro e Escuro mantêm-se fixos. Sistema acompanha a aparência do dispositivo, incluindo alterações enquanto o Kanbada está aberto. A escolha é guardada ao recarregar.',
+      'Use o seletor de tema no cabeçalho, em Definições ou no ecrã de início de sessão. Claro e Escuro mantêm-se fixos. Sistema acompanha a aparência do dispositivo, incluindo alterações enquanto o Domus está aberto. A escolha é guardada ao recarregar.',
     ],
   },
   {
@@ -69,11 +69,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I change the language?',
-      'Select EN or PT in the header for English (United States) or Portuguese (Portugal). Kanbada remembers the choice. Interface text and dates change language; names and descriptions you write stay as entered.',
+      'Select EN or PT in the header for English (United States) or Portuguese (Portugal). Domus remembers the choice. Interface text and dates change language; names and descriptions you write stay as entered.',
     ],
     pt: [
       'Como altero o idioma?',
-      'Selecione EN ou PT no cabeçalho para inglês dos Estados Unidos ou português de Portugal. O Kanbada guarda a escolha. Os textos da interface e as datas mudam de idioma; os nomes e as descrições que escreveu mantêm-se.',
+      'Selecione EN ou PT no cabeçalho para inglês dos Estados Unidos ou português de Portugal. O Domus guarda a escolha. Os textos da interface e as datas mudam de idioma; os nomes e as descrições que escreveu mantêm-se.',
     ],
   },
   {
@@ -116,12 +116,12 @@ export const helpArticles: HelpArticle[] = [
     id: 'workspace-images',
     category: 'Workspaces & members',
     en: [
-      'How do I change the workspace icon and banner?',
-      'Open Settings → Workspace appearance. Choose Change icon or Change banner, upload a JPG, PNG, or WebP image up to 10 MB, and review the preview. Adjust Banner position if needed, then Save workspace images. Remove icon or Remove banner restores the default after saving.',
+      'How do I change the workspace icon?',
+      'Open Settings → Workspace appearance. Choose Change icon, upload a JPG, PNG, or WebP image up to 10 MB, and review the preview. Choose Save workspace images. Remove icon restores the default after saving.',
     ],
     pt: [
-      'Como altero o ícone e a imagem de capa do espaço?',
-      'Abra Definições → Aparência do espaço de trabalho. Escolha Alterar ícone ou Alterar imagem de capa, carregue uma imagem JPG, PNG ou WebP até 10 MB e confirme a pré-visualização. Ajuste a posição da imagem de capa se necessário e escolha Guardar imagens do espaço de trabalho. Remover ícone ou Remover imagem de capa repõe a aparência inicial depois de guardar.',
+      'Como altero o ícone do espaço?',
+      'Abra Definições → Aparência do espaço de trabalho. Escolha Alterar ícone, carregue uma imagem JPG, PNG ou WebP até 10 MB e confirme a pré-visualização. Escolha Guardar imagens do espaço de trabalho. Remover ícone repõe a aparência inicial depois de guardar.',
     ],
   },
   {
@@ -465,11 +465,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Links & sharing',
     en: [
       'Why can’t someone open my shared card?',
-      'Check that the link has not expired or been revoked, the card still exists, and the person is signed in with an allowed account. The link must point to a server the recipient can reach. A localhost address only works on the computer running Kanbada; use your deployed application address for other devices.',
+      'Check that the link has not expired or been revoked, the card still exists, and the person is signed in with an allowed account. The link must point to a server the recipient can reach. A localhost address only works on the computer running Domus; use your deployed application address for other devices.',
     ],
     pt: [
       'Porque não consegue alguém abrir o meu cartão partilhado?',
-      'Verifique se a ligação não expirou nem foi revogada, se o cartão existe e se a pessoa iniciou sessão com uma conta permitida. A ligação deve apontar para um servidor acessível ao destinatário. Um endereço localhost só funciona no computador que executa o Kanbada; use o endereço da aplicação publicada para outros dispositivos.',
+      'Verifique se a ligação não expirou nem foi revogada, se o cartão existe e se a pessoa iniciou sessão com uma conta permitida. A ligação deve apontar para um servidor acessível ao destinatário. Um endereço localhost só funciona no computador que executa o Domus; use o endereço da aplicação publicada para outros dispositivos.',
     ],
   },
   {
@@ -513,11 +513,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'How do I change my password?',
-      'Open Profile → Change password. Enter your current password, a new password of 12–200 characters, its confirmation, and an authenticator or recovery code. Save new password keeps your current session and signs out your other sessions. Google-only or Microsoft-only accounts manage their password with that provider. There is no email-based Forgot password flow in Kanbada; changing a password here requires the current password and second factor.',
+      'Open Profile → Change password. Enter your current password, a new password of 12–200 characters, its confirmation, and an authenticator or recovery code. Save new password keeps your current session and signs out your other sessions. Google-only or Microsoft-only accounts manage their password with that provider. There is no email-based Forgot password flow in Domus; changing a password here requires the current password and second factor.',
     ],
     pt: [
       'Como altero a palavra-passe?',
-      'Abra Perfil → Alterar palavra-passe. Introduza a palavra-passe atual, uma nova de 12–200 caracteres, a confirmação e um código do autenticador ou de recuperação. Guardar nova palavra-passe mantém a sessão atual e termina as restantes sessões. As contas exclusivamente Google ou Microsoft gerem a palavra-passe nesse fornecedor. O Kanbada não tem recuperação de palavra-passe por email; a alteração aqui exige a palavra-passe atual e o segundo fator.',
+      'Abra Perfil → Alterar palavra-passe. Introduza a palavra-passe atual, uma nova de 12–200 caracteres, a confirmação e um código do autenticador ou de recuperação. Guardar nova palavra-passe mantém a sessão atual e termina as restantes sessões. As contas exclusivamente Google ou Microsoft gerem a palavra-passe nesse fornecedor. O Domus não tem recuperação de palavra-passe por email; a alteração aqui exige a palavra-passe atual e o segundo fator.',
     ],
   },
   {
@@ -537,7 +537,7 @@ export const helpArticles: HelpArticle[] = [
     category: 'Account & appearance',
     en: [
       'Which logo formats can I upload, including SVG?',
-      'In Settings → Platform appearance, upload an Expanded sidebar logo and an optional Collapsed sidebar logo. Without a collapsed upload, the main logo is reused. Other screens and mobile navigation use the main logo. Both accept PNG, JPG, GIF, WebP or SVG up to 2 MB; SVG is converted to transparent PNG with a 1024-pixel longest edge. Turn off Show name beside logo for a centered logo without visible text. The name remains required for the browser title and accessibility. Review the preview, then Save platform appearance. Remove logo restores the built-in symbol; removing the collapsed logo restores the main-logo fallback. Workspace icons and banners are configured separately under Workspace appearance.',
+      'In Settings → Platform appearance, upload an Expanded sidebar logo and an optional Collapsed sidebar logo. Without a collapsed upload, the main logo is reused. Other screens and mobile navigation use the main logo. Both accept PNG, JPG, GIF, WebP or SVG up to 2 MB; SVG is converted to transparent PNG with a 1024-pixel longest edge. Turn off Show name beside logo for a centered logo without visible text. The name remains required for the browser title and accessibility. Review the preview, then Save platform appearance. Remove logo restores the built-in symbol; removing the collapsed logo restores the main-logo fallback. Workspace icons are configured separately under Workspace appearance.',
     ],
     pt: [
       'Que formatos de logótipo posso carregar, incluindo SVG?',
@@ -597,11 +597,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Jira synchronization',
     en: [
       'What do the three synchronization directions do?',
-      'Jira to Kanbada imports matching issues and updates linked cards without writing to Jira. Kanbada to Jira creates issues for unlinked project cards and updates linked issues within the JQL scope, without importing unrelated Jira issues. Bidirectional creates missing counterparts and propagates changes from either side. If both sides changed, the original creation system wins for synchronized fields: Jira for imports, Kanbada for exports. Cards are not matched by title. Assignees, when enabled, always flow only from Jira. Deletions never propagate in either direction.',
+      'Jira to Domus imports matching issues and updates linked cards without writing to Jira. Domus to Jira creates issues for unlinked project cards and updates linked issues within the JQL scope, without importing unrelated Jira issues. Bidirectional creates missing counterparts and propagates changes from either side. If both sides changed, the original creation system wins for synchronized fields: Jira for imports, Domus for exports. Cards are not matched by title. Assignees, when enabled, always flow only from Jira. Deletions never propagate in either direction.',
     ],
     pt: [
       'O que fazem as três direções de sincronização?',
-      'Jira para Kanbada importa pedidos correspondentes e atualiza cartões ligados sem escrever no Jira. Kanbada para Jira cria pedidos para cartões do projeto ainda sem ligação e atualiza pedidos ligados abrangidos pela JQL, sem importar outros pedidos Jira. Bidirecional cria os elementos em falta e transmite alterações de ambos os lados. Se ambos mudarem, o sistema de criação original prevalece nos campos sincronizados: Jira nas importações, Kanbada nas exportações. Os cartões não são associados pelo título. Os responsáveis, quando ativados, vêm sempre apenas do Jira. As eliminações nunca são propagadas em qualquer direção.',
+      'Jira para Domus importa pedidos correspondentes e atualiza cartões ligados sem escrever no Jira. Domus para Jira cria pedidos para cartões do projeto ainda sem ligação e atualiza pedidos ligados abrangidos pela JQL, sem importar outros pedidos Jira. Bidirecional cria os elementos em falta e transmite alterações de ambos os lados. Se ambos mudarem, o sistema de criação original prevalece nos campos sincronizados: Jira nas importações, Domus nas exportações. Os cartões não são associados pelo título. Os responsáveis, quando ativados, vêm sempre apenas do Jira. As eliminações nunca são propagadas em qualquer direção.',
     ],
   },
   {
@@ -620,12 +620,12 @@ export const helpArticles: HelpArticle[] = [
     id: 'jira-status-mapping',
     category: 'Jira synchronization',
     en: [
-      'How do I map several Jira statuses to one Kanbada status?',
-      'Test connection and load mappings populates dropdowns with Jira names; saved connections load them automatically. Under Status mapping, choose the matching Jira status and use Add Jira status for additional states that should share a Kanbada status. Each Jira status belongs to one Kanbada status. Select exactly one Default outbound target per mapped Kanbada status. If Jira is already in any status mapped to the desired Kanbada status, no transition is made. Map priorities separately: they remain one-to-one. Unavailable choices or unmapped values need correction, not a guessed replacement.',
+      'How do I map several Jira statuses to one Domus status?',
+      'Test connection and load mappings populates dropdowns with Jira names; saved connections load them automatically. Under Status mapping, choose the matching Jira status and use Add Jira status for additional states that should share a Domus status. Each Jira status belongs to one Domus status. Select exactly one Default outbound target per mapped Domus status. If Jira is already in any status mapped to the desired Domus status, no transition is made. Map priorities separately: they remain one-to-one. Unavailable choices or unmapped values need correction, not a guessed replacement.',
     ],
     pt: [
-      'Como associo vários estados Jira a um estado Kanbada?',
-      'Testar a ligação e carregar mapeamentos preenche os seletores com nomes Jira; as ligações guardadas carregam-nos automaticamente. Em Mapeamento de estados, escolha o estado correspondente e use Adicionar estado Jira para outros estados que devam partilhar o mesmo estado Kanbada. Cada estado Jira pertence a um estado Kanbada. Selecione exatamente um destino predefinido de saída por estado Kanbada mapeado. Se o Jira já estiver num estado associado ao estado Kanbada pretendido, não é feita qualquer transição. Mapeie as prioridades separadamente: continuam a ser um-para-um. As opções indisponíveis e os valores sem mapeamento precisam de correção, não de uma substituição presumida.',
+      'Como associo vários estados Jira a um estado Domus?',
+      'Testar a ligação e carregar mapeamentos preenche os seletores com nomes Jira; as ligações guardadas carregam-nos automaticamente. Em Mapeamento de estados, escolha o estado correspondente e use Adicionar estado Jira para outros estados que devam partilhar o mesmo estado Domus. Cada estado Jira pertence a um estado Domus. Selecione exatamente um destino predefinido de saída por estado Domus mapeado. Se o Jira já estiver num estado associado ao estado Domus pretendido, não é feita qualquer transição. Mapeie as prioridades separadamente: continuam a ser um-para-um. As opções indisponíveis e os valores sem mapeamento precisam de correção, não de uma substituição presumida.',
     ],
   },
   {
@@ -633,11 +633,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Jira synchronization',
     en: [
       'How do I map Jira assignees to workspace members?',
-      'Enable Synchronize assignees from Jira under Assignee mapping, then select Jira users and registered workspace members by name. Invitees must join first. Choices include users found in the JQL results and saved mappings, not the entire Jira directory. This option is off by default and works only with Jira to Kanbada or Bidirectional. The mapped member replaces all current card assignees. An unassigned Jira issue clears them; an unmapped Jira user also clears them and records an Assignee mapping warning. Fix the mapping and run again. Kanbada never writes Jira assignees, even when creating issues.',
+      'Enable Synchronize assignees from Jira under Assignee mapping, then select Jira users and registered workspace members by name. Invitees must join first. Choices include users found in the JQL results and saved mappings, not the entire Jira directory. This option is off by default and works only with Jira to Domus or Bidirectional. The mapped member replaces all current card assignees. An unassigned Jira issue clears them; an unmapped Jira user also clears them and records an Assignee mapping warning. Fix the mapping and run again. Domus never writes Jira assignees, even when creating issues.',
     ],
     pt: [
       'Como associo responsáveis Jira a membros do espaço?',
-      'Ative Sincronizar responsáveis do Jira em Mapeamento de responsáveis e selecione utilizadores Jira e membros registados pelo nome. Os convidados têm de aderir primeiro. As opções incluem utilizadores encontrados nos resultados JQL e nos mapeamentos guardados, não todo o diretório Jira. A opção está desativada por predefinição e só funciona com Jira para Kanbada ou Bidirecional. O membro mapeado substitui todos os responsáveis atuais do cartão. Um pedido sem responsável limpa as atribuições; um utilizador Jira sem mapeamento também as limpa e regista um aviso. Corrija o mapeamento e execute novamente. O Kanbada nunca escreve responsáveis no Jira, nem ao criar pedidos.',
+      'Ative Sincronizar responsáveis do Jira em Mapeamento de responsáveis e selecione utilizadores Jira e membros registados pelo nome. Os convidados têm de aderir primeiro. As opções incluem utilizadores encontrados nos resultados JQL e nos mapeamentos guardados, não todo o diretório Jira. A opção está desativada por predefinição e só funciona com Jira para Domus ou Bidirecional. O membro mapeado substitui todos os responsáveis atuais do cartão. Um pedido sem responsável limpa as atribuições; um utilizador Jira sem mapeamento também as limpa e regista um aviso. Corrija o mapeamento e execute novamente. O Domus nunca escreve responsáveis no Jira, nem ao criar pedidos.',
     ],
   },
   {
@@ -657,11 +657,11 @@ export const helpArticles: HelpArticle[] = [
     category: 'Jira synchronization',
     en: [
       'Why is my Jira card locked, and how do I open it in Jira?',
-      'A card with a confirmed Jira link is entirely read-only when its connection is Jira to Kanbada. Fields, assignments, comments, checklists, attachment changes, dragging, duplication and deletion are disabled. History, downloads and Open in Jira remain available in Details; the Jira link opens a new tab and Jira may require its own sign-in. Unlinked cards remain editable. Pausing synchronization does not unlock linked cards: the workspace owner must change direction to allow local edits. A workspace containing locked cards cannot be deleted.',
+      'A card with a confirmed Jira link is entirely read-only when its connection is Jira to Domus. Fields, assignments, comments, checklists, attachment changes, dragging, duplication and deletion are disabled. History, downloads and Open in Jira remain available in Details; the Jira link opens a new tab and Jira may require its own sign-in. Unlinked cards remain editable. Pausing synchronization does not unlock linked cards: the workspace owner must change direction to allow local edits. A workspace containing locked cards cannot be deleted.',
     ],
     pt: [
       'Porque está bloqueado o meu cartão Jira e como o abro no Jira?',
-      'Um cartão com ligação Jira confirmada é inteiramente de leitura quando a direção é Jira para Kanbada. Campos, atribuições, comentários, listas de verificação, alterações de anexos, arrastar, duplicar e eliminar ficam desativados. O Histórico, as transferências e Abrir no Jira continuam disponíveis em Detalhes; a ligação abre um novo separador e o Jira pode exigir início de sessão próprio. Os cartões sem ligação continuam editáveis. Pausar a sincronização não desbloqueia os cartões ligados: o proprietário tem de mudar a direção para permitir edições locais. Não é possível eliminar um espaço que contenha cartões bloqueados.',
+      'Um cartão com ligação Jira confirmada é inteiramente de leitura quando a direção é Jira para Domus. Campos, atribuições, comentários, listas de verificação, alterações de anexos, arrastar, duplicar e eliminar ficam desativados. O Histórico, as transferências e Abrir no Jira continuam disponíveis em Detalhes; a ligação abre um novo separador e o Jira pode exigir início de sessão próprio. Os cartões sem ligação continuam editáveis. Pausar a sincronização não desbloqueia os cartões ligados: o proprietário tem de mudar a direção para permitir edições locais. Não é possível eliminar um espaço que contenha cartões bloqueados.',
     ],
   },
   {

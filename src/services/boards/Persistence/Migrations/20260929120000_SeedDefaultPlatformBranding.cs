@@ -1,12 +1,12 @@
-using Kanbada.Api;
+using Domus.Boards.Api;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Kanbada.Api.Persistence.Migrations;
+namespace Domus.Boards.Api.Persistence.Migrations;
 
-[DbContext(typeof(KanbadaDbContext))]
+[DbContext(typeof(BoardsDbContext))]
 [Migration("20260929120000_SeedDefaultPlatformBranding")]
 public sealed class SeedDefaultPlatformBranding : Migration
 {
@@ -19,7 +19,7 @@ public sealed class SeedDefaultPlatformBranding : Migration
                 light_border, dark_border, sidebar_background, sidebar_text,
                 font_family, font_scale, corner_radius, show_name, collapsed_logo
             ) VALUES (
-                1, 0, 'kanbada', NULL, '#334153', '#aac2e1', '#f8f9fb', '#17191c',
+                1, 0, 'domus', NULL, '#334153', '#aac2e1', '#f8f9fb', '#17191c',
                 'system', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                 'default', 100, 8, TRUE, NULL
             )

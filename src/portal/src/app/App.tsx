@@ -9,6 +9,7 @@ import {
   Menu,
   Plus,
   Search,
+  Sparkles,
   Trash2,
   X,
 } from 'lucide-react';
@@ -31,7 +32,7 @@ import { Dashboard } from '../features/dashboard/Dashboard';
 import { HelpCenter } from '../features/help/HelpCenter';
 import { ProjectDirectory } from '../features/projects/ProjectDirectory';
 import { currentStorageAccount } from '../infrastructure/accountStorage';
-import { apiEnabled } from '../infrastructure/apiClient';
+import { apiEnabled, apiRequest } from '../infrastructure/apiClient';
 import { fileRepository } from '../infrastructure/attachments';
 import { repository } from '../infrastructure/workspaceRepository';
 import { useI18n, type Locale } from '../shared/i18n';
@@ -44,11 +45,14 @@ import { AutomationsModule } from '../features/automations/AutomationsModule';
 import '../styles/domus-automations.css';
 import { Sidebar } from './Sidebar';
 import { WorkspaceDialogs } from './WorkspaceDialogs';
+import { ProjectAssistant } from '../features/ai/ProjectAssistant';
 export function App() {
   const { branding } = useBranding();
   const { t, locale, setLocale } = useI18n();
   const [projectId, setProjectId] = useState('website');
-  const [page, setPage] = useState('Projects');
+  const [assistantMode, setAssistantMode] = useState<'project' | 'automations'>('project');
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [page, setPage] = useState('Overview');
   const [automationRun, setAutomationRun] = useState<{ workspace: string; id: string } | null>(
     null,
   );
@@ -60,6 +64,21 @@ export function App() {
   const [modal, setModal] = useState<string | null>(null);
   const [draft, setDraft] = useState<Task | null>(null);
   const [toast, setToast] = useState('');
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const result = url.searchParams.get('ai_connection');
+    if (!result) return;
+    url.searchParams.delete('ai_connection');
+    window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    setModal('AI settings');
+    setToast(
+      t(
+        result === 'success'
+          ? 'ChatGPT connected. Choose a model to continue.'
+          : 'ChatGPT connection failed or was cancelled. Please try again.',
+      ),
+    );
+  }, [t]);
   const [menu, setMenu] = useState(false);
   const [sidebar, setSidebar] = useState(false);
   const [canManagePlatform, setCanManagePlatform] = useState(false);
@@ -82,9 +101,17 @@ export function App() {
   const [removingMember, setRemovingMember] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
-      return localStorage.getItem('kanbada-sidebar-collapsed') === 'true';
+      return localStorage.getItem('domus-sidebar-collapsed') === 'true';
     } catch {
       return false;
+    }
+  });
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    try {
+      const width = Number(localStorage.getItem('domus-sidebar-width'));
+      return Number.isFinite(width) && width >= 180 ? width : 236;
+    } catch {
+      return 236;
     }
   });
   useEffect(() => setCollapsedLanes(new Set()), [projectId, page]);
@@ -202,13 +229,23 @@ export function App() {
   );
   const statuses = data.statuses.map((s) => s.name);
   const isDone = (task: Task) => !!data.statuses.find((s) => s.name === task.status)?.complete;
+  const configuredLanes = data.swimlanes.filter(
+    (lane) => page === 'My tasks' || lane.project === project.id,
+  );
+  const needsUnassignedLane =
+    page === 'My tasks'
+      ? activeTasks.some((task) => !data.swimlanes.some((lane) => lane.project === task.project))
+      : !configuredLanes.length;
   const lanes = [
-    { id: '', name: '', project: '', color: '#879eb9', complete: false },
-    ...data.swimlanes.filter((lane) => page === 'My tasks' || lane.project === project.id),
+    ...(needsUnassignedLane
+      ? [{ id: '', name: '', project: '', color: '#879eb9', complete: false }]
+      : []),
+    ...configuredLanes,
   ];
   const inLane = (task: Task, lane: (typeof lanes)[number]) =>
     (task.swimlane ?? '') === lane.name && (!lane.project || task.project === lane.project);
-  const groups = groupBy === 'Status' ? statuses : ['', ...data.buckets.map((b) => b.name)];
+  const groups =
+    groupBy === 'Status' ? statuses : data.buckets.length ? data.buckets.map((b) => b.name) : [''];
   const inGroup = (task: Task, value: string) =>
     groupBy === 'Status' ? task.status === value : (task.bucket ?? '') === value;
   const groupName = (value: string) => value || 'No bucket';
@@ -216,7 +253,7 @@ export function App() {
     if (uploading || saving) return;
     const previous = data.tasks.find((t) => t.id === task.id);
     if (previous?.readOnly) {
-      setToast('This card is managed by Jira and is read-only in Kanbada. Make changes in Jira.');
+      setToast('This card is managed by Jira and is read-only in Domus. Make changes in Jira.');
       return;
     }
     const updated = recordChanges(previous, task, currentMember.name);
@@ -396,8 +433,9 @@ export function App() {
     }
     setDraft({
       id: `KB-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
-      bucket,
-      swimlane,
+      bucket: bucket || data.buckets[0]?.name || '',
+      swimlane:
+        swimlane || data.swimlanes.find((lane) => lane.project === targetProject)?.name || '',
       project: targetProject,
       title: '',
       description: '',
@@ -436,8 +474,6 @@ export function App() {
             ? !isDone(t)
             : !isDone(t) && !!t.due && t.due < today)),
   );
-  const completed = projectTasks.filter((t) => isDone(t)).length;
-  const progress = projectTasks.length ? Math.round((completed / projectTasks.length) * 100) : 0;
   const avatar = (name: string, small = false) => {
     const m = data.members.find((m) => m.name === name);
     return (
@@ -471,13 +507,13 @@ export function App() {
     setCompletionFilter('All');
     setFilterOpen(false);
     setMenu(false);
-    if (name === 'My tasks') setView('List');
+    if (name === 'My tasks' || name === 'Projects') setView('Board');
   };
   const move = (id: string, value: string, lane: (typeof lanes)[number]) => {
     const task = data.tasks.find((t) => t.id === id);
     if (!task) return;
     if (task.readOnly) {
-      setToast('This card is managed by Jira and is read-only in Kanbada. Make changes in Jira.');
+      setToast('This card is managed by Jira and is read-only in Domus. Make changes in Jira.');
       return;
     }
     if (lane.project && task.project !== lane.project) {
@@ -520,7 +556,12 @@ export function App() {
     />
   );
   return (
-    <div className={`app ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <div
+      className={`app ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
+      style={
+        { '--sidebar-width': `${sidebarCollapsed ? 76 : sidebarWidth}px` } as React.CSSProperties
+      }
+    >
       {sidebar && (
         <button
           className="sidebar-scrim"
@@ -533,6 +574,8 @@ export function App() {
         sidebar={sidebar}
         navigate={navigate}
         t={t}
+        sidebarWidth={sidebarWidth}
+        setSidebarWidth={setSidebarWidth}
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
         data={data}
@@ -605,10 +648,6 @@ export function App() {
         <div className="main-content">
           <div className="project-heading">
             <div>
-              <div className="eyebrow">
-                <span />
-                {' ' + t('A LITTLE STRUCTURE. A LOT OF POSSIBILITY.')}
-              </div>
               <h1>
                 {page === 'Projects'
                   ? isActivitiesProject(project)
@@ -617,9 +656,9 @@ export function App() {
                   : page === 'Project directory'
                     ? t('Projects')
                     : page === 'Overview'
-                      ? t('A good day to make progress.')
+                      ? t('Overview')
                       : page === 'Members'
-                        ? t('Your workspace members.')
+                        ? t('Members')
                         : page === 'Help'
                           ? t('Help')
                           : [
@@ -635,27 +674,28 @@ export function App() {
                                 'Automation settings': t('Automation settings'),
                               }[page]
                             : t('My tasks')}
-                <span className="title-dot">.</span>
               </h1>
-              <p>
-                {page === 'Projects'
-                  ? isActivitiesProject(project)
-                    ? t(project.description)
-                    : project.description
-                  : page === 'Project directory'
-                    ? t(
-                        'Every project, in one place. Manage what\u2019s live and what\u2019s saved for later.',
-                      )
-                    : page === 'Members'
-                      ? t('The people who make this workspace yours.')
-                      : page === 'My tasks'
-                        ? t('Your assigned cards across all active projects in this workspace.')
-                        : t('Here\u2019s what\u2019s moving across your workspace.')}
-              </p>
+              {page === 'Projects' && project.description && (
+                <p>{isActivitiesProject(project) ? t(project.description) : project.description}</p>
+              )}
             </div>
+            {apiEnabled && ['Automations', 'Catalog', 'Executions'].includes(page) && (
+              <button
+                type="button"
+                className="secondary assistant-trigger"
+                aria-expanded={assistantOpen}
+                onClick={() => {
+                  setAssistantMode('automations');
+                  setAssistantOpen(true);
+                }}
+              >
+                <Sparkles size={16} />
+                {t('Assistant')}
+              </button>
+            )}
           </div>
           {page === 'Projects' && project.archived && (
-            <div className="archive-banner">
+            <div className="archive-notice">
               <Folder size={16} />
               <span>{t('This project is archived. Its cards and documents are preserved.')}</span>
               <button onClick={() => void toggleArchive(false)}>
@@ -666,72 +706,16 @@ export function App() {
           )}
           {(page === 'Projects' || page === 'My tasks') && (
             <>
-              {page === 'Projects' && (
-                <section
-                  className={`project-banner ${data.workspace.banner ? 'has-workspace-banner' : ''}`}
-                >
-                  {data.workspace.banner && (
-                    <img
-                      className="workspace-banner-image"
-                      src={data.workspace.banner}
-                      alt={t('Workspace banner')}
-                      style={{ objectPosition: `center ${data.workspace.bannerPosition ?? 50}%` }}
-                    />
-                  )}
-                  <div className="banner-text">
-                    <span className="banner-eyebrow">{t('THE NEXT CHAPTER')}</span>
-                    <h2>
-                      {t('Good ideas.')}
-                      <br />
-                      {t('Great things ahead.')}
-                    </h2>
-                    <p>{t('A shared space to turn what if into what\u2019s next.')}</p>
-                    <div className="banner-bottom">
-                      <div className="avatar-stack">
-                        {data.members.slice(0, 4).map((m) => (
-                          <React.Fragment key={m.name}>{avatar(m.name, true)}</React.Fragment>
-                        ))}
-                      </div>
-                      <span>
-                        {data.members.length}
-                        {' ' + t('creative minds, one direction')}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="banner-art" aria-hidden="true">
-                    <div className="orbit orbit-one" />
-                    <div className="orbit orbit-two" />
-                    <div className="art-star">✳</div>
-                    <div className="art-dot" />
-                    <div className="art-ring" />
-                    <span className="art-caption">
-                      {t('MAKE ROOM FOR')}
-                      <br />
-                      {t('SOMETHING GREAT \u2197')}
-                    </span>
-                  </div>
-                  <div className="banner-progress">
-                    <span>
-                      {t('PROJECT PROGRESS')}
-                      <ArrowUpRight size={16} />
-                    </span>
-                    <div>
-                      <strong>{progress}%</strong>
-                      <span>{t('keep it going \u2197')}</span>
-                    </div>
-                    <div className="progress-track">
-                      <i style={{ width: `${progress}%` }} />
-                    </div>
-                    <p>
-                      <b>{completed}</b>
-                      {' ' + t('of') + ' '}
-                      {projectTasks.length}
-                      {' ' + t('tasks completed')}
-                    </p>
-                  </div>
-                </section>
-              )}
               <BoardToolbar
+                onAssistant={
+                  apiEnabled && page === 'Projects' && !project.archived
+                    ? () => {
+                        setAssistantMode('project');
+                        setAssistantOpen(true);
+                      }
+                    : undefined
+                }
+                assistantOpen={assistantOpen}
                 view={view}
                 setView={setView}
                 t={t}
@@ -764,33 +748,31 @@ export function App() {
                 setModal={setModal}
                 toggleArchive={toggleArchive}
               />
-              {page === 'Projects' && view === 'Board' && (
-                <div className="workflow-toolbar">
-                  <label>
-                    {t('Group by')}
-                    <select
-                      aria-label={t('Group board by')}
-                      value={groupBy}
-                      onChange={(e) => setGroupBy(e.target.value)}
-                    >
-                      <option value={'Status'}>{t('Status')}</option>
-                      <option value={'Bucket'}>{t('Bucket')}</option>
-                    </select>
-                  </label>
+              {(view === 'Board' || view === 'Calendar' || saving) && (
+                <div className="board-context-toolbar">
+                  {page === 'Projects' && view === 'Board' && (
+                    <label>
+                      {t('Group by')}
+                      <select
+                        aria-label={t('Group board by')}
+                        value={groupBy}
+                        onChange={(event) => setGroupBy(event.target.value)}
+                      >
+                        <option value="Status">{t('Status')}</option>
+                        <option value="Bucket">{t('Bucket')}</option>
+                      </select>
+                    </label>
+                  )}
+                  <div className="board-context-summary">
+                    {saving && <span role="status">{t('Saving changes…')}</span>}
+                    {view !== 'List' && view !== 'Dashboard' && (
+                      <span>
+                        {filtered.length} {t('tasks')}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
-              <div className={`board-caption ${view === 'List' ? 'board-caption-list' : ''}`}>
-                <span>
-                  <span className="live-dot" />
-                  {saving ? t('Saving changes\u2026') : t('Everything\u2019s up to date')}
-                </span>
-                {view !== 'List' && (
-                  <span>
-                    {filtered.length}
-                    {' ' + t('tasks') + ' '}
-                  </span>
-                )}
-              </div>
               {view === 'Dashboard' ? (
                 <Dashboard
                   key={page + project.id}
@@ -806,10 +788,11 @@ export function App() {
                     <section
                       className="swimlane"
                       key={lane.id}
-                      aria-label={lane.name || 'No swimlane'}
+                      aria-label={lane.name || t('Cards')}
                     >
                       <button
                         className="swimlane-heading"
+                        hidden={!lane.id}
                         aria-expanded={!collapsedLanes.has(lane.id)}
                         aria-controls={'swimlane-' + (lane.id || 'default')}
                         onClick={() =>
@@ -826,7 +809,7 @@ export function App() {
                           className={collapsedLanes.has(lane.id) ? 'collapsed' : ''}
                         />
                         <span className="lane-color" style={{ background: lane.color }} />
-                        <strong>{lane.name || 'No swimlane'}</strong>
+                        <strong>{lane.name}</strong>
                         <span className="lane-count">
                           {filtered.filter((t) => inLane(t, lane)).length}
                         </span>
@@ -966,18 +949,6 @@ export function App() {
           {page === 'Help' && <HelpCenter />}
           {page === 'Overview' && (
             <>
-              {data.workspace.banner && (
-                <div className="workspace-overview-cover">
-                  <img
-                    src={data.workspace.banner}
-                    alt={t('Workspace banner')}
-                    style={{ objectPosition: `center ${data.workspace.bannerPosition ?? 50}%` }}
-                  />
-                  <button className="secondary" onClick={() => setModal('Workspace appearance')}>
-                    {t('Change banner')}
-                  </button>
-                </div>
-              )}
               <Dashboard
                 data={data}
                 tasks={activeTasks}
@@ -993,11 +964,7 @@ export function App() {
                 }}
               />
               <div className="project-section-heading">
-                <h2 className="section-title">
-                  {showArchived
-                    ? t('Saved for another day.')
-                    : t('A little closer to what\u2019s next')}
-                </h2>
+                <h2 className="section-title">{t('Projects')}</h2>
                 <div className="project-scope-tabs">
                   <button
                     className={!showArchived ? 'active' : ''}
@@ -1030,10 +997,10 @@ export function App() {
                           navigate('Projects');
                         }}
                       >
-                        <span className="project-tile-art" style={{ background: p.color }}>
-                          ✳<ArrowUpRight size={24} />
-                        </span>
-                        <h3>{isActivitiesProject(p) ? t('My activities') : p.name}</h3>
+                        <div className="project-tile-heading">
+                          <h3>{isActivitiesProject(p) ? t('My activities') : p.name}</h3>
+                          <ArrowUpRight size={16} aria-hidden="true" />
+                        </div>
                         <p>{p.description}</p>
                         <div className="progress-track">
                           <i style={{ width: `${ts.length ? (n / ts.length) * 100 : 0}%` }} />
@@ -1082,7 +1049,6 @@ export function App() {
           )}
           {page === 'Members' && (
             <>
-              <h2 className="section-title">{t('Workspace members')}</h2>
               <div className="team-grid">
                 {data.members
                   .filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
@@ -1137,7 +1103,7 @@ export function App() {
                           onClick={() => {
                             navigate('Projects');
                             setPerson(m.name);
-                            setView('List');
+                            setView('Board');
                           }}
                         >
                           {t('View tasks') + ' '}
@@ -1181,6 +1147,30 @@ export function App() {
           updateTask={updateTask}
           commit={commit}
           avatar={avatar}
+        />
+      )}
+      {apiEnabled && (
+        <ProjectAssistant
+          key={assistantMode + data.workspace.id + (assistantMode === 'project' ? project.id : '')}
+          mode={assistantMode}
+          workspace={data.workspace.id}
+          projects={data.projects}
+          initialProject={project.id}
+          open={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+          onSettings={() => {
+            setAssistantOpen(false);
+            setModal('AI settings');
+          }}
+          onCard={async (id) => {
+            const card = await apiRequest<Task>(
+              `/workspaces/${data.workspace.id}/cards/${encodeURIComponent(id)}`,
+            );
+            setAssistantOpen(false);
+            setPage('Projects');
+            setProjectId(card.project);
+            setDraft(card);
+          }}
         />
       )}
       <WorkspaceDialogs

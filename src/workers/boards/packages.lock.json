@@ -82,7 +82,7 @@
         "resolved": "2.17.3",
         "contentHash": "TwAf1zy/MH2famozcDqk9+/jD37VAbonRXfnjAso0Q2YKeWtA0kH59WxhuevvAxWDL3jUU3TDpNmUFS2gF9bHw=="
       },
-      "kanbada.api": {
+      "domus.boards.api": {
         "type": "Project",
         "dependencies": {
           "Cronos": "[0.13.0, )",

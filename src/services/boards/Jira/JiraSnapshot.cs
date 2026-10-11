@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed record JiraSnapshot(string Title, string DescriptionText, string Status, string Priority, DateOnly? Due, string[] Labels)
 {
@@ -21,19 +21,19 @@ public sealed record JiraSnapshot(string Title, string DescriptionText, string S
         var title = f["summary"]?.GetValue<string>() ?? "";
         if (title.Length is < 1 or > 500) throw new JiraSyncException("Jira issue has an invalid title.");
         var labels = f["labels"]?.AsArray().Select(l => l?.GetValue<string>() ?? "").Distinct().Order(StringComparer.Ordinal).ToArray() ?? [];
-        if (labels.Any(l => l.Trim().Length is < 1 or > 120)) throw new JiraSyncException("Jira labels must be 1 to 120 characters in Kanbada.");
+        if (labels.Any(l => l.Trim().Length is < 1 or > 120)) throw new JiraSyncException("Jira labels must be 1 to 120 characters in Domus.");
         DateOnly? due = null;
         if (f["duedate"] is JsonValue value && value.TryGetValue<string>(out var date) && !string.IsNullOrEmpty(date))
             due = DateOnly.TryParseExact(date, "yyyy-MM-dd", out var parsed) ? parsed : throw new JiraSyncException("Jira returned an invalid due date.");
-        return new(title, Description(f["description"]), ToKanbada(c, "status", f["status"]?["id"]?.GetValue<string>()),
-            ToKanbada(c, "priority", f["priority"]?["id"]?.GetValue<string>()), due, labels);
+        return new(title, Description(f["description"]), ToDomus(c, "status", f["status"]?["id"]?.GetValue<string>()),
+            ToDomus(c, "priority", f["priority"]?["id"]?.GetValue<string>()), due, labels);
     }
 
     public static string ToJira(JiraConnectionEntity c, string kind, string value) =>
-        c.Mappings.SingleOrDefault(m => m.Kind == kind && m.KanbadaValue == value && (kind != "status" || m.IsDefault))?.JiraValue
-            ?? throw new JiraSyncException($"Missing {kind} mapping for Kanbada value {value}.");
-    private static string ToKanbada(JiraConnectionEntity c, string kind, string? value) =>
-        c.Mappings.SingleOrDefault(m => m.Kind == kind && m.JiraValue == value)?.KanbadaValue
+        c.Mappings.SingleOrDefault(m => m.Kind == kind && m.DomusValue == value && (kind != "status" || m.IsDefault))?.JiraValue
+            ?? throw new JiraSyncException($"Missing {kind} mapping for Domus value {value}.");
+    private static string ToDomus(JiraConnectionEntity c, string kind, string? value) =>
+        c.Mappings.SingleOrDefault(m => m.Kind == kind && m.JiraValue == value)?.DomusValue
             ?? throw new JiraSyncException($"Missing {kind} mapping for Jira ID {value ?? "(none)"}.");
     private static string Normalize(string text) => text.Replace("\r\n", "\n").TrimEnd('\n');
 
@@ -61,11 +61,11 @@ public sealed record JiraSnapshot(string Title, string DescriptionText, string S
     public static string Winner(string direction, string origin, string localHash, string remoteHash, string? previousLocal, string? previousRemote)
     {
         if (localHash == remoteHash) return "none";
-        if (direction == "jira-to-kanbada") return "jira";
-        if (direction == "kanbada-to-jira") return "kanbada";
+        if (direction == "jira-to-domus") return "jira";
+        if (direction == "domus-to-jira") return "domus";
         var localChanged = localHash != previousLocal;
         var remoteChanged = remoteHash != previousRemote;
         if (localChanged && remoteChanged) return origin;
-        return localChanged ? "kanbada" : remoteChanged ? "jira" : "none";
+        return localChanged ? "domus" : remoteChanged ? "jira" : "none";
     }
 }

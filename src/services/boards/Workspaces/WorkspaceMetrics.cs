@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
-public sealed class WorkspaceMetrics(KanbadaDbContext db)
+public sealed class WorkspaceMetrics(BoardsDbContext db)
 {
     public async Task<object> Calculate(Guid workspace, Guid user, DateOnly today, string? project = null, string? bucket = null, string? swimlane = null)
     {

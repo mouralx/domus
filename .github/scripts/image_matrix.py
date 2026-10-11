@@ -7,11 +7,13 @@ import subprocess
 
 COMPONENTS = (
     ('portal', 'portal.Dockerfile'),
+    ('ai', 'ai-api.Dockerfile'),
+    ('mcp', 'mcp-server.Dockerfile'),
     ('membership', 'membership.Dockerfile'),
     ('boards', 'boards-api.Dockerfile'),
     ('automations', 'automations-api.Dockerfile'),
     ('boards-worker', 'boards-worker.Dockerfile'),
-    ('automation-worker', 'automations-worker.Dockerfile'),
+    ('automations-worker', 'automations-worker.Dockerfile'),
 )
 BACKENDS = {name for name, _ in COMPONENTS if name != 'portal'}
 ALL = {name for name, _ in COMPONENTS}
@@ -20,7 +22,7 @@ ALL = {name for name, _ in COMPONENTS}
 def affected_images(paths):
     selected = set()
     for path in paths:
-        if path in {'.dockerignore', '.github/workflows/publish-images.yml', '.github/scripts/image_matrix.py', '.github/scripts/image_version.py', '.github/image-version.json'}:
+        if path in {'.dockerignore', '.github/workflows/publish-images.yml', '.github/scripts/image_version.py', '.github/image-version.json'}:
             selected.update(ALL)
         if path in {'src/global.json', 'src/Directory.Build.props'}:
             selected.update(BACKENDS)
@@ -30,7 +32,7 @@ def affected_images(paths):
         if path == 'infra/containers/portal.conf':
             selected.add('portal')
         if path == 'docs/schemas/automation.schema.json':
-            selected.update({'automations', 'automation-worker'})
+            selected.update({'automations', 'automations-worker'})
         # Test projects and documentation are excluded from application builds.
         if '/tests/' in path or path.endswith('.md'):
             continue
@@ -38,16 +40,20 @@ def affected_images(paths):
             selected.add('portal')
         if path.startswith('src/services/boards/'):
             selected.update({'boards', 'membership', 'boards-worker'})
+        if path.startswith('src/services/ai/'):
+            selected.add('ai')
+        if path.startswith('src/services/mcp/'):
+            selected.add('mcp')
         if path.startswith('src/services/membership/'):
             selected.add('membership')
         if path.startswith('src/services/automations/'):
             selected.add('automations')
         if path.startswith('src/services/automations/Core/'):
-            selected.add('automation-worker')
+            selected.add('automations-worker')
         if path.startswith('src/workers/boards/'):
             selected.add('boards-worker')
         if path.startswith('src/workers/automations/'):
-            selected.add('automation-worker')
+            selected.add('automations-worker')
     return selected
 
 

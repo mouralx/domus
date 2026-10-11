@@ -2,19 +2,30 @@ using Cronos;
 using Microsoft.AspNetCore.DataProtection;
 using System.Net.Mail;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class JiraSecrets
 {
     private readonly IDataProtector protector;
-    public JiraSecrets(string directory) =>
+    private readonly IDataProtector persistedProtector;
+    public JiraSecrets(string directory)
+    {
         protector = DataProtectionProvider.Create(new DirectoryInfo(directory),
-            options => options.SetApplicationName("Kanbada.Jira")).CreateProtector("JiraTokens.v1");
+            options => options.SetApplicationName("Domus.Jira")).CreateProtector("JiraTokens.v1");
+        // Retain the persisted encryption discriminator for existing Jira tokens.
+        var context = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String("S2FuYmFkYS5KaXJh"));
+        persistedProtector = DataProtectionProvider.Create(new DirectoryInfo(directory),
+            options => options.SetApplicationName(context)).CreateProtector("JiraTokens.v1");
+    }
     public string Protect(string token) => protector.Protect(token);
-    public string Unprotect(string token) => protector.Unprotect(token);
+    public string Unprotect(string token)
+    {
+        try { return protector.Unprotect(token); }
+        catch (System.Security.Cryptography.CryptographicException) { return persistedProtector.Unprotect(token); }
+    }
 }
 
-public sealed class JiraDestinationPolicy(IConfiguration configuration, KanbadaDbContext? db = null)
+public sealed class JiraDestinationPolicy(IConfiguration configuration, BoardsDbContext? db = null)
 {
     public static Uri Parse(string value)
     {
@@ -56,7 +67,7 @@ public static class JiraSchedule
     }
 }
 
-public sealed record JiraMappingInput(string Kind, string KanbadaValue, string JiraValue, bool IsDefault = true);
+public sealed record JiraMappingInput(string Kind, string DomusValue, string JiraValue, bool IsDefault = true);
 public sealed record JiraConnectionInput(
     long Version, string BaseUrl, string Edition, string Email, string? Token, string Jql,
     string JiraProjectKey, string IssueTypeId, string Direction, string Cron, string TimeZone,
@@ -83,7 +94,7 @@ public static class JiraConfiguration
         if (input.Email is null) throw new ApiError(400, "Provide an email value (empty for a Data Center PAT).");
         if (input.Edition is not ("cloud" or "data-center")) throw new ApiError(400, "Select Jira Cloud or Data Center.");
         policy.Validate(input.BaseUrl, input.Edition);
-        if (input.Direction is not ("jira-to-kanbada" or "kanbada-to-jira" or "bidirectional"))
+        if (input.Direction is not ("jira-to-domus" or "domus-to-jira" or "bidirectional"))
             throw new ApiError(400, "Select a supported synchronization direction.");
         if (string.IsNullOrWhiteSpace(input.Jql) || input.Jql.Length > 10000) throw new ApiError(400, "JQL is required (maximum 10000 characters).");
         if (input.Edition == "cloud" && !MailAddress.TryCreate(input.Email, out _)) throw new ApiError(400, "Jira Cloud requires the account email and an API token.");
@@ -93,17 +104,17 @@ public static class JiraConfiguration
         if (input.Token is { Length: > 4096 } || input.Token?.Any(char.IsControl) == true)
             throw new ApiError(400, "Invalid Jira token.");
         if (input.Mappings is null || input.Mappings.Count > 200
-            || input.Mappings.Any(m => m is null || m.Kind is not ("status" or "priority" or "assignee") || string.IsNullOrWhiteSpace(m.KanbadaValue)
+            || input.Mappings.Any(m => m is null || m.Kind is not ("status" or "priority" or "assignee") || string.IsNullOrWhiteSpace(m.DomusValue)
                 || (m.Kind == "assignee"
-                    ? !Guid.TryParse(m.KanbadaValue, out _) || string.IsNullOrWhiteSpace(m.JiraValue)
+                    ? !Guid.TryParse(m.DomusValue, out _) || string.IsNullOrWhiteSpace(m.JiraValue)
                         || m.JiraValue.Length > 255 || m.JiraValue != m.JiraValue.Trim() || m.JiraValue.Any(char.IsControl)
                     : !System.Text.RegularExpressions.Regex.IsMatch(m.JiraValue ?? "", "^[0-9]{1,20}$")))
-            || input.Mappings.Where(m => m.Kind == "priority").GroupBy(m => m.KanbadaValue).Any(g => g.Count() > 1)
+            || input.Mappings.Where(m => m.Kind == "priority").GroupBy(m => m.DomusValue).Any(g => g.Count() > 1)
             || input.Mappings.GroupBy(m => (m.Kind, m.JiraValue)).Any(g => g.Count() > 1)
-            || input.Mappings.Where(m => m.Kind == "status").GroupBy(m => m.KanbadaValue).Any(g => g.Count(m => m.IsDefault) != 1)
+            || input.Mappings.Where(m => m.Kind == "status").GroupBy(m => m.DomusValue).Any(g => g.Count(m => m.IsDefault) != 1)
             || !input.Mappings.Any(m => m.Kind == "status")
-            || !input.Mappings.Where(m => m.Kind == "priority").Select(m => m.KanbadaValue).Order().SequenceEqual(new[] { "High", "Low", "Medium" }))
-            throw new ApiError(400, "Map each Jira ID only once, choose one default Jira status per Kanbada status, map all three priorities, and use valid workspace members for assignees.");
+            || !input.Mappings.Where(m => m.Kind == "priority").Select(m => m.DomusValue).Order().SequenceEqual(new[] { "High", "Low", "Medium" }))
+            throw new ApiError(400, "Map each Jira ID only once, choose one default Jira status per Domus status, map all three priorities, and use valid workspace members for assignees.");
         JiraSchedule.Next(input.Cron, input.TimeZone, DateTimeOffset.UtcNow);
     }
 }

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 /// <summary>Illustrative contract data only. Never reads a database or exposes real credentials.</summary>
 public static class ApiExamples

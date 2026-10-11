@@ -41,7 +41,7 @@ export function JiraSettings({
     jql: '',
     jiraProjectKey: '',
     issueTypeId: '',
-    direction: 'jira-to-kanbada',
+    direction: 'jira-to-domus',
     cron: '*/15 * * * *',
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     enabled: false,
@@ -108,11 +108,11 @@ export function JiraSettings({
   function mapping(kind: 'status' | 'priority', value: string, name: string) {
     const options = kind === 'status' ? metadata?.statuses : metadata?.priorities;
     const selected =
-      input.mappings.find((m) => m.kind === kind && m.kanbadaValue === value)?.jiraValue ?? '';
+      input.mappings.find((m) => m.kind === kind && m.domusValue === value)?.jiraValue ?? '';
     const update = (jiraValue: string) =>
       change('mappings', [
-        ...input.mappings.filter((m) => !(m.kind === kind && m.kanbadaValue === value)),
-        ...(jiraValue ? [{ kind, kanbadaValue: value, jiraValue }] : []),
+        ...input.mappings.filter((m) => !(m.kind === kind && m.domusValue === value)),
+        ...(jiraValue ? [{ kind, domusValue: value, jiraValue }] : []),
       ]);
     return (
       <label className="jira-mapping-row" key={`${kind}-${value}`}>
@@ -272,7 +272,7 @@ export function JiraSettings({
         </label>
         <p className="jira-full jira-hint">
           {t(
-            'Only matching Jira issues are synchronized. New Kanbada cards are exported to the selected Jira project; make sure they will match the JQL.',
+            'Only matching Jira issues are synchronized. New Domus cards are exported to the selected Jira project; make sure they will match the JQL.',
           )}
         </p>
         <button
@@ -326,15 +326,15 @@ export function JiraSettings({
             onChange={(event) => {
               const direction = event.target.value;
               if (
-                direction === 'jira-to-kanbada' ||
-                direction === 'kanbada-to-jira' ||
+                direction === 'jira-to-domus' ||
+                direction === 'domus-to-jira' ||
                 direction === 'bidirectional'
               )
                 change('direction', direction);
             }}
           >
-            <option value="jira-to-kanbada">{t('Jira to Kanbada')}</option>
-            <option value="kanbada-to-jira">{t('Kanbada to Jira')}</option>
+            <option value="jira-to-domus">{t('Jira to Domus')}</option>
+            <option value="domus-to-jira">{t('Domus to Jira')}</option>
             <option value="bidirectional">{t('Bidirectional')}</option>
           </select>
         </label>
@@ -357,7 +357,7 @@ export function JiraSettings({
         </div>
         <p className="jira-hint">
           {t(
-            'Several Jira statuses can map to one Kanbada status. Choose one default for writes to Jira; an already-matching Jira status is preserved. Jira status changes require an available direct transition.',
+            'Several Jira statuses can map to one Domus status. Choose one default for writes to Jira; an already-matching Jira status is preserved. Jira status changes require an available direct transition.',
           )}
         </p>
       </fieldset>
@@ -376,9 +376,9 @@ export function JiraSettings({
             'Jira assignees replace the card members. Unassigned or unmapped Jira users leave the card unassigned; missing mappings produce a warning. Jira assignees are never changed.',
           )}
         </p>
-        {input.direction === 'kanbada-to-jira' && (
+        {input.direction === 'domus-to-jira' && (
           <p className="jira-notice">
-            {t('Assignee synchronization is inactive in Kanbada to Jira mode.')}
+            {t('Assignee synchronization is inactive in Domus to Jira mode.')}
           </p>
         )}
         <JiraAssigneeMappings

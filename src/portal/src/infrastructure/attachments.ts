@@ -5,7 +5,7 @@ import { activeWorkspaceId } from './remoteRepository';
 export type { Attachment } from '../domain/models';
 function database(prefix = accountStoragePrefix()): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(prefix + 'kanbada-files', 1);
+    const request = indexedDB.open(prefix + 'domus-files', 1);
     request.onupgradeneeded = () => request.result.createObjectStore('files');
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);

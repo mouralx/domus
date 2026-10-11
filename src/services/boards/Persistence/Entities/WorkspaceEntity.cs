@@ -1,4 +1,4 @@
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class WorkspaceEntity
 {
@@ -7,8 +7,6 @@ public sealed class WorkspaceEntity
     public bool Personal { get; set; }
     public string Name { get; set; } = "";
     public string? Icon { get; set; }
-    public string? Banner { get; set; }
-    public double? BannerPosition { get; set; }
     public long Version { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }

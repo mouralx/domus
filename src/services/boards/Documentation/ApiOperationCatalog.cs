@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed record ApiOperationExample(
     string Method, string Path, string Summary, string Description, string ExampleUrl,
@@ -31,7 +31,7 @@ public static class ApiOperationCatalog
             "/api/jira/hosts", "204", Request: ApiExamples.Json(new { baseUrl = "https://jira.example.com" })),
         new("GET", "/api/platform/branding", "Read public platform branding",
             "Public, including for enrollment sessions. Returns the platform name, raster logo data URI, colors and default theme, never administrator identities. Conditional If-None-Match with the returned ETag can return 304. Personal theme preferences override the platform default.",
-            "/api/platform/branding", Response: ApiExamples.Json(new { id = 1, version = 0, name = "kanbada", logo = (string?)null, primary = "#334153", accent = "#aac2e1", lightBackground = "#f8f9fb", darkBackground = "#17191c", defaultTheme = "system" })),
+            "/api/platform/branding", Response: ApiExamples.Json(new { id = 1, version = 0, name = "domus", logo = (string?)null, primary = "#334153", accent = "#aac2e1", lightBackground = "#f8f9fb", darkBackground = "#17191c", defaultTheme = "system" })),
         new("GET", "/api/platform/branding/access", "Check platform administrator access",
             "Requires a fully verified session. Reports whether the account is among the existing identities resolved from Platform:AdminEmails at API startup. Workspace ownership does not grant platform administration.",
             "/api/platform/branding/access", Response: ApiExamples.Json(new { canManage = false })),
@@ -44,7 +44,7 @@ public static class ApiOperationCatalog
             "Workspace owner only. Returns connection=null when not configured; otherwise includes safe settings, last run status and up to 100 problematic links. Never returns plaintext or protected tokens. Settings are separate from workspace snapshots.",
             Workspace + "/projects/my-activities/jira", Response: new JsonObject { ["connection"] = JiraApiExamples.Connection() }),
         new("PUT", "/api/workspaces/{id}/projects/{projectId}/jira", "Save project Jira synchronization settings",
-            "Workspace owner only. Send version=0 to create, or the last connection version to update (stale=409). No If-Match header is required. Cloud uses email/API token; Data Center uses a PAT. Blank token preserves the saved credential. HTTPS and approved hosts are required. Multiple Jira statuses may share a Kanbada status, with exactly one isDefault=true per Kanbada status. Priorities remain one-to-one. Optional kind=assignee mappings use a registered workspace member's user ID as kanbadaValue and a Jira account ID/user key as jiraValue. syncAssignees defaults to false; when enabled in an inbound direction it replaces local assignees without writing Jira assignees. Unmapped assignees clear local assignments and produce a warning. Directions: jira-to-kanbada, kanbada-to-jira, bidirectional. Conflicts use the original creation system. Cron has five fields and an IANA time zone. Saving does not contact Jira; use Test first.",
+            "Workspace owner only. Send version=0 to create, or the last connection version to update (stale=409). No If-Match header is required. Cloud uses email/API token; Data Center uses a PAT. Blank token preserves the saved credential. HTTPS and approved hosts are required. Multiple Jira statuses may share a Domus status, with exactly one isDefault=true per Domus status. Priorities remain one-to-one. Optional kind=assignee mappings use a registered workspace member's user ID as domusValue and a Jira account ID/user key as jiraValue. syncAssignees defaults to false; when enabled in an inbound direction it replaces local assignees without writing Jira assignees. Unmapped assignees clear local assignments and produce a warning. Directions: jira-to-domus, domus-to-jira, bidirectional. Conflicts use the original creation system. Cron has five fields and an IANA time zone. Saving does not contact Jira; use Test first.",
             Workspace + "/projects/my-activities/jira", Request: JiraApiExamples.Input(), Response: JiraApiExamples.Connection()),
         new("POST", "/api/workspaces/{id}/projects/{projectId}/jira/test", "Test Jira credentials, JQL and discover mappings",
             "Workspace owner only; rate limited. Does not persist settings or write Jira issues. Accepts the settings body, but mappings and issueTypeId can be empty for discovery. Returns paginated JQL match count, named issue types, statuses, priorities and assignees. Saved status/user mappings outside the JQL are resolved to current names; warnings report inaccessible saved choices. A blank token can reuse saved credentials only for the same instance/account. Host approval is checked before any outbound request.",
@@ -54,7 +54,7 @@ public static class ApiOperationCatalog
             "Workspace owner only. No body. Queues the saved, enabled configuration for the separate worker; does not run inline. Archived projects are skipped. Inspect settings for completion and failures.",
             Workspace + "/projects/my-activities/jira/run", "202", Response: ApiExamples.Json(new { queued = true })),
         new("POST", "/api/workspaces/{id}/projects/{projectId}/jira/links/{linkId}/resolve", "Resolve an interrupted Jira creation",
-            "Workspace owner only. After manually verifying an issue was created by an interrupted request, supply its numeric Jira ID (not key). Only a pending creation can be resolved; duplicate issue links are rejected. The next run resumes according to original Kanbada ownership. Never attach unrelated issues.",
+            "Workspace owner only. After manually verifying an issue was created by an interrupted request, supply its numeric Jira ID (not key). Only a pending creation can be resolved; duplicate issue links are rejected. The next run resumes according to original Domus ownership. Never attach unrelated issues.",
             Workspace + "/projects/my-activities/jira/links/73716be0-a56b-4589-a5f6-2bf96a531132/resolve", "204", Request: ApiExamples.Json(new { jiraIssueId = "10042" })),
         new("GET", "/api/health", "Check API/database connectivity",
             "Public connectivity probe. Returns 200 when a database connection opens; an unexpected database connection failure returns 500. Use readiness for orchestration.",
@@ -76,7 +76,7 @@ public static class ApiOperationCatalog
             "/api/auth/two-factor", Response: ApiExamples.Json(new { available = true, enabled = false, recoveryCodesRemaining = 0, required = true, passwordRequired = true })),
         new("POST", "/api/auth/two-factor/setup", "Start authenticator setup",
             "Requires a session and current password for password accounts (external identities send an empty password). Returns a private setup key and otpauth URI to render locally as a QR code. Pending setup expires after ten minutes and does not enable 2FA. Restarting replaces pending setup; enabled accounts return 409. Do not log or share this response.",
-            "/api/auth/two-factor/setup", Request: ApiExamples.Json(new { password = "Replace-this-example-password!" }), Response: ApiExamples.Json(new { secret = "EXAMPLE-ONLY", uri = "otpauth://totp/Kanbada:alex%40example.test?secret=EXAMPLE-ONLY&issuer=Kanbada&digits=6&period=30" })),
+            "/api/auth/two-factor/setup", Request: ApiExamples.Json(new { password = "Replace-this-example-password!" }), Response: ApiExamples.Json(new { secret = "EXAMPLE-ONLY", uri = "otpauth://totp/Domus:alex%40example.test?secret=EXAMPLE-ONLY&issuer=Domus&digits=6&period=30" })),
         new("POST", "/api/auth/two-factor/confirm", "Enable authenticator protection",
             "Requires a session, current password, and a valid six-digit code for the unexpired pending setup. Enables 2FA, revokes other sessions, and returns ten single-use recovery codes exactly once. The confirmation code cannot be reused for login. Save recovery codes securely.",
             "/api/auth/two-factor/confirm", Request: ApiExamples.Json(new { password = "Replace-this-example-password!", code = "123456" }), Response: ApiExamples.Json(new { codes = new[] { "EXAMPLE-ONLY-SAVE-REAL-CODES" } })),
@@ -167,7 +167,7 @@ public static class ApiOperationCatalog
             "Requires the same authentication/access/expiry checks as the shared card. File must be referenced by that exact card. Returns attachment bytes; unrelated/missing files return 404. Use the share token and one of the returned card attachment IDs.",
             Share + "/files/" + ApiExamples.FileId, Response: JsonValue.Create("<binary requirements.pdf bytes>"), ResponseType: "application/octet-stream"),
         new("GET", "/api/invitations/{token}", "Read a pending workspace invitation",
-            "Requires authentication and a valid unused invitation token. Returns workspace name and invited email; missing/used invitations return 404. An owner creates pending members through workspace PUT and copies their invitationToken into /?invite={token}; Kanbada does not send email.",
+            "Requires authentication and a valid unused invitation token. Returns workspace name and invited email; missing/used invitations return 404. An owner creates pending members through workspace PUT and copies their invitationToken into /?invite={token}; Domus does not send email.",
             Invitation, Response: ApiExamples.Json(new { workspace = "Product delivery", email = "colleague@example.test" })),
         new("POST", "/api/invitations/{token}/accept", "Accept a workspace invitation",
             "Requires a session matching the invited email (403 otherwise). No JSON body. Assigns the user to the pending membership, invalidates the invitation token, and increments workspace version. Already-member conflicts return 409; unavailable invitations return 404. Open the returned workspaceId with GET /api/workspaces/{id}.",

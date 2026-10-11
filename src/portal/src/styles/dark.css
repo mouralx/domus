@@ -130,24 +130,8 @@
 :root[data-theme="dark"] .invite-button > svg:last-child {
     color: #a6a8ae
 }
-:root[data-theme="dark"] .project-banner {
-    background: #1b1d21;
-    border: 1px solid #383b42
-}
-:root[data-theme="dark"] .banner-eyebrow {
-    color: #a6a8ae
-}
-:root[data-theme="dark"] .banner-text h2 {
-    color: #e5e5e7
-}
-:root[data-theme="dark"] .banner-text p {
-    color: #a6a8ae
-}
 :root[data-theme="dark"] .avatar-stack .avatar {
     border-color: #383b42
-}
-:root[data-theme="dark"] .banner-bottom > span {
-    color: #a6a8ae
 }
 :root[data-theme="dark"] .art-star {
     color: #a6a8ae
@@ -164,27 +148,8 @@
 :root[data-theme="dark"] .art-caption {
     color: #a6a8ae
 }
-:root[data-theme="dark"] .banner-progress {
-    border: 1px solid #383b42;
-    background: #1b1d21dd
-}
-:root[data-theme="dark"] .banner-progress > span {
-    color: #a6a8ae
-}
-:root[data-theme="dark"] .banner-progress strong {
-    color: #e5e5e7
-}
-:root[data-theme="dark"] .banner-progress > div > span {
-    color: #a6a8ae
-}
 :root[data-theme="dark"] .progress-track {
     background: #2c2f35
-}
-:root[data-theme="dark"] .banner-progress p {
-    color: #a6a8ae
-}
-:root[data-theme="dark"] .banner-progress b {
-    color: #a6a8ae
 }
 :root[data-theme="dark"] .view-tabs button {
     color: #a6a8ae
@@ -424,12 +389,6 @@
 :root[data-theme="dark"] .project-tile {
     background: #232529
 }
-:root[data-theme="dark"] .project-tile-art {
-    color: #e5e5e760
-}
-:root[data-theme="dark"] .project-tile-art svg {
-    color: #e5e5e7
-}
 :root[data-theme="dark"] .project-tile p {
     color: #a6a8ae
 }
@@ -521,9 +480,6 @@
 @media (max-width: 760px) {
     :root[data-theme="dark"] .sidebar {
         box-shadow: 10px 0 40px #00000020
-    }
-    :root[data-theme="dark"] .banner-progress {
-        background: #1b1d21ed
     }
 }
 :root[data-theme="dark"] .workflow-toolbar > label {
@@ -731,12 +687,12 @@
 :root[data-theme="dark"] .swimlane-heading small {
     color: #a6a8ae
 }
-:root[data-theme="dark"] .archive-banner {
+:root[data-theme="dark"] .archive-notice {
     border: 1px solid #383b42;
     background: #1b1d21;
     color: #a6a8ae
 }
-:root[data-theme="dark"] .archive-banner button {
+:root[data-theme="dark"] .archive-notice button {
     color: #a6a8ae
 }
 :root[data-theme="dark"] .project-scope-tabs {
@@ -1050,28 +1006,12 @@
 :root[data-theme="dark"] .workspace-appearance h3 {
     color: #a6a8ae
 }
-:root[data-theme="dark"] .workspace-banner-preview {
-    background: #1b1d21
-}
-:root[data-theme="dark"] .workspace-banner-preview > span {
-    color: #a6a8ae
-}
 :root[data-theme="dark"] .simple-form .image-upload-button {
     border: 1px solid #383b42;
     color: #a6a8ae
 }
 :root[data-theme="dark"] .image-upload-button:focus-within {
     outline: 2px solid #686d78
-}
-:root[data-theme="dark"] .has-workspace-banner:after {
-    background: linear-gradient(90deg, #1b1d21f2 0%, #1b1d21ad 42%, #1b1d2115 70%)
-}
-:root[data-theme="dark"] .has-workspace-banner .banner-progress {
-    background: #1b1d21f0
-}
-:root[data-theme="dark"] .workspace-overview-cover button {
-    background: #232529f2;
-    color: #a6a8ae
 }
 :root[data-theme="dark"] .auth-page {
     background: #232529
@@ -1363,7 +1303,6 @@
 :root[data-theme="dark"]{--line:#383b42;--muted:#a6a8ae;--green:#9aacbf;color-scheme:dark}
 :root[data-theme="dark"] .avatar{color:#26384e}
 :root[data-theme="dark"] .completion-donut>span{background:#232529}
-:root[data-theme="dark"] .has-workspace-banner .banner-text{color:#e5e5e7}
 :root[data-theme='dark'] {
   --chart-rest: #34475e;
 }
@@ -1407,14 +1346,6 @@
 :root[data-theme='dark'] .topbar {
   background: #1b1d21;
   border-color: #303238;
-}
-:root[data-theme='dark'] .project-banner {
-  background: #272a30;
-  border-color: #3a3d45;
-}
-:root[data-theme='dark'] .banner-progress {
-  background: #22252b;
-  border-color: #41454e;
 }
 :root[data-theme='dark'] .kanban-column {
   background: #1d1f23;

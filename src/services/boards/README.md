@@ -1,4 +1,4 @@
-# Kanbada API
+# Domus API
 
 Start PostgreSQL and create local configuration using the [root README](../README.md), then run `dotnet run` from this directory.
 

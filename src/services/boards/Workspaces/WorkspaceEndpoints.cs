@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class WorkspaceEndpoints
 {
@@ -15,7 +15,7 @@ public static class WorkspaceEndpoints
             var id = await store.Create(user, input.Name);
             return Results.Ok((await store.Read(id, user)).State);
         });
-        api.MapGet("/workspaces/{id}", async (string id, WorkspaceResolver db, KanbadaDbContext context, WorkspaceStore store, HttpContext ctx) =>
+        api.MapGet("/workspaces/{id}", async (string id, WorkspaceResolver db, BoardsDbContext context, WorkspaceStore store, HttpContext ctx) =>
         {
             var user = Auth.User(ctx);
             var workspace = await db.WorkspaceId(id, user);

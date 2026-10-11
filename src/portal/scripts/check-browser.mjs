@@ -20,9 +20,9 @@ const newPage = browser.newPage.bind(browser);
 browser.newPage = async (options) => {
   const page = await newPage(options);
   await page.addInitScript(() => {
-    if (!localStorage.getItem('kanbada-session-v1'))
+    if (!localStorage.getItem('domus-session-v1'))
       localStorage.setItem(
-        'kanbada-session-v1',
+        'domus-session-v1',
         JSON.stringify({
           id: 'owner',
           name: 'Alex Morgan',
@@ -42,7 +42,7 @@ page.on('pageerror', (e) => errors.push(e.message));
 try {
   await page.goto('http://localhost:4173');
   await page.getByRole('heading', { name: 'Website redesign', exact: true }).waitFor();
-  await page.screenshot({ path: '/private/tmp/kanbada-desktop.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-desktop.png', fullPage: true });
   assert.equal(await page.locator('.task-card').count(), 11);
   await page.getByRole('button', { name: 'Add task', exact: true }).first().click();
   await page.getByRole('textbox', { name: 'Task title' }).fill('Browser test task');
@@ -97,7 +97,7 @@ try {
   await page.getByRole('button', { name: 'Delete task', exact: true }).click();
   assert.equal(await page.locator('.task-card').count(), 11);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.screenshot({ path: '/private/tmp/kanbada-mobile.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-mobile.png', fullPage: true });
   assert.equal(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     true,
@@ -105,7 +105,7 @@ try {
   );
   await page.getByRole('button', { name: 'Toggle navigation' }).click();
   await page.getByRole('button', { name: 'Overview', exact: true }).click();
-  await page.getByRole('heading', { name: 'A good day to make progress.' }).waitFor();
+  await page.getByRole('heading', { name: 'Overview', exact: true }).waitFor();
   assert.deepEqual(errors, []);
   console.log(
     'PASS: task CRUD, checklist, comments, persistence, drag/drop, search, filters, list, calendar, projects, team, mobile navigation; no browser errors.',

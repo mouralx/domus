@@ -7,7 +7,7 @@ export async function checkAuthentication(browser) {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('http://localhost:4173');
   await expect(page.getByRole('heading', { name: 'Welcome to your workspace.' })).toBeVisible();
-  await page.screenshot({ path: '/private/tmp/kanbada-sign-in.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-sign-in.png', fullPage: true });
   await page.getByRole('button', { name: 'Continue with Google', exact: true }).click();
   await page.getByRole('button', { name: 'Back', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Welcome to your workspace.' })).toBeVisible();
@@ -39,7 +39,7 @@ export async function checkAuthentication(browser) {
     .click();
   await expect(page.getByRole('heading', { name: 'Taylor project', exact: true })).toBeVisible();
   const firstId = await page.evaluate(
-    () => JSON.parse(localStorage.getItem('kanbada-session-v1')).id,
+    () => JSON.parse(localStorage.getItem('domus-session-v1')).id,
   );
   await page.reload();
   await expect(page.getByRole('button', { name: 'Taylor project', exact: true })).toBeVisible();
@@ -48,7 +48,7 @@ export async function checkAuthentication(browser) {
   await page.getByRole('button', { name: 'Continue with Microsoft', exact: true }).click();
   await page.getByRole('button', { name: /Taylor Test taylor@example.com/ }).click();
   assert.equal(
-    await page.evaluate(() => JSON.parse(localStorage.getItem('kanbada-session-v1')).id),
+    await page.evaluate(() => JSON.parse(localStorage.getItem('domus-session-v1')).id),
     firstId,
   );
   await expect(page.getByRole('button', { name: 'Taylor project', exact: true })).toBeVisible();
@@ -67,7 +67,7 @@ export async function checkAuthentication(browser) {
   ).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-  await page.screenshot({ path: '/private/tmp/kanbada-sign-in-mobile.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-sign-in-mobile.png', fullPage: true });
   await page.getByRole('button', { name: 'Continuar com Google', exact: true }).click();
   await page.getByRole('button', { name: /Alex Morgan alex@studio.co/ }).click();
   await page.getByRole('button', { name: 'O seu perfil', exact: true }).click();

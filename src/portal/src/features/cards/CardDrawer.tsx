@@ -4,6 +4,7 @@ import { type Member, type State, type Status, type Task } from '../../domain/mo
 import { isActivitiesProject } from '../../domain/projectRules';
 import { fileRepository } from '../../infrastructure/attachments';
 import { useI18n } from '../../shared/i18n';
+import { CardAi } from '../ai/CardAi';
 import { Attachments } from './CardAttachments';
 import { CardLabels } from './CardLabels';
 import { CardJiraLinks } from './CardJiraLinks';
@@ -190,9 +191,16 @@ export function CardDrawer({
           )}
           {readOnly && (
             <p className="card-read-only-notice" role="note">
-              {t('This card is managed by Jira and is read-only in Kanbada. Make changes in Jira.')}
+              {t('This card is managed by Jira and is read-only in Domus. Make changes in Jira.')}
             </p>
           )}
+          <CardAi
+            key={`${data.workspace.id}/${draft.id}`}
+            workspace={data.workspace.id}
+            draft={draft}
+            saved={data.tasks.find((task) => task.id === draft.id)}
+            onApply={(task) => setDraft(task)}
+          />
           <fieldset className="card-edit-fields" disabled={readOnly}>
             <input
               className="task-title-input"
@@ -269,7 +277,9 @@ export function CardDrawer({
                   value={draft.swimlane ?? ''}
                   onChange={(e) => setDraft({ ...draft, swimlane: e.target.value })}
                 >
-                  <option value="">{t('No swimlane')}</option>
+                  {!data.swimlanes.some((lane) => lane.project === draft.project) && (
+                    <option value="">{t('No swimlane')}</option>
+                  )}
                   {data.swimlanes
                     .filter((lane) => lane.project === draft.project)
                     .map((lane) => (
@@ -286,7 +296,7 @@ export function CardDrawer({
                   value={draft.bucket ?? ''}
                   onChange={(e) => setDraft({ ...draft, bucket: e.target.value })}
                 >
-                  <option value="">{t('No bucket')}</option>
+                  {!data.buckets.length && <option value="">{t('No bucket')}</option>}
                   {data.buckets.map((b) => (
                     <option key={b.id} value={b.name}>
                       {b.name}

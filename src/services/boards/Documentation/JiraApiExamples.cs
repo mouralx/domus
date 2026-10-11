@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class JiraApiExamples
 {
@@ -21,11 +21,11 @@ public static class JiraApiExamples
         syncAssignees = false,
         mappings = new[]
         {
-            new { kind = "status", kanbadaValue = "backlog", jiraValue = "10000", isDefault = true },
-            new { kind = "status", kanbadaValue = "backlog", jiraValue = "10001", isDefault = false },
-            new { kind = "priority", kanbadaValue = "Low", jiraValue = "4", isDefault = true },
-            new { kind = "priority", kanbadaValue = "Medium", jiraValue = "3", isDefault = true },
-            new { kind = "priority", kanbadaValue = "High", jiraValue = "2", isDefault = true }
+            new { kind = "status", domusValue = "backlog", jiraValue = "10000", isDefault = true },
+            new { kind = "status", domusValue = "backlog", jiraValue = "10001", isDefault = false },
+            new { kind = "priority", domusValue = "Low", jiraValue = "4", isDefault = true },
+            new { kind = "priority", domusValue = "Medium", jiraValue = "3", isDefault = true },
+            new { kind = "priority", domusValue = "High", jiraValue = "2", isDefault = true }
         }
     }).AsObject();
 

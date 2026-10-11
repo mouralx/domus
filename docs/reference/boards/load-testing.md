@@ -2,12 +2,12 @@
 
 # Large local dataset
 
-`tools/Kanbada.LoadData` is an explicit destructive EF Core maintenance command. It removes all workspace data and all accounts except the specified existing user, then generates a repeatable workload. The retained user's credentials, provider identities and sessions are preserved. It creates no additional users and sends no invitations or messages.
+`tools/Domus.LoadData` is an explicit destructive EF Core maintenance command. It removes all workspace data and all accounts except the specified existing user, then generates a repeatable workload. The retained user's credentials, provider identities and sessions are preserved. It creates no additional users and sends no invitations or messages.
 
 Stop the API and take a verified PostgreSQL backup before running this from the repository root:
 
 ```sh
-dotnet run --project tools/Kanbada.LoadData -- --reset-keep-user nuno.moura@outlook.com
+dotnet run --project tools/Domus.LoadData -- --reset-keep-user nuno.moura@outlook.com
 ```
 
 It uses the same local/environment connection configuration as EF migrations. The reset and seed run in one transaction; a failure rolls back both. Writes use EF Core in batches of 250 cards. Migration history is preserved. The user must already exist and match exactly one account.
@@ -25,7 +25,7 @@ Reload the portal after the reset. Old workspace/card URLs no longer point to ex
 
 This seeds a large dataset; it does not generate concurrent traffic. Use it to measure workspace loading, board/list rendering, filtering, dashboards, PDF export, card editing and attachment downloads. Larger workspaces intentionally stress the current full-snapshot reads and client-side rendering. Record browser timings, API latency and memory before drawing conclusions about concurrent-user capacity.
 
-A read-only application-service check is available with `dotnet run --project tools/Kanbada.LoadData -- --verify-user nuno.moura@outlook.com`. It validates access to the workspaces, filtered metrics and complete snapshots for all five workspaces without creating extra test users.
+A read-only application-service check is available with `dotnet run --project tools/Domus.LoadData -- --verify-user nuno.moura@outlook.com`. It validates access to the workspaces, filtered metrics and complete snapshots for all five workspaces without creating extra test users.
 
 ## Mapping performance fix
 

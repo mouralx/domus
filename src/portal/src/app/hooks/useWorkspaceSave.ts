@@ -1,5 +1,6 @@
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import type { State } from '../../domain/models';
+import { assignDefaultPlacement } from '../../domain/cardPlacement';
 import { repository } from '../../infrastructure/workspaceRepository';
 
 /** Serializes local writes and publishes the canonical server version only after a successful save. */
@@ -29,7 +30,7 @@ export function useWorkspaceSave(
             .concat(next.notifications.filter((notification) => notification.cardId)),
         };
       setSaving(true);
-      const saved = await repository.save(next, data);
+      const saved = await repository.save(assignDefaultPlacement(next), data);
       setData(saved);
       if (message) setToast(message);
       return true;

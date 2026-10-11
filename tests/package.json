@@ -14,7 +14,10 @@
     "test:backend": "cd ../src && dotnet test ../tests/Automations.Tests/Automations.Tests.csproj",
     "start": "../infra/scripts/compose.sh up --build -d --wait",
     "test:boards": "python3 ../infra/scripts/test-boards.py",
-    "test:ci": "python3 -m unittest discover -s . -p \"test_image_*.py\" -v"
+    "test:ci": "python3 -m unittest discover -s . -p \"test_image_*.py\" -v",
+    "test:ai": "dotnet run --project Ai.Tests/Domus.Ai.Tests.csproj && node ai-api.mjs",
+    "test:ai:browser": "node ai-browser.mjs",
+    "test:mcp": "dotnet build ../src/services/mcp/Domus.Mcp.Server.csproj && node mcp-api.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.0",

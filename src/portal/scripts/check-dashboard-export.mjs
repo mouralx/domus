@@ -14,7 +14,7 @@ export async function checkDashboardExport(browser) {
   await page.getByRole('button', { name: 'Export PDF', exact: true }).click();
   const file = await download;
   assert.match(file.suggestedFilename(), /Website redesign.*\.pdf$/);
-  await file.saveAs('/private/tmp/kanbada-dashboard-report.pdf');
+  await file.saveAs('/private/tmp/domus-dashboard-report.pdf');
   const bytes = await readFile(await file.path());
   assert.equal(bytes.subarray(0, 5).toString(), '%PDF-');
   assert.ok(bytes.includes(Buffer.from('Bucket performance')));
@@ -40,7 +40,7 @@ export async function checkDashboardExport(browser) {
   const personal = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Exportar PDF', exact: true }).click();
   assert.match((await personal).suggestedFilename(), /As minhas atividades/);
-  await page.screenshot({ path: '/private/tmp/kanbada-dashboard-export.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-dashboard-export.png', fullPage: true });
   await page.reload();
   await expect(
     page.getByRole('button', { name: 'As minhas atividades', exact: true }),

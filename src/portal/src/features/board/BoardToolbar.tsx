@@ -10,14 +10,17 @@ import {
   MoreHorizontal,
   Plus,
   SlidersHorizontal,
+  Sparkles,
   Trash2,
 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { type Project, type State, type Status, type Task } from '../../domain/models';
 import { isActivitiesProject } from '../../domain/projectRules';
 import { apiEnabled } from '../../infrastructure/apiClient';
 
 type BoardToolbarProps = {
+  onAssistant?: () => void;
+  assistantOpen?: boolean;
   view: string;
   setView: React.Dispatch<React.SetStateAction<string>>;
   t: (value: unknown, ...values: unknown[]) => string;
@@ -55,6 +58,8 @@ type BoardToolbarProps = {
 };
 
 export function BoardToolbar({
+  onAssistant,
+  assistantOpen = false,
   view,
   setView,
   t,
@@ -87,6 +92,28 @@ export function BoardToolbar({
   setModal,
   toggleArchive,
 }: BoardToolbarProps) {
+  const filters = useRef<HTMLDivElement>(null);
+  const options = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!filterOpen && !menu) return;
+    const dismissOutside = (event: PointerEvent) => {
+      if (!(event.target instanceof Node)) return;
+      if (!filters.current?.contains(event.target)) setFilterOpen(false);
+      if (!options.current?.contains(event.target)) setMenu(false);
+    };
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      (menu ? options : filters).current?.querySelector<HTMLButtonElement>('button')?.focus();
+      setFilterOpen(false);
+      setMenu(false);
+    };
+    document.addEventListener('pointerdown', dismissOutside, true);
+    document.addEventListener('keydown', dismissOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', dismissOutside, true);
+      document.removeEventListener('keydown', dismissOnEscape);
+    };
+  }, [filterOpen, menu, setFilterOpen, setMenu]);
   return (
     <div className="board-toolbar">
       <div className="view-tabs">
@@ -107,10 +134,14 @@ export function BoardToolbar({
         ))}
       </div>
       <div className="board-actions">
-        <div className="filter-wrap">
+        <div className="filter-wrap" ref={filters}>
           <button
             className={`filter-button ${priority !== 'All' || person !== 'All' || bucketFilter !== 'All' || swimlaneFilter !== 'All' || statusFilter !== 'All' || completionFilter !== 'All' ? 'selected' : ''}`}
-            onClick={() => setFilterOpen(!filterOpen)}
+            aria-expanded={filterOpen}
+            onClick={() => {
+              setMenu(false);
+              setFilterOpen(!filterOpen);
+            }}
           >
             <SlidersHorizontal size={15} />
             {t('Filter')}
@@ -161,7 +192,7 @@ export function BoardToolbar({
                   onChange={(e) => setBucketFilter(e.target.value)}
                 >
                   <option value="All">{t('All buckets')}</option>
-                  <option value="">{t('No bucket')}</option>
+                  {!data.buckets.length && <option value="">{t('No bucket')}</option>}
                   {data.buckets.map((b) => (
                     <option value={b.name} key={b.id}>
                       {b.name} ({projectTasks.filter((t) => t.bucket === b.name).length})
@@ -177,10 +208,12 @@ export function BoardToolbar({
                   onChange={(e) => setSwimlaneFilter(e.target.value)}
                 >
                   <option value="All">{t('All swimlanes')}</option>
-                  <option value="">
-                    {t('No swimlane (')}
-                    {projectTasks.filter((t) => !t.swimlane).length})
-                  </option>
+                  {lanes.some((lane) => !lane.id) && (
+                    <option value="">
+                      {t('No swimlane (')}
+                      {projectTasks.filter((t) => !t.swimlane).length})
+                    </option>
+                  )}
                   {lanes
                     .filter((lane) => lane.id)
                     .map((lane) => (
@@ -237,16 +270,31 @@ export function BoardToolbar({
           )}
         </div>
         <span className="toolbar-divider" />
+        {onAssistant && (
+          <button
+            type="button"
+            className="secondary assistant-trigger"
+            aria-expanded={assistantOpen}
+            onClick={onAssistant}
+          >
+            <Sparkles size={16} />
+            {t('Assistant')}
+          </button>
+        )}
         <button className="primary" onClick={() => newTask()}>
           <Plus size={16} />
           {t('Add task')}
         </button>
         {page === 'Projects' && (
-          <div className="filter-wrap">
+          <div className="filter-wrap" ref={options}>
             <button
               aria-label={t('Project options')}
               className="icon-button"
-              onClick={() => setMenu(!menu)}
+              aria-expanded={menu}
+              onClick={() => {
+                setFilterOpen(false);
+                setMenu(!menu);
+              }}
             >
               <MoreHorizontal size={20} />
             </button>

@@ -516,47 +516,6 @@ h1 .title-dot:last-child {
   margin-left: 9px;
   color: #728092;
 }
-.project-banner {
-  display: flex;
-  position: relative;
-  background: #dce5f0;
-  border: 1px solid #d2dbe7;
-  min-height: 225px;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 28px;
-}
-.banner-text {
-  padding: 25px 29px;
-  z-index: 2;
-  flex: 1;
-}
-.banner-eyebrow {
-  font-size: 8px;
-  letter-spacing: 2px;
-  font-weight: 650;
-  color: #586a82;
-}
-.banner-text h2 {
-  font-family: Manrope, sans-serif;
-  font-size: 29px;
-  letter-spacing: -1px;
-  line-height: 1.25;
-  font-weight: 600;
-  color: #2c3847;
-  margin: 11px 0 9px;
-}
-.banner-text p {
-  font-size: 10px;
-  color: #778495;
-  margin: 0;
-}
-.banner-bottom {
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-  gap: 10px;
-}
 .avatar-stack {
   display: flex;
   padding-left: 0;
@@ -567,18 +526,6 @@ h1 .title-dot:last-child {
 }
 .avatar-stack .avatar:first-child {
   margin-left: 0;
-}
-.banner-bottom > span {
-  font-size: 9px;
-  color: #6d7887;
-}
-.banner-art {
-  position: absolute;
-  left: 43%;
-  width: 31%;
-  height: 100%;
-  top: 0;
-  overflow: hidden;
 }
 .art-star {
   position: absolute;
@@ -634,41 +581,6 @@ h1 .title-dot:last-child {
   line-height: 1.5;
   color: #5a6d86;
 }
-.banner-progress {
-  align-self: center;
-  width: 215px;
-  margin: 0 27px 0 0;
-  padding: 20px;
-  border: 1px solid #c7d2e1;
-  border-radius: 8px;
-  background: #e8eef6dd;
-  z-index: 2;
-}
-.banner-progress > span {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 8px;
-  letter-spacing: 1px;
-  color: #6b7786;
-}
-.banner-progress > div:not(.progress-track) {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 12px 0 9px;
-}
-.banner-progress strong {
-  font-size: 35px;
-  letter-spacing: -1.5px;
-  font-family: Manrope;
-  font-weight: 600;
-  color: #313e50;
-}
-.banner-progress > div > span {
-  font-size: 8px;
-  color: #76869c;
-}
 .progress-track {
   background: #d0dae7;
   height: 5px;
@@ -681,15 +593,6 @@ h1 .title-dot:last-child {
   background: #506785;
   border-radius: 4px;
   transition: width 0.5s;
-}
-.banner-progress p {
-  font-size: 9px;
-  color: #828d9c;
-  margin: 10px 0 0;
-}
-.banner-progress b {
-  color: #4f5f74;
-  font-weight: 500;
 }
 .board-toolbar {
   display: flex;
@@ -1387,22 +1290,6 @@ h1 .title-dot:last-child {
   text-align: left;
   padding: 18px;
 }
-.project-tile-art {
-  height: 120px;
-  border-radius: 6px;
-  display: flex;
-  font-size: 105px;
-  align-items: center;
-  justify-content: center;
-  color: #41506460;
-  position: relative;
-}
-.project-tile-art svg {
-  position: absolute;
-  right: 13px;
-  top: 13px;
-  color: #435060;
-}
 .project-tile h3 {
   font-size: 16px;
   margin-bottom: 9px;
@@ -1802,15 +1689,6 @@ h1 .title-dot:last-child {
   .kanban-board {
     gap: 20px;
   }
-  .project-banner {
-    min-height: 240px;
-  }
-  .banner-art {
-    left: 46%;
-  }
-  .banner-text h2 {
-    font-size: 33px;
-  }
 }
 @media (max-width: 1200px) {
   .sidebar {
@@ -1843,23 +1721,8 @@ h1 .title-dot:last-child {
   .task-cover {
     height: 104px;
   }
-  .banner-art {
-    left: 40%;
-    width: 32%;
-  }
-  .banner-progress {
-    width: 184px;
-    margin-right: 20px;
-    padding: 16px;
-  }
-  .banner-text {
-    padding: 24px;
-  }
   .art-star {
     left: 8px;
-  }
-  .banner-bottom > span {
-    font-size: 8px;
   }
   .task-card h3 {
     font-size: 11px;
@@ -1920,35 +1783,6 @@ h1 .title-dot:last-child {
   }
   .search {
     display: none;
-  }
-  .banner-art {
-    left: 43%;
-    width: 25%;
-    opacity: 0.65;
-  }
-  .banner-progress {
-    width: 165px;
-    margin-right: 18px;
-    padding: 14px;
-  }
-  .banner-progress > div > span {
-    font-size: 7px;
-  }
-  .banner-text h2 {
-    font-size: 26px;
-  }
-  .banner-text p {
-    font-size: 9px;
-  }
-  .banner-text {
-    padding: 23px 20px;
-  }
-  .banner-bottom > span {
-    max-width: 100px;
-    line-height: 1.5;
-  }
-  .banner-progress strong {
-    font-size: 29px;
   }
   .list-header,
   .list-row {
@@ -2045,61 +1879,10 @@ h1 .title-dot:last-child {
   .invite-button svg:first-child {
     width: 17px;
   }
-  .project-banner {
-    min-height: 214px;
-  }
-  .banner-text {
-    padding: 21px 18px;
-  }
-  .banner-text h2 {
-    font-size: 26px;
-  }
-  .banner-text p {
-    max-width: 170px;
-    line-height: 1.6;
-    font-size: 9px;
-  }
-  .banner-art {
-    left: 45%;
-    width: 55%;
-  }
   .art-star {
     font-size: 230px;
     top: -38px;
     left: 0;
-  }
-  .banner-progress {
-    position: absolute;
-    right: 0;
-    bottom: 15px;
-    margin-right: 12px;
-    width: 133px;
-    padding: 11px;
-    background: #e8eef6ed;
-  }
-  .banner-progress > span {
-    font-size: 6px;
-  }
-  .banner-progress strong {
-    font-size: 25px;
-  }
-  .banner-progress > div:not(.progress-track) {
-    margin: 4px 0 7px;
-  }
-  .banner-progress > div > span {
-    display: none;
-  }
-  .banner-progress p {
-    font-size: 7px;
-    margin-top: 7px;
-  }
-  .banner-bottom {
-    margin-top: 15px;
-    gap: 5px;
-  }
-  .banner-bottom > span {
-    max-width: 80px;
-    font-size: 7px;
   }
   .art-caption,
   .art-dot {
@@ -2230,24 +2013,6 @@ h1 .title-dot:last-child {
     background: #1a202755;
     backdrop-filter: blur(2px);
     z-index: 29;
-  }
-  .project-banner {
-    min-height: 260px;
-  }
-  .banner-progress {
-    bottom: 17px;
-    width: 125px;
-  }
-  .banner-bottom {
-    max-width: 185px;
-  }
-  .banner-art {
-    height: 145px;
-    width: 50%;
-    left: 50%;
-  }
-  .banner-text h2 {
-    font-size: 25px;
   }
 }
 /* Workspace controls, card details and live dashboards. */
@@ -3065,7 +2830,7 @@ button:disabled {
     font-size: 8px;
   }
 }
-.archive-banner {
+.archive-notice {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -3077,10 +2842,10 @@ button:disabled {
   color: #7a90ac;
   font-size: 11px;
 }
-.archive-banner > span {
+.archive-notice > span {
   flex: 1;
 }
-.archive-banner button {
+.archive-notice button {
   display: flex;
   gap: 7px;
   align-items: center;
@@ -3140,13 +2905,13 @@ button:disabled {
   .board-actions > .filter-wrap:last-child {
     display: block;
   }
-  .archive-banner {
+  .archive-notice {
     flex-wrap: wrap;
   }
-  .archive-banner > span {
+  .archive-notice > span {
     font-size: 10px;
   }
-  .archive-banner button {
+  .archive-notice button {
     margin-left: auto;
   }
   .project-section-heading {
@@ -4319,23 +4084,6 @@ button:disabled {
   font-weight: 600;
   color: #486581;
 }
-.workspace-banner-preview {
-  height: 150px;
-  border-radius: 12px;
-  background: #dbe6f4;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-}
-.workspace-banner-preview > span {
-  font-size: 120px;
-  color: #829dbe;
-}
-.workspace-banner-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 .workspace-image-actions {
   display: flex;
   gap: 20px;
@@ -4376,62 +4124,9 @@ button:disabled {
   display: flex;
   margin-top: 12px;
 }
-.workspace-banner-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.has-workspace-banner .banner-art {
-  visibility: hidden;
-}
-.has-workspace-banner:after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #ecf3faf2 0%, #ecf3faad 42%, #ecf3fa15 70%);
-  pointer-events: none;
-}
-.has-workspace-banner .banner-text,
-.has-workspace-banner .banner-progress {
-  z-index: 1;
-  position: relative;
-}
-.has-workspace-banner .banner-progress {
-  background: #edf3faf0;
-}
-.workspace-overview-cover {
-  height: 220px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-.workspace-overview-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.workspace-overview-cover button {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  background: #fffffff2;
-  padding: 10px 14px;
-  border-radius: 7px;
-  color: #486581;
-  font-size: 11px;
-}
 @media (max-width: 760px) {
-  .workspace-overview-cover {
-    height: 160px;
-  }
   .workspace-image-actions {
     gap: 12px;
-  }
-  .workspace-banner-preview {
-    height: 120px;
   }
 }
 .auth-page {

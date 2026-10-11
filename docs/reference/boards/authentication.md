@@ -6,7 +6,7 @@
 
 Email registration requires a name, valid email address, and a password of 12–200 characters. Passwords are hashed with Microsoft's ASP.NET Core Identity `PasswordHasher`; plaintext passwords are not persisted. Local sign-in and registration use the ASP.NET Core rate limiter.
 
-The API signs a protected `kanbada_session` cookie using ASP.NET Core cookie authentication and Data Protection. It is HttpOnly, SameSite=Lax, and secure for HTTPS requests. Sessions have a fixed eight-hour lifetime. `SessionEvents` checks the session row, user, and expiry on authenticated requests. Logout removes that row and clears the cookie, so a replayed revoked session is rejected.
+The API signs a protected `domus_session` cookie using ASP.NET Core cookie authentication and Data Protection. It is HttpOnly, SameSite=Lax, and secure for HTTPS requests. Sessions have a fixed eight-hour lifetime. `SessionEvents` checks the session row, user, and expiry on authenticated requests. Logout removes that row and clears the cookie, so a replayed revoked session is rejected.
 
 The portal refreshes session state on focus, once a minute, across tabs, and after a 401. It stores a non-secret cross-tab notification, not authentication tokens. Profile photos and workspace membership display details remain in workspace state; changing your own display name also updates your account's session display name. Login email is read-only in the API-backed profile form.
 
@@ -47,7 +47,7 @@ See Microsoft's [external authentication guidance](https://learn.microsoft.com/e
 
 Every read and write requires membership. Owners can change workspace settings, invite/remove members, and delete non-personal workspaces. Members can collaborate on cards and workflows and edit their own profile. Personal workspaces and My activities cannot be deleted; My activities cannot be archived or renamed.
 
-Inviting a member creates a pending record and a random link token. The owner copies the invitation URL and sends it to the intended recipient. Kanbada does not send emails. Acceptance requires a signed-in account matching the invited email. Removing membership revokes ordinary workspace access immediately.
+Inviting a member creates a pending record and a random link token. The owner copies the invitation URL and sends it to the intended recipient. Domus does not send emails. Acceptance requires a signed-in account matching the invited email. Removing membership revokes ordinary workspace access immediately.
 
 ## Sharing
 
@@ -57,6 +57,6 @@ Links use cryptographically random tokens and optional seven/thirty-day expiry. 
 
 ## Request boundary
 
-Mutations require `X-Kanbada-Request: 1`, and supplied Origin values are checked. There is no credentialed cross-origin CORS policy. Browser HTML forms cannot supply this custom header, and other origins cannot preflight it successfully. Multipart uploads use this same request boundary rather than ASP.NET antiforgery form tokens. Preserve these assumptions if changing hosting or adding CORS.
+Mutations require `X-Domus-Request: 1`, and supplied Origin values are checked. There is no credentialed cross-origin CORS policy. Browser HTML forms cannot supply this custom header, and other origins cannot preflight it successfully. Multipart uploads use this same request boundary rather than ASP.NET antiforgery form tokens. Preserve these assumptions if changing hosting or adding CORS.
 
 Responses include `nosniff`, `same-origin` referrer policy, and `no-store`. Never log passwords, session cookies, connection strings, or invitation/share tokens. Log correlation IDs and operation context instead.

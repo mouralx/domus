@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Kanbada.Api.Persistence.Migrations;
+namespace Domus.Boards.Api.Persistence.Migrations;
 
-[DbContext(typeof(KanbadaDbContext))]
+[DbContext(typeof(BoardsDbContext))]
 [Migration("20261010010000_DomusBlueBranding")]
 public sealed class DomusBlueBranding : Migration
 {

@@ -88,7 +88,7 @@ export async function checkLabels(browser) {
   await page.getByLabel('Idioma da interface').selectOption('en-US');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'List', exact: true }).click();
-  await page.screenshot({ path: '/private/tmp/kanbada-label-list-mobile.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-label-list-mobile.png', fullPage: true });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.setViewportSize({ width: 1440, height: 1050 });
   // Workspaces: protected personal workspace, cancellation, current/inactive deletion and file cleanup.
@@ -131,7 +131,7 @@ export async function checkLabels(browser) {
     page.getByRole('button', { name: 'Download cleanup.txt', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Save task', exact: true }).click();
-  const deletedId = await page.evaluate(() => localStorage.getItem('kanbada-active-workspace'));
+  const deletedId = await page.evaluate(() => localStorage.getItem('domus-active-workspace'));
   await page.getByRole('button', { name: 'Switch workspace', exact: true }).click();
   await page.getByRole('button', { name: 'Delete workspace Disposable', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('You will return to My Workspace');
@@ -144,13 +144,13 @@ export async function checkLabels(browser) {
   await expect(page.locator('.workspace')).toContainText('My Workspace');
   await expect(page.locator('.kpi-card').first().locator('strong')).toHaveText('11');
   assert.equal(
-    await page.evaluate((id) => localStorage.getItem('kanbada-workspace-' + id), deletedId),
+    await page.evaluate((id) => localStorage.getItem('domus-workspace-' + id), deletedId),
     null,
   );
   const keys = await page.evaluate(
     () =>
       new Promise((resolve) => {
-        const request = indexedDB.open('kanbada-files', 1);
+        const request = indexedDB.open('domus-files', 1);
         request.onsuccess = () => {
           const db = request.result;
           const query = db.transaction('files', 'readonly').objectStore('files').getAllKeys();
@@ -179,7 +179,7 @@ export async function checkLabels(browser) {
   await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
   // Legacy tags and original workspace name migrate without losing the existing cards.
   await page.evaluate(() => {
-    const state = JSON.parse(localStorage.getItem('kanbada-v1'));
+    const state = JSON.parse(localStorage.getItem('domus-v1'));
     delete state.labels;
     state.workspace.name = 'Studio workspace';
     for (const task of state.tasks) {
@@ -187,8 +187,8 @@ export async function checkLabels(browser) {
       delete task.labels;
     }
     state.tasks[0].tag = 'Legacy custom label';
-    localStorage.setItem('kanbada-v1', JSON.stringify(state));
-    localStorage.setItem('kanbada-workspaces-v1', JSON.stringify([]));
+    localStorage.setItem('domus-v1', JSON.stringify(state));
+    localStorage.setItem('domus-workspaces-v1', JSON.stringify([]));
   });
   await page.reload();
   await expect(page.locator('.workspace')).toContainText('My Workspace');

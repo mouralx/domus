@@ -21,7 +21,7 @@ try:
     port = subprocess.check_output([*docker, 'port', name, '5432']).decode().strip().rsplit(':', 1)[1]
     env = dict(os.environ, ConnectionStrings__Postgres=f'Host=127.0.0.1;Port={port};Database=postgres;Username=postgres;Password={password}')
     env.pop('DOMUS_MEMBERSHIP_URL', None)  # Exercise the inherited standalone boards regression suite.
-    result = subprocess.run(['dotnet', 'test', 'services/boards/tests/Kanbada.Api.Tests/Kanbada.Api.Tests.csproj'], cwd=root / "src", env=env)
+    result = subprocess.run(['dotnet', 'test', 'services/boards/tests/Domus.Boards.Api.Tests/Domus.Boards.Api.Tests.csproj'], cwd=root / "src", env=env)
 finally:
     subprocess.run([*docker, 'rm', '-fv', name], stdout=subprocess.DEVNULL, check=True)
 raise SystemExit(result.returncode)

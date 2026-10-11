@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class AutomationContext
 {
@@ -8,7 +8,7 @@ public static class AutomationContext
     {
         api.MapGet("/domus/platform/context", (HttpContext ctx, PlatformAdmins admins) =>
             Results.Ok(new { userId = Auth.User(ctx), canManagePlatform = admins.Contains(Auth.User(ctx)) })).ExcludeFromDescription();
-        api.MapGet("/domus/workspaces/{id}/context", async (string id, HttpContext ctx, WorkspaceResolver resolver, KanbadaDbContext db, PlatformAdmins admins) =>
+        api.MapGet("/domus/workspaces/{id}/context", async (string id, HttpContext ctx, WorkspaceResolver resolver, BoardsDbContext db, PlatformAdmins admins) =>
         {
             var user = Auth.User(ctx);
             var workspace = await resolver.WorkspaceId(id, user);

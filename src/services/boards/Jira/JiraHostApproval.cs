@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class JiraApprovedHostEntity
 {
@@ -15,7 +15,7 @@ public static class JiraHostApproval
     public static void Map(RouteGroupBuilder api)
     {
         var routes = api.MapGroup("/jira").WithTags("Jira synchronization");
-        routes.MapGet("/hosts", async (KanbadaDbContext db, PlatformAdmins admins, IConfiguration configuration, HttpContext ctx, CancellationToken ct) =>
+        routes.MapGet("/hosts", async (BoardsDbContext db, PlatformAdmins admins, IConfiguration configuration, HttpContext ctx, CancellationToken ct) =>
         {
             ctx.Response.Headers.CacheControl = "no-store";
             return Results.Ok(new
@@ -25,7 +25,7 @@ public static class JiraHostApproval
                 configuredHosts = (configuration["Jira:AllowedHosts"] ?? "").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             });
         });
-        routes.MapPost("/hosts", async (HostInput input, KanbadaDbContext db, PlatformAdmins admins, HttpContext ctx, CancellationToken ct) =>
+        routes.MapPost("/hosts", async (HostInput input, BoardsDbContext db, PlatformAdmins admins, HttpContext ctx, CancellationToken ct) =>
         {
             admins.Require(Auth.User(ctx));
             var authority = JiraDestinationPolicy.Parse(input.BaseUrl).Authority.ToLowerInvariant();
@@ -36,7 +36,7 @@ public static class JiraHostApproval
             }
             return Results.Ok(new { authority });
         });
-        routes.MapDelete("/hosts", async ([Microsoft.AspNetCore.Mvc.FromBody] HostInput input, KanbadaDbContext db, PlatformAdmins admins, HttpContext ctx, CancellationToken ct) =>
+        routes.MapDelete("/hosts", async ([Microsoft.AspNetCore.Mvc.FromBody] HostInput input, BoardsDbContext db, PlatformAdmins admins, HttpContext ctx, CancellationToken ct) =>
         {
             admins.Require(Auth.User(ctx));
             var authority = JiraDestinationPolicy.Parse(input.BaseUrl).Authority.ToLowerInvariant();

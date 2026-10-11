@@ -72,6 +72,15 @@ export function PlatformBrandingProvider({ children }: { children: ReactNode }) 
         const response = await fetch('/api/platform/branding', {
           headers: etag ? { 'If-None-Match': etag } : {},
         });
+        if (response.status === 401) {
+          etag = '';
+          if (active) {
+            setBranding(defaultBranding);
+            setLoaded(true);
+            setError('');
+          }
+          return;
+        }
         if (!response.ok && response.status !== 304)
           throw new Error(`Could not load platform branding (HTTP ${response.status}).`);
         if (response.status !== 304) {
@@ -93,10 +102,13 @@ export function PlatformBrandingProvider({ children }: { children: ReactNode }) 
       }
     };
     void load();
+    const changed = () => void load();
+    window.addEventListener('domus-session-changed', changed);
     const timer = window.setInterval(() => void load(), 60000);
     return () => {
       active = false;
       window.clearInterval(timer);
+      window.removeEventListener('domus-session-changed', changed);
     };
   }, []);
   useLayoutEffect(() => {
@@ -118,8 +130,7 @@ export function PlatformBrandingProvider({ children }: { children: ReactNode }) 
       '--brand-dark-text': foreground(branding.darkBackground),
     };
     for (const [name, value] of Object.entries(variables)) root.style.setProperty(name, value);
-    document.title =
-      branding.name === 'kanbada' ? 'Kanbada — Make room for great work' : branding.name;
+    document.title = branding.name;
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute('content', `${branding.name} — a calmer place to do your best work.`);

@@ -6,7 +6,7 @@ Branding is shared by the entire installation, including the sign-in/enrollment
 pages, navigation logo, shared-card/invitation headers and browser title/favicon.
 It does not replace individual workspace icons/banners or semantic card
 status/priority colors. API documentation and authenticator issuer names remain
-Kanbada; those identify the underlying product rather than a workspace brand.
+Domus; those identify the underlying product rather than a workspace brand.
 
 ## Configure administrators
 

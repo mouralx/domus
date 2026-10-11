@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class ApiOptions
 {

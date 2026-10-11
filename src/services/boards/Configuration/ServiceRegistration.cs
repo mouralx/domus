@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
-using Kanbada.Api;
+using Domus.Boards.Api;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
@@ -11,11 +11,11 @@ using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading.RateLimiting;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class ServiceRegistration
 {
-    public static Dictionary<string, bool> AddKanbada(this WebApplicationBuilder builder)
+    public static Dictionary<string, bool> AddDomusBoards(this WebApplicationBuilder builder)
     {
         builder.WebHost.ConfigureKestrel(o =>
         {
@@ -35,7 +35,7 @@ public static class ServiceRegistration
         builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = 26 * 1024 * 1024);
         var connection = builder.Configuration.GetConnectionString("Postgres") ?? throw new InvalidOperationException("Configure ConnectionStrings:Postgres.");
         builder.Services.AddSingleton(NpgsqlDataSource.Create(connection));
-        builder.Services.AddDbContext<KanbadaDbContext>((services, options) => options.UseNpgsql(services.GetRequiredService<NpgsqlDataSource>()));
+        builder.Services.AddDbContext<BoardsDbContext>((services, options) => options.UseNpgsql(services.GetRequiredService<NpgsqlDataSource>()));
         builder.Services.AddScoped<WorkspaceMapper>();
         builder.Services.AddScoped<WorkspaceMetrics>();
         builder.Services.AddScoped<WorkspaceResolver>();
@@ -55,7 +55,7 @@ public static class ServiceRegistration
         builder.Services.AddExceptionHandler<ApiExceptionHandler>();
         builder.Services.AddScoped<SessionEvents>();
         builder.Services.AddScoped<MembershipSessionEvents>();
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(options => options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
         builder.Services.AddHealthChecks().AddCheck<PostgresHealthCheck>("postgres");
         builder.Services.AddOptions<ApiOptions>().Bind(builder.Configuration).ValidateDataAnnotations().Validate(o => Uri.TryCreate(o.PortalOrigin, UriKind.Absolute, out var uri) && (uri.Scheme == "https" || uri.Host is "localhost" or "127.0.0.1"), "PortalOrigin must use HTTPS outside localhost.").ValidateOnStart();
         builder.Services.AddOpenApi(ApiDocumentation.Configure);

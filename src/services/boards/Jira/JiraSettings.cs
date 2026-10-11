@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
-public sealed class JiraSettings(KanbadaDbContext db, WorkspaceResolver resolver, JiraSecrets secrets, JiraDestinationPolicy policy)
+public sealed class JiraSettings(BoardsDbContext db, WorkspaceResolver resolver, JiraSecrets secrets, JiraDestinationPolicy policy)
 {
     public async Task<JiraConnectionEntity> ForTest(Guid workspace, string project, JiraConnectionInput input, CancellationToken ct)
     {
@@ -55,7 +55,7 @@ public sealed class JiraSettings(KanbadaDbContext db, WorkspaceResolver resolver
             c.Id, c.Version, c.BaseUrl, c.Edition, c.Email, HasToken = c.ProtectedToken.Length > 0,
             c.Jql, c.JiraProjectKey, c.IssueTypeId, c.Direction, c.Cron, c.TimeZone, c.Enabled, c.SyncAssignees,
             c.NextRunAt, c.RequestedAt, c.LastStartedAt, c.LastFinishedAt, c.LastError, c.LastSyncedCount,
-            Mappings = c.Mappings.Select(m => new JiraMappingInput(m.Kind, m.KanbadaValue, m.JiraValue, m.IsDefault)), Problems = problems
+            Mappings = c.Mappings.Select(m => new JiraMappingInput(m.Kind, m.DomusValue, m.JiraValue, m.IsDefault)), Problems = problems
         };
     }
 
@@ -63,11 +63,11 @@ public sealed class JiraSettings(KanbadaDbContext db, WorkspaceResolver resolver
     {
         JiraConfiguration.Validate(input, policy);
         var statuses = await db.Statuses.Where(s => s.WorkspaceId == workspace).Select(s => s.Id).ToListAsync(ct);
-        if (input.Mappings.Any(m => m.Kind == "status" && !statuses.Contains(m.KanbadaValue)))
-            throw new ApiError(400, "A mapped Kanbada status no longer exists.");
+        if (input.Mappings.Any(m => m.Kind == "status" && !statuses.Contains(m.DomusValue)))
+            throw new ApiError(400, "A mapped Domus status no longer exists.");
         var members = await db.Members.Where(m => m.WorkspaceId == workspace && m.UserId != null)
             .Select(m => m.UserId!.Value).ToListAsync(ct);
-        if (input.Mappings.Any(m => m.Kind == "assignee" && !members.Contains(Guid.Parse(m.KanbadaValue))))
+        if (input.Mappings.Any(m => m.Kind == "assignee" && !members.Contains(Guid.Parse(m.DomusValue))))
             throw new ApiError(400, "Assignee mappings must refer to registered members of this workspace.");
         var c = await Find(workspace, project, ct);
         if ((c?.Version ?? 0) != input.Version) throw new ApiError(409, "Jira settings changed. Reload before saving.");
@@ -76,7 +76,7 @@ public sealed class JiraSettings(KanbadaDbContext db, WorkspaceResolver resolver
             throw new ApiError(400, "Enter a new token when changing the Jira instance or account.");
         if (c is not null && (c.BaseUrl != url || c.Edition != input.Edition || c.JiraProjectKey != input.JiraProjectKey)
             && await db.Set<JiraLinkEntity>().AnyAsync(l => l.ConnectionId == c.Id, ct))
-            throw new ApiError(400, "The Jira instance, edition and project cannot change after items have been linked. Use a new Kanbada project.");
+            throw new ApiError(400, "The Jira instance, edition and project cannot change after items have been linked. Use a new Domus project.");
         if (c is null)
         {
             if (string.IsNullOrWhiteSpace(input.Token)) throw new ApiError(400, "A Jira token is required.");
@@ -103,10 +103,10 @@ public sealed class JiraSettings(KanbadaDbContext db, WorkspaceResolver resolver
         {
             var next = input.Mappings.SingleOrDefault(m => m.Kind == old.Kind && m.JiraValue == old.JiraValue);
             if (next is null) { db.Remove(old); c.Mappings.Remove(old); }
-            else { old.KanbadaValue = next.KanbadaValue; old.IsDefault = next.IsDefault; }
+            else { old.DomusValue = next.DomusValue; old.IsDefault = next.IsDefault; }
         }
         foreach (var next in input.Mappings.Where(m => !c.Mappings.Any(old => old.Kind == m.Kind && old.JiraValue == m.JiraValue)))
-            c.Mappings.Add(new JiraMappingEntity { ConnectionId = c.Id, Kind = next.Kind, KanbadaValue = next.KanbadaValue, JiraValue = next.JiraValue, IsDefault = next.IsDefault });
+            c.Mappings.Add(new JiraMappingEntity { ConnectionId = c.Id, Kind = next.Kind, DomusValue = next.DomusValue, JiraValue = next.JiraValue, IsDefault = next.IsDefault });
         await db.SaveChangesAsync(ct);
     }
 }

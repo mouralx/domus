@@ -1,3 +1,4 @@
+import { AiSettings } from '../features/ai/AiSettings';
 import { ArrowRight, Folder, Plus, Sparkles, Trash2, X } from 'lucide-react';
 import React from 'react';
 import { recordChanges } from '../domain/cardHistory';
@@ -68,7 +69,7 @@ export function WorkspaceDialogs({
           role="dialog"
           aria-modal="true"
           aria-label={t(modal)}
-          className={`modal ${modal === 'Profile' ? 'profile-modal' : modal === 'Share card' ? 'share-modal' : modal === 'Jira synchronization' ? 'jira-modal' : modal === 'Platform appearance' ? 'jira-modal branding-modal' : ''}`}
+          className={`modal ${modal === 'Profile' ? 'profile-modal' : modal === 'AI settings' ? 'ai-settings-modal' : modal === 'Share card' ? 'share-modal' : modal === 'Jira synchronization' ? 'jira-modal' : modal === 'Platform appearance' ? 'jira-modal branding-modal' : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="modal-heading">
@@ -139,6 +140,8 @@ export function WorkspaceDialogs({
               statuses={data.statuses}
               members={data.members}
             />
+          ) : modal === 'AI settings' && apiEnabled ? (
+            <AiSettings workspace={data.workspace.id} />
           ) : modal === 'Platform appearance' && apiEnabled ? (
             <PlatformSettings />
           ) : modal === 'Notifications' ? (
@@ -453,7 +456,7 @@ export function WorkspaceDialogs({
                 ) {
                   const response = await fetch('/api/auth/profile', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Kanbada-Request': '1' },
+                    headers: { 'Content-Type': 'application/json', 'X-Domus-Request': '1' },
                     body: JSON.stringify({ name }),
                   });
                   if (!response.ok) {
@@ -491,6 +494,12 @@ export function WorkspaceDialogs({
               </div>
               <p>{t('Manage your workspace, members, and preferences.')}</p>
               <ThemeSelect />
+              {apiEnabled && (
+                <button className="secondary" onClick={() => setModal('AI settings')}>
+                  <Sparkles size={16} />
+                  {t('AI settings')}
+                </button>
+              )}
               <PlatformSettingsButton onOpen={() => setModal('Platform appearance')} />
               <button className="secondary" onClick={() => setModal('Workspace appearance')}>
                 <Sparkles size={16} />

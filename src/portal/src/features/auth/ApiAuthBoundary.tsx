@@ -33,34 +33,37 @@ export function ApiAuthBoundary({ children }: { children: ReactNode }) {
       if (value.twoFactorSetupRequired) setEnrollmentActive(true);
       setStorageAccount(value.user);
       setSession(value);
+      window.dispatchEvent(new Event('domus-session-changed'));
     } catch {
-      setError('Could not connect to Kanbada. Please try again.');
+      setError('Could not connect to Domus. Please try again.');
       setSession({ user: null, providers: { google: false, microsoft: false } });
     }
   };
   useEffect(() => {
     void refresh();
     const update = (e: StorageEvent) => {
-      if (e.key === 'kanbada-auth-change') void refresh();
+      if (e.key === 'domus-auth-change') void refresh();
     };
     const expired = () => {
       setStorageAccount(null);
+      window.dispatchEvent(new Event('domus-session-changed'));
       setSession((previous) => (previous ? { ...previous, user: null } : null));
     };
     window.addEventListener('storage', update);
     window.addEventListener('focus', refresh);
-    window.addEventListener('kanbada-session-expired', expired);
+    window.addEventListener('domus-session-expired', expired);
     const timer = setInterval(refresh, 60000);
     return () => {
       clearInterval(timer);
       window.removeEventListener('storage', update);
       window.removeEventListener('focus', refresh);
-      window.removeEventListener('kanbada-session-expired', expired);
+      window.removeEventListener('domus-session-expired', expired);
     };
   }, []);
   const signal = () => {
+    window.dispatchEvent(new Event('domus-session-changed'));
     try {
-      localStorage.setItem('kanbada-auth-change', String(Date.now()));
+      localStorage.setItem('domus-auth-change', String(Date.now()));
     } catch {
       /* Cookies still control the session. */
     }
@@ -72,6 +75,7 @@ export function ApiAuthBoundary({ children }: { children: ReactNode }) {
       await apiRequest('/auth/logout', { method: 'POST' });
       setEnrollmentActive(false);
       setStorageAccount(null);
+      window.dispatchEvent(new Event('domus-session-changed'));
       setSession((previous) => (previous ? { ...previous, user: null } : null));
       signal();
     } catch (e) {

@@ -45,8 +45,6 @@ export type Workspace = {
   id: string;
   name: string;
   icon?: string;
-  banner?: string;
-  bannerPosition?: number;
 };
 export type Notification = { id: string; message: string; at: string; cardId?: string };
 export type State = {

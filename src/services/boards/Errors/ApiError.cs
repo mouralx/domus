@@ -1,4 +1,4 @@
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class ApiError(int status, string message) : Exception(message)
 {

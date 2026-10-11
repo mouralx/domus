@@ -95,13 +95,13 @@ export function TwoFactorSettings({ onComplete }: { onComplete?: () => void } = 
                 className="secondary"
                 onClick={() => {
                   const url = URL.createObjectURL(
-                    new Blob(['Kanbada recovery codes\n\n' + codes.join('\n')], {
+                    new Blob(['Domus recovery codes\n\n' + codes.join('\n')], {
                       type: 'text/plain',
                     }),
                   );
                   const link = document.createElement('a');
                   link.href = url;
-                  link.download = 'kanbada-recovery-codes.txt';
+                  link.download = 'domus-recovery-codes.txt';
                   link.click();
                   setTimeout(() => URL.revokeObjectURL(url), 1000);
                 }}

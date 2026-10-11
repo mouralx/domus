@@ -211,29 +211,6 @@
 :is(:root, [data-platform-theme])[data-platform-theme] .invite-button > svg:last-child {
     color: var(--ui-muted)
 }
-:is(:root, [data-platform-theme])[data-platform-theme] .project-banner {
-    background: var(--ui-field);
-    border: 1px solid var(--ui-border);
-    border-radius: calc(10px * var(--ui-radius-scale));
-    --ui-text: var(--ui-panel-text)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-eyebrow {
-    font-size: calc(8px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-text h2 {
-    font-family: var(--ui-font-heading);
-    font-size: calc(29px * var(--ui-font-scale));
-    color: var(--ui-text)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-text p {
-    font-size: calc(10px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-bottom > span {
-    font-size: calc(9px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
 :is(:root, [data-platform-theme])[data-platform-theme] .art-star {
     font-size: calc(270px * var(--ui-font-scale));
     color: var(--ui-muted)
@@ -249,23 +226,6 @@
     font-size: calc(7px * var(--ui-font-scale));
     color: var(--ui-muted)
 }
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-progress {
-    border: 1px solid var(--ui-border);
-    border-radius: calc(8px * var(--ui-radius-scale))
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-progress > span {
-    font-size: calc(8px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-progress strong {
-    font-size: calc(35px * var(--ui-font-scale));
-    font-family: var(--ui-font-heading);
-    color: var(--ui-text)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-progress > div > span {
-    font-size: calc(8px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
 :is(:root, [data-platform-theme])[data-platform-theme] .progress-track {
     background: var(--ui-accent);
     border-radius: calc(4px * var(--ui-radius-scale))
@@ -273,13 +233,6 @@
 :is(:root, [data-platform-theme])[data-platform-theme] .progress-track i {
     background: var(--ui-accent);
     border-radius: calc(4px * var(--ui-radius-scale))
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-progress p {
-    font-size: calc(9px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .banner-progress b {
-    color: var(--ui-text)
 }
 :is(:root, [data-platform-theme])[data-platform-theme] .view-tabs button {
     color: var(--ui-muted);
@@ -568,13 +521,6 @@
     border-radius: calc(10px * var(--ui-radius-scale));
     --ui-text: var(--ui-panel-text)
 }
-:is(:root, [data-platform-theme])[data-platform-theme] .project-tile-art {
-    border-radius: calc(6px * var(--ui-radius-scale));
-    font-size: calc(105px * var(--ui-font-scale))
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .project-tile-art svg {
-    color: var(--ui-text)
-}
 :is(:root, [data-platform-theme])[data-platform-theme] .project-tile h3 {
     font-size: calc(16px * var(--ui-font-scale))
 }
@@ -744,14 +690,8 @@
     :is(:root, [data-platform-theme])[data-platform-theme] .task-card h3 {
         font-size: calc(14px * var(--ui-font-scale))
     }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-text h2 {
-        font-size: calc(33px * var(--ui-font-scale))
-    }
 }
 @media (max-width: 1200px) {
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-bottom > span {
-        font-size: calc(8px * var(--ui-font-scale))
-    }
     :is(:root, [data-platform-theme])[data-platform-theme] .task-card h3 {
         font-size: calc(11px * var(--ui-font-scale))
     }
@@ -771,18 +711,6 @@
     }
     :is(:root, [data-platform-theme])[data-platform-theme] .upgrade-card button {
         font-size: calc(9px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-progress > div > span {
-        font-size: calc(7px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-text h2 {
-        font-size: calc(26px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-text p {
-        font-size: calc(9px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-progress strong {
-        font-size: calc(29px * var(--ui-font-scale))
     }
     :is(:root, [data-platform-theme])[data-platform-theme] .list-header,
 :is(:root, [data-platform-theme])[data-platform-theme] .list-row {
@@ -808,26 +736,8 @@
     :is(:root, [data-platform-theme])[data-platform-theme] .project-heading p {
         font-size: calc(10px * var(--ui-font-scale))
     }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-text h2 {
-        font-size: calc(26px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-text p {
-        font-size: calc(9px * var(--ui-font-scale))
-    }
     :is(:root, [data-platform-theme])[data-platform-theme] .art-star {
         font-size: calc(230px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-progress > span {
-        font-size: calc(6px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-progress strong {
-        font-size: calc(25px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-progress p {
-        font-size: calc(7px * var(--ui-font-scale))
-    }
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-bottom > span {
-        font-size: calc(7px * var(--ui-font-scale))
     }
     :is(:root, [data-platform-theme])[data-platform-theme] .view-tabs button {
         font-size: calc(10px * var(--ui-font-scale))
@@ -861,11 +771,6 @@
     }
     :is(:root, [data-platform-theme])[data-platform-theme] .board-caption {
         font-size: calc(8px * var(--ui-font-scale))
-    }
-}
-@media (max-width: 760px) {
-    :is(:root, [data-platform-theme])[data-platform-theme] .banner-text h2 {
-        font-size: calc(25px * var(--ui-font-scale))
     }
 }
 :is(:root, [data-platform-theme])[data-platform-theme] .workflow-toolbar > label {
@@ -1191,7 +1096,7 @@
         font-size: calc(8px * var(--ui-font-scale))
     }
 }
-:is(:root, [data-platform-theme])[data-platform-theme] .archive-banner {
+:is(:root, [data-platform-theme])[data-platform-theme] .archive-notice {
     border: 1px solid var(--ui-border);
     background: var(--ui-field);
     border-radius: calc(7px * var(--ui-radius-scale));
@@ -1199,7 +1104,7 @@
     font-size: calc(11px * var(--ui-font-scale));
     --ui-text: var(--ui-panel-text)
 }
-:is(:root, [data-platform-theme])[data-platform-theme] .archive-banner button {
+:is(:root, [data-platform-theme])[data-platform-theme] .archive-notice button {
     color: var(--ui-muted);
     font-size: calc(11px * var(--ui-font-scale))
 }
@@ -1219,7 +1124,7 @@
     color: var(--ui-muted)
 }
 @media (max-width: 760px) {
-    :is(:root, [data-platform-theme])[data-platform-theme] .archive-banner > span {
+    :is(:root, [data-platform-theme])[data-platform-theme] .archive-notice > span {
         font-size: calc(10px * var(--ui-font-scale))
     }
 }
@@ -1630,14 +1535,6 @@
     font-size: calc(13px * var(--ui-font-scale));
     color: var(--ui-text)
 }
-:is(:root, [data-platform-theme])[data-platform-theme] .workspace-banner-preview {
-    border-radius: calc(12px * var(--ui-radius-scale));
-    background: var(--ui-selection)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .workspace-banner-preview > span {
-    font-size: calc(120px * var(--ui-font-scale));
-    color: var(--ui-muted)
-}
 :is(:root, [data-platform-theme])[data-platform-theme] .simple-form .image-upload-button {
     border: 1px solid var(--ui-border);
     border-radius: calc(7px * var(--ui-radius-scale));
@@ -1646,14 +1543,6 @@
 }
 :is(:root, [data-platform-theme])[data-platform-theme] .image-upload-button:focus-within {
     outline: 2px solid var(--ui-link)
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .workspace-overview-cover {
-    border-radius: calc(12px * var(--ui-radius-scale))
-}
-:is(:root, [data-platform-theme])[data-platform-theme] .workspace-overview-cover button {
-    border-radius: calc(7px * var(--ui-radius-scale));
-    color: var(--ui-text);
-    font-size: calc(11px * var(--ui-font-scale))
 }
 :is(:root, [data-platform-theme])[data-platform-theme] .auth-page {
     background: var(--ui-surface);

@@ -4,7 +4,7 @@
 
 ## Persistence boundaries
 
-Kanbada uses EF Core 10 with `Npgsql.EntityFrameworkCore.PostgreSQL`. `KanbadaDbContext` is scoped to a request; the underlying `NpgsqlDataSource` pools connections. Explicit entity classes live in `api/Persistence/Entities/`, with keys, relationships, indexes, and constraints configured in the context. Runtime reads and writes use LINQ, tracked entities, `SaveChangesAsync`, and EF bulk deletion. Explicit SQL is used for migrations, PostgreSQL synchronization locks, and database integration fixtures.
+Domus uses EF Core 10 with `Npgsql.EntityFrameworkCore.PostgreSQL`. `BoardsDbContext` is scoped to a request; the underlying `NpgsqlDataSource` pools connections. Explicit entity classes live in `api/Persistence/Entities/`, with keys, relationships, indexes, and constraints configured in the context. Runtime reads and writes use LINQ, tracked entities, `SaveChangesAsync`, and EF bulk deletion. Explicit SQL is used for migrations, PostgreSQL synchronization locks, and database integration fixtures.
 
 There are no JSON/JSONB business-data columns. JSON remains the HTTP/export format. `WorkspaceMapper` assembles that contract from relational records and synchronizes incoming collections by primary key. Existing rows retain their keys; EF only updates changed scalar values. The frontend sends compact field/array changes to PATCH `/api/workspaces/{id}`. Property names, card URLs, and the `If-Match` concurrency header remain compatible. The full PUT route remains available for compatibility and controlled imports.
 
@@ -17,7 +17,7 @@ There are no JSON/JSONB business-data columns. JSON remains the HTTP/export form
   `ExpandedPlatformTheme` preserves existing values and adds automatic (null)
   optional colors with default typography (100%) and rounding (8). Platform admin
   account IDs are resolved from server configuration, not exposed in this table.
-  `SeedDefaultPlatformBranding` inserts the built-in Kanbada defaults when the
+  `SeedDefaultPlatformBranding` inserts the built-in Domus defaults when the
   singleton row is absent and preserves any branding already saved.
 
 - `recovery_codes`: user-bound hashes of single-use authenticator recovery codes. Authenticator secrets and pending setup are encrypted in `users`; expiry, replay prevention, and failure-lockout state are stored alongside them. The per-account `two_factor_required` flag was removed by `EnforceTwoFactorForAllAccounts`; enrollment is mandatory for every user. `sessions.two_factor_verified` tracks assurance per session, and unverified/unenrolled sessions are restricted by middleware. Second-factor changes and login session creation serialize on the user row within an EF transaction.
@@ -45,7 +45,7 @@ There are no JSON/JSONB business-data columns. JSON remains the HTTP/export form
 - `jira_connections`: one connection per workspace/project, encrypted token,
   edition, JQL, direction, cron/timezone and run status.
 - `jira_mappings`: status/priority/assignee mappings keyed by connection, kind and
-  Jira identity. Multiple Jira statuses can share a Kanbada status; `is_default`
+  Jira identity. Multiple Jira statuses can share a Domus status; `is_default`
   selects its outbound target. Assignee targets are registered workspace user
   UUIDs, resolved to current membership on each inbound sync.
 - `jira_approved_hosts`: platform-administrator-approved HTTPS authorities. API and
@@ -125,7 +125,7 @@ For schema changes, edit entities/configuration, run `dotnet ef migrations add D
 
 Files retain the 25 MiB upload limit. Resized profile/workspace images are data-URL strings in dedicated text columns. Large media collections may warrant object storage; authorization must remain enforced on downloads.
 
-The Compose volume is `kanbada-postgres-data`; stopping the container preserves it. Expired sessions are cleaned up on session issuance, share expiry is checked on reads, and abandoned uploads can be deleted by the uploader while unreferenced. There is no scheduled orphan-file retention job.
+The Compose volume is `domus-postgres-data`; stopping the container preserves it. Expired sessions are cleaned up on session issuance, share expiry is checked on reads, and abandoned uploads can be deleted by the uploader while unreferenced. There is no scheduled orphan-file retention job.
 
 See Microsoft's guidance on [EF optimistic concurrency](https://learn.microsoft.com/en-us/ef/core/saving/concurrency) and [applying migrations in production](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying).
 

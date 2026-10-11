@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
-public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source, JiraClient jira, ILogger<JiraSyncEngine> logger)
+public sealed class JiraSyncEngine(BoardsDbContext db, NpgsqlDataSource source, JiraClient jira, ILogger<JiraSyncEngine> logger)
 {
     public async Task Run(Guid connectionId, CancellationToken ct)
     {
@@ -38,7 +38,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
                         var link = await db.Set<JiraLinkEntity>().SingleOrDefaultAsync(l => l.ConnectionId == c.Id && l.JiraIssueId == issue.Id, deadline.Token);
                         if (link is null)
                         {
-                            if (c.Direction == "kanbada-to-jira") return;
+                            if (c.Direction == "domus-to-jira") return;
                             if (uncertainCreation) throw new JiraSyncException("Resolve the pending Jira creation before importing unlinked issues to avoid duplicate cards.");
                             await Import(c, issue, deadline.Token);
                         }
@@ -46,7 +46,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
                         count++;
                     }, issue.Key, errors, deadline.Token);
                 }
-                if (c.Direction != "jira-to-kanbada")
+                if (c.Direction != "jira-to-domus")
                 {
                     db.ChangeTracker.Clear();
                     var cards = await db.Cards.AsNoTracking().Where(card => card.WorkspaceId == c.WorkspaceId && card.ProjectId == c.ProjectId
@@ -117,7 +117,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
     {
         JiraSyncException => error.Message,
         ApiError => error.Message,
-        DbUpdateConcurrencyException => "Kanbada changed during synchronization. The item will be retried on the next run.",
+        DbUpdateConcurrencyException => "Domus changed during synchronization. The item will be retried on the next run.",
         PostgresException { SqlState: "23505", ConstraintName: "labels_workspace_normalized_name" } =>
             "Workspace labels changed during synchronization. The item will be retried on the next run.",
         DbUpdateException { InnerException: PostgresException { SqlState: "23505", ConstraintName: "labels_workspace_normalized_name" } } =>
@@ -146,6 +146,8 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
             WorkspaceId = c.WorkspaceId,
             Id = "KB-" + Guid.NewGuid().ToString("N").ToUpperInvariant(),
             ProjectId = c.ProjectId,
+            BucketId = await db.Set<BucketEntity>().Where(b => b.WorkspaceId == c.WorkspaceId).OrderBy(b => b.Position).ThenBy(b => b.Id).Select(b => b.Id).FirstOrDefaultAsync(ct),
+            SwimlaneId = await db.Set<SwimlaneEntity>().Where(l => l.WorkspaceId == c.WorkspaceId && l.ProjectId == c.ProjectId).OrderBy(l => l.Position).ThenBy(l => l.Id).Select(l => l.Id).FirstOrDefaultAsync(ct),
             Position = (await db.Cards.Where(x => x.WorkspaceId == c.WorkspaceId).MaxAsync(x => (int?)x.Position, ct) ?? -1) + 1
         };
         db.Add(card);
@@ -159,7 +161,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
             JiraIssueId = issue.Id,
             JiraKey = issue.Key,
             Origin = "jira",
-            KanbadaHash = snapshot.Hash(),
+            DomusHash = snapshot.Hash(),
             JiraHash = snapshot.Hash(),
             LastError = assignee.Warning,
             LastSyncedAt = DateTimeOffset.UtcNow
@@ -175,7 +177,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
         var snapshot = await Snapshot(card, ct);
         // Validate mappings before reserving a creation attempt.
         JiraClient.ValidateWrite(c, snapshot);
-        var link = new JiraLinkEntity { Id = Guid.NewGuid(), ConnectionId = c.Id, CardId = cardId, Origin = "kanbada", CreationPending = true };
+        var link = new JiraLinkEntity { Id = Guid.NewGuid(), ConnectionId = c.Id, CardId = cardId, Origin = "domus", CreationPending = true };
         db.Add(link);
         await db.SaveChangesAsync(ct);
         (string Id, string Key) created;
@@ -198,7 +200,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
         await jira.Transition(c, issue, snapshot.Status, ct);
         var actual = JiraSnapshot.FromIssue(c, await jira.Get(c, created.Id, ct));
         if (snapshot.Hash() != actual.Hash()) throw new JiraSyncException("Jira did not retain all requested field values. Check workflow rules before retrying.");
-        link.KanbadaHash = snapshot.Hash();
+        link.DomusHash = snapshot.Hash();
         link.JiraHash = actual.Hash();
         link.LastSyncedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
@@ -210,9 +212,9 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
         var remote = JiraSnapshot.FromIssue(c, issue);
         var card = await db.Cards.SingleOrDefaultAsync(x => x.WorkspaceId == c.WorkspaceId && x.Id == link.CardId, ct);
         if (card is null || card.ProjectId != c.ProjectId)
-            throw new JiraSyncException("The linked Kanbada card was deleted or moved. No deletion or recreation is propagated.");
+            throw new JiraSyncException("The linked Domus card was deleted or moved. No deletion or recreation is propagated.");
         var local = await Snapshot(card, ct);
-        var winner = JiraSnapshot.Winner(c.Direction, link.Origin, local.Hash(), remote.Hash(), link.KanbadaHash, link.JiraHash);
+        var winner = JiraSnapshot.Winner(c.Direction, link.Origin, local.Hash(), remote.Hash(), link.DomusHash, link.JiraHash);
         if (winner == "jira")
         {
             await using var tx = await db.Database.BeginTransactionAsync(ct);
@@ -223,7 +225,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
                 throw new DbUpdateConcurrencyException();
             await Apply(card, remote, ct);
             var assignee = await ApplyAssignee(c, card, issue, ct);
-            link.KanbadaHash = remote.Hash();
+            link.DomusHash = remote.Hash();
             link.JiraHash = remote.Hash();
             link.JiraKey = issue.Key;
             link.LastError = assignee.Warning;
@@ -232,7 +234,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
             await tx.CommitAsync(ct);
             return;
         }
-        if (winner == "kanbada")
+        if (winner == "domus")
         {
             await jira.Update(c, issue, local, ct);
             issue = await jira.Get(c, issue.Id, ct);
@@ -245,7 +247,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
             await db.Entry(card).ReloadAsync(ct);
             if (card.ProjectId != c.ProjectId) throw new DbUpdateConcurrencyException();
             var assignee = await ApplyAssignee(c, card, issue, ct);
-            link.KanbadaHash = local.Hash();
+            link.DomusHash = local.Hash();
             link.JiraHash = remote.Hash();
             link.JiraKey = issue.Key;
             link.LastError = assignee.Warning;
@@ -259,7 +261,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
 
     private async Task<(bool Changed, string? Warning)> ApplyAssignee(JiraConnectionEntity c, CardEntity card, JiraIssue issue, CancellationToken ct)
     {
-        if (!c.SyncAssignees || c.Direction == "kanbada-to-jira") return (false, null);
+        if (!c.SyncAssignees || c.Direction == "domus-to-jira") return (false, null);
         if (!issue.Fields.ContainsKey("assignee"))
             throw new JiraSyncException("Jira did not return the assignee field. No assignee changes were saved.");
         string? email = null;
@@ -268,7 +270,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
         {
             var identity = JiraClient.AssigneeId(issue.Fields["assignee"]!.AsObject(), c.Edition);
             var mapping = c.Mappings.SingleOrDefault(m => m.Kind == "assignee" && m.JiraValue == identity);
-            if (mapping is not null && Guid.TryParse(mapping.KanbadaValue, out var user))
+            if (mapping is not null && Guid.TryParse(mapping.DomusValue, out var user))
                 email = await db.Members.Where(m => m.WorkspaceId == c.WorkspaceId && m.UserId == user)
                     .Select(m => m.Email).SingleOrDefaultAsync(ct);
             if (email is null)
@@ -289,7 +291,7 @@ public sealed class JiraSyncEngine(KanbadaDbContext db, NpgsqlDataSource source,
     private async Task Apply(CardEntity card, JiraSnapshot snapshot, CancellationToken ct)
     {
         if (!await db.Statuses.AnyAsync(s => s.WorkspaceId == card.WorkspaceId && s.Id == snapshot.Status, ct))
-            throw new JiraSyncException("The mapped Kanbada status no longer exists.");
+            throw new JiraSyncException("The mapped Domus status no longer exists.");
         card.Title = snapshot.Title;
         card.Description = snapshot.DescriptionText;
         card.StatusId = snapshot.Status;

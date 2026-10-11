@@ -6,7 +6,7 @@
 
 Open `/api/scalar` through the portal at `http://localhost:4173/api/scalar` or directly at `http://127.0.0.1:5180/api/scalar`. Scalar uses the generated `/api/openapi.json`, groups operations by feature, serves its JavaScript locally, and defaults code samples to C# HttpClient. The optional Scalar agent and external default fonts are disabled.
 
-When opening Scalar through the portal, an existing portal session is available to same-origin browser requests. Otherwise execute `/api/auth/login` in Scalar with your development account first. The session is an HttpOnly cookie; do not copy it into source code or localStorage. Mutations expose the required `X-Kanbada-Request` header with default value `1`. For workspace PATCH (or compatibility PUT), copy the current `version` from GET into `If-Match`.
+When opening Scalar through the portal, an existing portal session is available to same-origin browser requests. Otherwise execute `/api/auth/login` in Scalar with your development account first. The session is an HttpOnly cookie; do not copy it into source code or localStorage. Mutations expose the required `X-Domus-Request` header with default value `1`. For workspace PATCH (or compatibility PUT), copy the current `version` from GET into `If-Match`.
 
 Scalar and OpenAPI are currently mapped in every environment. Restrict their routes at the deployment boundary if your environment requires private developer documentation. See [Scalar's ASP.NET Core integration](https://scalar.com/products/api-references/integrations/aspnetcore/integration).
 
@@ -14,7 +14,7 @@ Scalar and OpenAPI are currently mapped in every environment. Restrict their rou
 
 1. Open `/api/scalar` on the same origin where you signed in, or use **Authentication → Sign in with an email and password** first.
 2. Open **Cards → Create a card** (`POST /api/workspaces/{id}/cards`).
-3. Set `id` to `studio` and leave `X-Kanbada-Request` as `1`.
+3. Set `id` to `studio` and leave `X-Domus-Request` as `1`.
 4. Select the **minimal** request example and replace its title:
 
 ```json
@@ -31,7 +31,7 @@ Every operation includes a request URL example, parameter examples, documented s
 
 ## Transport conventions
 
-All feature routes begin with `/api`. Requests and responses use JSON except multipart file uploads, binary file downloads, and workspace JSON downloads. Authentication uses cookies; there is no bearer token API. All mutations require `X-Kanbada-Request: 1`. A supplied Origin must match the portal origin or API origin. The application intentionally does not enable cross-origin credentialed CORS.
+All feature routes begin with `/api`. Requests and responses use JSON except multipart file uploads, binary file downloads, and workspace JSON downloads. Authentication uses cookies; there is no bearer token API. All mutations require `X-Domus-Request: 1`. A supplied Origin must match the portal origin or API origin. The application intentionally does not enable cross-origin credentialed CORS.
 
 An authenticated caller without access normally receives 404 for workspace/file lookup to avoid disclosing inaccessible resources. Ownership violations return 403. Invalid domain input returns 400. A missing workspace version returns 428; stale saves return 409. Rate-limited authentication requests return 429. Errors are centralized Problem Details with a trace ID; unexpected exception details are logged server-side.
 
@@ -70,7 +70,7 @@ Workspace reads and writes:
 Projects, cards, comments, checklists, assignees, notifications, profile/workspace images, and workflow definitions are updated through compact versioned workspace PATCH operations. Related changes are grouped atomically, including a new card and its activity/notification. Standalone API clients can also use the dedicated card-creation command above. Labels/buckets/statuses are workspace-scoped; swimlanes reference a project.
 
 Cards expose a server-derived `readOnly` flag. Confirmed Jira-linked cards in
-Jira-to-Kanbada mode reject user edits, moves and deletion with HTTP 403, including
+Jira-to-Domus mode reject user edits, moves and deletion with HTTP 403, including
 changes to comments, checklists and attachments. PATCH cannot write `readOnly`;
 PUT cannot bypass the policy by omitting it. Unlinked cards remain editable.
 
@@ -123,7 +123,7 @@ The flexible workspace JSON schema is partly represented as an open object in ge
 
 ## Compact portal saves and conditional refreshes
 
-The portal uses `PATCH /api/workspaces/{id}` with `X-Kanbada-Request: 1` and the loaded version in `If-Match`. It sends only changed fields or inserted/removed array entries, keeping related edits atomic:
+The portal uses `PATCH /api/workspaces/{id}` with `X-Domus-Request: 1` and the loaded version in `If-Match`. It sends only changed fields or inserted/removed array entries, keeping related edits atomic:
 
 ```json
 {"changes":[{"op":"replace","path":"/tasks/0/title","value":"Updated title"}]}
