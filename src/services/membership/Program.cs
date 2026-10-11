@@ -22,7 +22,7 @@ builder.Services.AddScoped<IIdentityDirectory, IdentityDirectory>();
 builder.Services.AddHostedService<DirectoryDispatcher>();
 var app = builder.Build();
 app.UseExceptionHandler(); app.UseStatusCodePages();
-app.UseMiddleware<RequestSecurityMiddleware>(); app.UseAuthentication(); app.UseMiddleware<TwoFactorEnrollmentMiddleware>(); app.UseAuthorization(); app.UseRateLimiter();
+app.UseMiddleware<RequestSecurityMiddleware>(); app.UseMiddleware<OAuthOriginMiddleware>(); app.UseAuthentication(); app.UseMiddleware<TwoFactorEnrollmentMiddleware>(); app.UseAuthorization(); app.UseRateLimiter();
 AuthenticationEndpoints.Map(app, providers);
 app.MapGet("/api/membership/health", async (BoardsDbContext db) => await db.Database.CanConnectAsync() ? Results.Ok(new { ok = true }) : Results.StatusCode(503)).AllowAnonymous();
 app.MapGet("/api/membership/session/context", (HttpContext ctx, PlatformAdmins admins) => Results.Ok(new MembershipSession(Auth.User(ctx), ctx.User.FindFirstValue(ClaimTypes.Name)!, ctx.User.FindFirstValue(ClaimTypes.Email)!, ctx.User.HasClaim("avatar_pending", "true"), ctx.User.HasClaim("two_factor_pending", "true"), admins.Contains(Auth.User(ctx))))).RequireAuthorization();
