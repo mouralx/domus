@@ -140,11 +140,53 @@ try {
   assert.equal(await page.getByRole('combobox',{name:'Assistant project'}).count(),0);
   await page.getByRole('button',{name:'Which automations are installed?',exact:true}).click();
   await page.getByText('Two automations are installed.',{exact:true}).waitFor();
+  await page.route('**/automations-api/api/**', route=>route.fulfill({json:new URL(route.request().url()).pathname.endsWith('/installations')?[]:{packages:[],runs:[],metrics:{running:0,completed:0},automations:[]}}));
+  await page.evaluate(async () => {
+    const { default: React } = await import('/node_modules/.vite/deps/react.js');
+    const { default: ReactDOM } = await import('/node_modules/.vite/deps/react-dom_client.js');
+    const { App } = await import('/src/app/App.tsx');
+    const { LogoutContext } = await import('/src/features/auth/LogoutContext.ts');
+    const { remoteRepository } = await import('/src/infrastructure/remoteRepository.ts');
+    const state={workspace:{id:'workspace',name:'Test workspace',canManage:true},version:1,notifications:[],tasks:[],projects:[{id:'my-activities',name:'My activities',description:'',color:'#167d8d',system:'activities'},{id:'project',name:'Project',description:'',color:'#167d8d'}],members:[{name:'Test owner',email:'test@example.test',initials:'TO',color:'#167d8d'}],activity:[],statuses:[{id:'open',name:'Open',color:'#167d8d',complete:false}],buckets:[],labels:[],swimlanes:[]};
+    remoteRepository.load=async()=>structuredClone(state);remoteRepository.switchWorkspace=async()=>structuredClone(state);remoteRepository.listWorkspaces=async()=>[state.workspace];
+    history.replaceState(null,'','/');
+    const node=document.createElement('div');document.body.replaceChildren(node);ReactDOM.createRoot(node).render(React.createElement(LogoutContext.Provider,{value:{busy:false,error:'',logout:async()=>{}}},React.createElement(App)));
+  });
+  const launcher=page.getByRole('button',{name:'Open assistant',exact:true});
+  await launcher.waitFor();
+  assert.deepEqual(await page.locator('.sidebar-bottom button').allTextContents(),['Help','Sign out']);
+  for (const theme of ['light','dark']) {
+    await page.evaluate(theme=>document.documentElement.setAttribute('data-theme',theme),theme);
+    const box=await launcher.boundingBox();assert.ok(box.x+box.width<=1280&&box.y+box.height<=900);assert.ok(box.width>=44&&box.height>=44);
+  }
+  await launcher.click();
+  await page.getByRole('dialog',{name:'Assistant',exact:true}).waitFor();
+  await page.getByRole('group',{name:'Assistant area'}).getByRole('button',{name:'Automations',exact:true}).click();
+  await page.getByRole('button',{name:'Which automations are installed?',exact:true}).waitFor();
+  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+  await launcher.waitFor();await page.waitForFunction(()=>document.activeElement?.classList.contains('assistant-launcher'));assert.equal(await launcher.evaluate(el=>el===document.activeElement),true);
+  const navigation=page.getByRole('navigation',{name:'Workspace navigation'});
+  await navigation.getByRole('button',{name:'Management',exact:true}).click();
+  await navigation.getByRole('button',{name:'Members',exact:true}).click();await launcher.waitFor();
+  await page.getByRole('button',{name:'Help',exact:true}).click();await launcher.waitFor();
+  const helpSearch=page.getByLabel('Search help');
+  for (const query of ['MCP','Shift+Enter','several automations','resize','icon']) {
+    await helpSearch.fill(query);assert.ok(await page.locator('.help-articles details').count()>0,'Missing help: '+query);
+  }
+  await helpSearch.fill('');assert.equal(await page.locator('.help-articles details').count(),65);
+  await navigation.locator('.nav-group-toggle').filter({hasText:'Automations'}).click();
+  await navigation.getByRole('button',{name:'Flows',exact:true}).click();await launcher.click();
+  await page.getByRole('button',{name:'Which automations are installed?',exact:true}).waitFor();
+  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+  await page.setViewportSize({width:390,height:844});const mobile=await launcher.boundingBox();assert.ok(mobile.x+mobile.width<=390&&mobile.y+mobile.height<=844);
+  await launcher.click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:'/private/tmp/domus-global-assistant-mobile.png',fullPage:true});
+  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
   advertisedOrigin = 'https://untrusted.example';
   await page.goto(origin.replace('127.0.0.1', 'localhost'));
   await page.locator('.auth-page').waitFor();
   assert.equal(new URL(page.url()).hostname, 'localhost', 'Only same-port loopback aliases may redirect');
-  console.log('PASS: reviewed description/checklist suggestions, duplicate filtering, unsaved/stale guards, personal subscription settings without API keys/monthly limits and mobile layout.');
+  console.log('PASS: reviewed description/checklist suggestions, duplicate filtering, unsaved/stale guards, personal subscription settings without API keys/monthly limits, persistent platform assistant, area switching, focus restoration, updated help and mobile layout.');
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');

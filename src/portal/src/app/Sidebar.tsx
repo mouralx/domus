@@ -389,7 +389,6 @@ export function Sidebar({
           </div>
         </nav>
         <div className="sidebar-bottom">
-          <LogoutButton />
           <button
             aria-label={t('Help')}
             title={sidebarCollapsed ? undefined : t('Help')}
@@ -398,6 +397,7 @@ export function Sidebar({
             <CircleHelp size={17} />
             <span className="nav-text">{t('Help')}</span>
           </button>
+          <LogoutButton />
         </div>
       </div>
     </aside>
