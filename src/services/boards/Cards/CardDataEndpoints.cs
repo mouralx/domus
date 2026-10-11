@@ -71,7 +71,7 @@ public static class CardDataEndpoints
     private static async Task<Guid> Access(string id, string project, string card, HttpContext ctx, WorkspaceResolver resolver, BoardsDbContext db, CancellationToken ct)
     {
         var workspace = await resolver.WorkspaceId(id, Auth.User(ctx));
-        if (!await db.Members.AnyAsync(m => m.WorkspaceId == workspace && m.UserId == Auth.User(ctx), ct) || !await db.Projects.AnyAsync(p => p.WorkspaceId == workspace && p.Id == project && !p.Archived, ct) || !await db.Cards.AnyAsync(c => c.WorkspaceId == workspace && c.ProjectId == project && c.Id == card, ct)) throw new ApiError(404, "Card not found or access denied.");
+        if (!await db.Members.AnyAsync(m => m.WorkspaceId == workspace && m.UserId == Auth.User(ctx), ct) || (project != "$workspace" && !await db.Projects.AnyAsync(p => p.WorkspaceId == workspace && p.Id == project && !p.Archived, ct)) || !await db.Cards.AnyAsync(c => c.WorkspaceId == workspace && (project == "$workspace" || c.ProjectId == project) && c.Id == card, ct)) throw new ApiError(404, "Card not found or access denied.");
         return workspace;
     }
 }

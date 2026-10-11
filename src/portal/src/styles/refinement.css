@@ -15,11 +15,36 @@
 }
 :root[data-platform-theme]
   .top-actions
-  :is(.theme-control, .language-switch, .search, .notification, .avatar-button),
+  :is(
+    .theme-control,
+    .theme-icon-trigger,
+    .assistant-launcher,
+    .language-switch,
+    .search,
+    .notification,
+    .avatar-button
+  ),
 :root[data-platform-theme] .top-actions .theme-control select {
   height: var(--header-control-height);
   min-height: var(--header-control-height);
   box-sizing: border-box;
+}
+.theme-menu-control .theme-icon-trigger {
+  gap: 10px;
+  padding-inline: 12px;
+  font: inherit;
+  font-size: 12px;
+}
+.theme-menu-control .theme-icon-options {
+  flex-direction: column;
+  min-width: 140px;
+}
+.theme-menu-control .theme-icon-options button {
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12px;
 }
 :root[data-platform-theme] .top-actions :is(.language-switch, .theme-control select) {
   padding-block: 0;

@@ -72,9 +72,9 @@ export function ThemeSelect({
   compact?: boolean;
   iconOnly?: boolean;
 }) {
-  return iconOnly ? <ThemeIconSelect /> : <ThemeTextSelect compact={compact} />;
+  return <ThemeIconSelect iconOnly={iconOnly} compact={compact} />;
 }
-function ThemeIconSelect() {
+function ThemeIconSelect({ iconOnly, compact }: { iconOnly: boolean; compact: boolean }) {
   const { theme, setTheme } = useContext(Context);
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -98,7 +98,7 @@ function ThemeIconSelect() {
   }, [open]);
   return (
     <div
-      className="theme-icon-control"
+      className={`theme-icon-control ${iconOnly ? '' : 'theme-menu-control'}`}
       ref={root}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
@@ -121,7 +121,14 @@ function ThemeIconSelect() {
         aria-controls={id}
         onClick={() => setOpen(!open)}
       >
-        <Icon size={17} aria-hidden="true" />
+        {iconOnly ? (
+          <Icon size={17} aria-hidden="true" />
+        ) : (
+          <span>
+            {!compact && `${t('Theme')}: `}
+            {t(selected.label)}
+          </span>
+        )}
         <ChevronDown size={12} aria-hidden="true" />
       </button>
       {open && (
@@ -140,30 +147,11 @@ function ThemeIconSelect() {
               }}
             >
               <OptionIcon size={18} aria-hidden="true" />
+              {!iconOnly && <span>{t(label)}</span>}
             </button>
           ))}
         </div>
       )}
     </div>
-  );
-}
-function ThemeTextSelect({ compact }: { compact: boolean }) {
-  const { theme, setTheme } = useContext(Context);
-  const { t } = useI18n();
-  const Icon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
-  return (
-    <label className={`theme-control ${compact ? 'theme-compact' : ''}`}>
-      <Icon size={16} />
-      {!compact && <span>{t('Theme')}</span>}
-      <select
-        aria-label={t('Theme')}
-        value={theme}
-        onChange={(e) => setTheme(e.target.value as Theme)}
-      >
-        <option value="light">{t('Light')}</option>
-        <option value="dark">{t('Dark')}</option>
-        <option value="system">{t('System')}</option>
-      </select>
-    </label>
   );
 }

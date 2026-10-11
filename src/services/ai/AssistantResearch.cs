@@ -5,7 +5,7 @@ public interface IProjectTools { Task<JsonObject> Call(string name, JsonObject a
 public sealed record ResearchResult(Suggestion Suggestion, string[] SeenIds, int ToolCalls, long InputTokens, long OutputTokens);
 public static class AssistantResearch
 {
-    public static async Task<ResearchResult> Run(OpenAiProvider provider, IProjectTools mcp, ChatGptConnection credential, string instructions, JsonArray payload, JsonArray tools, CancellationToken ct)
+    public static async Task<ResearchResult> Run(OpenAiProvider provider, IProjectTools mcp, ChatGptConnection credential, string instructions, JsonArray payload, JsonArray tools, CancellationToken ct, Func<string, JsonObject, JsonObject>? proposeAction = null)
     {
         var seen = new HashSet<string>(); long inputTokens = 0, outputTokens = 0; var toolCalls = 0;
         ModelStep? final = null;
@@ -23,13 +23,15 @@ public static class AssistantResearch
             {
                 var name = call!["name"]!.GetValue<string>();
                 var normalized = name.StartsWith("domus.", StringComparison.Ordinal) ? name[6..] : name;
-                if (!AssistantReadTools.Names.Contains(normalized)) throw new AiError(502, "O modelo pediu uma ferramenta não autorizada.");
+                if (!AssistantReadTools.Names.Contains(normalized) && !(proposeAction is not null && AssistantActionTools.Mutations.Contains(normalized))) throw new AiError(502, "O modelo pediu uma ferramenta não autorizada.");
                 var raw = call["arguments"]!.GetValue<string>();
                 if (raw.Length > 4096) throw new AiError(502, "Argumentos de ferramenta demasiado grandes.");
                 JsonObject arguments;
                 try { arguments = JsonNode.Parse(raw)?.AsObject() ?? throw new AiError(502, "Argumentos de ferramenta inválidos."); }
                 catch (System.Text.Json.JsonException) { throw new AiError(502, "Argumentos de ferramenta inválidos."); }
-                var result = await mcp.Call(normalized, arguments, ct); toolCalls++;
+                var result = AssistantActionTools.Mutations.Contains(normalized)
+                    ? proposeAction!(normalized, arguments)
+                    : await mcp.Call(normalized, arguments, ct); toolCalls++;
                 if (normalized is "read_card_data" or "read_card_attachment" && arguments["cardId"] is { } readId) seen.Add(readId.GetValue<string>());
                 if (result["cards"] is JsonArray cards) foreach (var card in cards) if (card?["id"] is { } cardId) seen.Add(cardId.GetValue<string>());
                 if (result["id"] is { } detailId && result["title"] is not null) seen.Add(detailId.GetValue<string>());

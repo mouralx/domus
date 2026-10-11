@@ -429,20 +429,16 @@
 }
 
 button.assistant-launcher {
-  position: fixed;
-  right: max(24px, env(safe-area-inset-right));
-  bottom: max(24px, env(safe-area-inset-bottom));
-  z-index: 28;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  flex-shrink: 0;
+  width: var(--header-control-height, 42px);
+  height: var(--header-control-height, 42px);
   padding: 0;
-  border: 1px solid var(--ui-primary);
-  border-radius: 50%;
-  background: var(--ui-primary);
-  color: var(--ui-on-primary);
-  box-shadow: 0 4px 16px #0002;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: var(--ui-surface);
+  color: var(--ui-text);
   cursor: pointer;
 }
 button.assistant-launcher:hover {
@@ -475,10 +471,6 @@ button.assistant-launcher:focus-visible {
 @media (max-width: 600px) {
   .assistant-area-switch {
     padding-inline: 16px;
-  }
-  button.assistant-launcher {
-    right: max(16px, env(safe-area-inset-right));
-    bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
 
@@ -523,4 +515,70 @@ button.assistant-launcher[hidden] {
 }
 .ai-transfer button {
   justify-self: start;
+}
+
+.assistant-prompt-anchor {
+  position: relative;
+}
+.assistant-prompt {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  width: min(340px, calc(100vw - 32px));
+  padding: 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--ui-surface);
+  box-shadow: 0 6px 20px #0002;
+}
+.assistant-prompt input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+}
+.assistant-action {
+  margin-block: 16px;
+  padding: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+}
+.assistant-action pre {
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .assistant-prompt {
+    position: fixed;
+    top: 78px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+.modal.card-drawer.assistant-conversation {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.assistant-action dl {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+}
+.assistant-action dl > div {
+  display: grid;
+  grid-template-columns: minmax(80px, auto) minmax(0, 1fr);
+  gap: 12px;
+}
+.assistant-action dt {
+  color: var(--ui-muted);
+}
+.assistant-action dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }

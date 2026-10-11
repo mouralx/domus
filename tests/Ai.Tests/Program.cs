@@ -127,6 +127,7 @@ try
     await Rejected(() => Task.FromResult(sessions.Open(new(actor, workspace, true, false), "one", sessionId)), 404);
     Console.WriteLine("PASS: scoped and expiring project conversations.");
     await ResearchChecks.Run();
+    ActionChecks.Run();
 
     var suggestion = JsonSerializer.Serialize(new { text = "A useful summary", items = new[] { "Review the card" } });
     var responseBody = JsonSerializer.Serialize(new { type = "response.completed", response = new { output = new[] { new { content = new[] { new { type = "output_text", text = suggestion } } } }, usage = new { input_tokens = 10, output_tokens = 20 } } });
