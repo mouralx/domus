@@ -941,5 +941,8 @@
   "Ask the assistant": "Pergunte ao assistente",
   "Ask the assistant…": "Pergunte ao assistente…",
   "Confirm action": "Confirmar ação",
-  "Action completed": "Ação concluída"
+  "Action completed": "Ação concluída",
+  "Request submitted": "Pedido submetido",
+  "Cancellation requested": "Cancelamento pedido",
+  "Action completed. Refresh the page to see the update.": "Ação concluída. Atualize a página para ver a alteração."
 }

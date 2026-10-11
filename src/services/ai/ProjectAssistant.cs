@@ -112,7 +112,7 @@ public static class ProjectAssistantEndpoints
                 AssistantActions.Begin(action);
                 var result = await mcp.Call(action.Tool, action.Arguments, context.RequestAborted);
                 var text = result.ToJsonString();
-                conversation.Turns.Add(new("User confirmed " + action.Tool, "Action completed: " + (text.Length > 3000 ? text[..3000] : text), []));
+                conversation.Turns.Add(new("User confirmed " + action.Tool, "Confirmed action result: " + (text.Length > 3000 ? text[..3000] : text), []));
                 if (conversation.Turns.Count > 6) conversation.Turns.RemoveAt(0);
                 conversation.LastUsed = DateTimeOffset.UtcNow;
                 return Results.Ok(new { ok = true, result });
