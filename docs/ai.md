@@ -108,7 +108,7 @@ Export clears the source connection atomically so only the destination rotates t
 
 ## Phase 2: project assistant with MCP
 
-Click the sparkle button in the top bar to open a small prompt. Start typing to move the draft into a conversation-only sidebar. Enter sends; Shift+Enter adds a line. The workspace assistant searches across projects and automations using authenticated MCP tools, bounded pages and exact aggregate metrics. It does not send the full workspace to the model. Source references are validated against tool results and current access.
+Click the sparkle button in the top bar to open the conversation-only sidebar directly. Enter sends; Shift+Enter adds a line. The workspace assistant searches across projects and automations using authenticated MCP tools, bounded pages and exact aggregate metrics. It does not send the full workspace to the model. Source references are validated against tool results and current access.
 
 The AI API owns personal OAuth, configuration and usage metadata in its dedicated PostgreSQL database. The independent MCP server delegates each operation to its owning domain API with the current member session. No API keys or monthly caps are introduced. Conversations expire after 30 minutes.
 

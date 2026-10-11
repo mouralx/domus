@@ -164,7 +164,7 @@ export function ProjectAssistant({
   };
   useEffect(() => {
     if (open && minimal) {
-      setQuestion(initialQuestion);
+      if (initialQuestion) setQuestion(initialQuestion);
       requestAnimationFrame(() => {
         const input = panel.current?.querySelector('textarea');
         input?.focus();

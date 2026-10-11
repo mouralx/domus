@@ -1,4 +1,76 @@
 /* Shared visual rhythm for every platform page, using the editable theme roles. */
+.enrollment-page {
+  margin: 0;
+  width: 100%;
+  min-height: 100dvh;
+}
+:root[data-platform-theme] .enrollment-card {
+  max-width: 440px;
+  padding: 32px;
+  background: var(--ui-surface);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--ui-text) 5%, transparent);
+}
+.enrollment-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 28px;
+  border-radius: 10px;
+  background: var(--ui-sidebar);
+  color: var(--ui-sidebar-text);
+  font-size: 22px;
+  font-weight: 700;
+}
+.enrollment-brand .logo-word {
+  color: inherit;
+}
+.enrollment-brand .brand-logo-only {
+  flex: none;
+  min-width: 160px;
+}
+:root[data-platform-theme] .enrollment-card h1 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  line-height: 1.2;
+}
+.enrollment-card > p {
+  margin: 0 0 24px;
+}
+.verification-enrollment > .two-factor-form {
+  display: grid;
+  gap: 18px;
+}
+.verification-enrollment > .two-factor-form label {
+  margin: 0;
+}
+.verification-enrollment > .two-factor-form input {
+  min-height: 48px;
+  font-size: 16px;
+}
+.verification-enrollment > .two-factor-form > button {
+  width: 100%;
+  min-height: 44px;
+}
+.enrollment-card > .enrollment-signout {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+}
+.auth-form .auth-back {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  min-height: 36px;
+}
+@media (max-width: 480px) {
+  :root[data-platform-theme] .enrollment-card {
+    padding: 24px;
+  }
+}
 :root[data-platform-theme] {
   --ui-card-shadow: 0 3px 16px color-mix(in srgb, var(--ui-text) 4%, transparent);
 }

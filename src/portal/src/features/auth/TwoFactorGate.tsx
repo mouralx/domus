@@ -19,11 +19,14 @@ export function TwoFactorGate({
   const [error, setError] = useState('');
   return (
     <main className="enrollment-page">
-      <div className="enrollment-card">
-        <div className="logo">
+      <section
+        className="enrollment-card verification-enrollment"
+        aria-labelledby="verification-title"
+      >
+        <div className="enrollment-brand">
           <Brand />
         </div>
-        <h1>{t(setup ? 'Secure your account' : 'Verify your sign-in')}</h1>
+        <h1 id="verification-title">{t(setup ? 'Secure your account' : 'Verify your sign-in')}</h1>
         <p>
           {t(
             setup
@@ -66,7 +69,7 @@ export function TwoFactorGate({
                 onChange={(e) => setCode(e.target.value)}
               />
             </label>
-            <button className="primary" disabled={busy}>
+            <button className="primary" disabled={busy || !code.trim()}>
               {t(busy ? 'Working…' : 'Verify your sign-in')}
             </button>
           </form>
@@ -76,10 +79,10 @@ export function TwoFactorGate({
             {t(error)}
           </p>
         )}
-        <button type="button" className="secondary" onClick={onLogout}>
+        <button type="button" className="secondary enrollment-signout" onClick={onLogout}>
           {t('Sign out')}
         </button>
-      </div>
+      </section>
     </main>
   );
 }
