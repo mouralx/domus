@@ -6,8 +6,6 @@ import {
   History,
   ListTodo,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   CircleHelp,
   BriefcaseBusiness,
   FolderKanban,
@@ -226,23 +224,6 @@ export function Sidebar({
           </div>,
           document.body,
         )}
-      <button
-        className="sidebar-collapse-toggle"
-        aria-label={sidebarCollapsed ? t('Expand sidebar') : t('Collapse sidebar')}
-        title={sidebarCollapsed ? undefined : t('Collapse sidebar')}
-        aria-expanded={!sidebarCollapsed}
-        onClick={() => {
-          const next = !sidebarCollapsed;
-          setSidebarCollapsed(next);
-          try {
-            localStorage.setItem('domus-sidebar-collapsed', String(next));
-          } catch {
-            /* Keep the current session preference. */
-          }
-        }}
-      >
-        {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
-      </button>
       <div
         className="sidebar-resize-handle"
         role="separator"
