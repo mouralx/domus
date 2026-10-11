@@ -41,11 +41,14 @@ public sealed class AiStore : IDisposable
     public Task<(ChatGptConnection? Connection, Guid Revision)> Connection(Guid actor) => sql?.Connection(actor) ?? Locked(() => Task.FromResult((
         state.Connections.TryGetValue(actor, out var encrypted) ? JsonSerializer.Deserialize<ChatGptConnection>(protector.CreateProtector(actor.ToString()).Unprotect(encrypted)) : null,
         state.Revisions.GetValueOrDefault(actor))));
-    public Task SaveConnection(Guid actor, ChatGptConnection? connection, Guid expected) => sql?.SaveConnection(actor, connection, expected) ?? Locked(async () =>
+    public Task<bool> TransferUsed(string key) => sql?.TransferUsed(key) ?? Locked(() => Task.FromResult(state.UsedTransfers.Contains(key)));
+    public Task SaveConnection(Guid actor, ChatGptConnection? connection, Guid expected, string? transferKey = null) => sql?.SaveConnection(actor, connection, expected, transferKey) ?? Locked(async () =>
     {
         if (state.Revisions.GetValueOrDefault(actor) != expected) throw new AiError(409, "A ligação mudou. Tente novamente.");
+        if (transferKey is not null && state.UsedTransfers.Contains(transferKey)) throw new AiError(409, "Esta transferência já foi utilizada.");
         var old = state;
-        state = new() { HostId = state.HostId, Connections = new(state.Connections), Revisions = new(state.Revisions), Workspaces = new(state.Workspaces), Usage = [.. state.Usage] };
+        state = new() { UsedTransfers = new(state.UsedTransfers), HostId = state.HostId, Connections = new(state.Connections), Revisions = new(state.Revisions), Workspaces = new(state.Workspaces), Usage = [.. state.Usage] };
+        if (transferKey is not null) state.UsedTransfers.Add(transferKey);
         state.Revisions[actor] = Guid.NewGuid();
         if (connection is null) state.Connections.Remove(actor);
         else state.Connections[actor] = protector.CreateProtector(actor.ToString()).Protect(JsonSerializer.Serialize(connection));
@@ -57,7 +60,7 @@ public sealed class AiStore : IDisposable
     {
         if (input.Provider != "openai") throw new AiError(400, "Escolha a ligação ChatGPT.");
         var old = state;
-        state = new() { HostId = state.HostId, Connections = new(state.Connections), Revisions = new(state.Revisions), Workspaces = new(state.Workspaces), Usage = [.. state.Usage] };
+        state = new() { UsedTransfers = new(state.UsedTransfers), HostId = state.HostId, Connections = new(state.Connections), Revisions = new(state.Revisions), Workspaces = new(state.Workspaces), Usage = [.. state.Usage] };
         state.Workspaces[id] = input;
         try { await Save(); } catch { state = old; throw; }
         return true;

@@ -30,6 +30,12 @@ public static class SqlStoreChecks
             var current = await sql.Connection(actor);
             var race = await Task.WhenAll(Enumerable.Range(0, 2).Select(async _ => { try { await sql.SaveConnection(actor, credential, current.Revision); return true; } catch (AiError error) when (error.Status == 409) { return false; } }));
             if (race.Count(x => x) != 1) throw new Exception("SQL concurrent refresh CAS is not atomic.");
+            var importActor = Guid.NewGuid(); var transferKey = "transfer:" + Guid.NewGuid().ToString("N");
+            await sql.SaveConnection(importActor, credential, Guid.Empty, transferKey);
+            if (!await sql.TransferUsed(transferKey)) throw new Exception("SQL transfer receipt was not persisted.");
+            var replayActor = Guid.NewGuid();
+            try { await sql.SaveConnection(replayActor, credential, Guid.Empty, transferKey); throw new Exception("SQL accepted transfer replay"); } catch(AiError error) when(error.Status==409) { }
+            if ((await sql.Connection(replayActor)).Connection is not null) throw new Exception("Replay rejection wrote another member credential.");
             var reservations = await Task.WhenAll(Enumerable.Range(0, 4).Select(async _ => { try { return await sql.Reserve(new(actor, workspace, true, false), "test-model", "test"); } catch (AiError error) when (error.Status == 429) { return null; } }));
             if (reservations.Count(x => x is not null) != 3) throw new Exception("SQL concurrency guard is not atomic.");
             foreach (var row in reservations.Where(x => x is not null)) await sql.Finish(row!.Id, "completed", 2, 3);

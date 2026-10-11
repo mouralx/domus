@@ -11,6 +11,7 @@ public sealed record AiModel(string Id, string Name);
 public sealed record UsageRecord(Guid Id, Guid Workspace, Guid Actor, string Provider, string Model, string Action, DateTimeOffset StartedAt, string Status, long InputTokens = 0, long OutputTokens = 0);
 public sealed class StoreState
 {
+    public HashSet<string> UsedTransfers { get; set; } = [];
     public string HostId { get; set; } = "urn:uuid:" + Guid.NewGuid();
     public Dictionary<Guid, string> Connections { get; set; } = [];
     public Dictionary<Guid, Guid> Revisions { get; set; } = [];

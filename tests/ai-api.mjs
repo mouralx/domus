@@ -45,6 +45,13 @@ try {
   assert.equal((await api('/workspace', { role: 'member', method: 'PUT', body: { enabled: false, provider: 'openai' } })).status, 403);
   assert.equal((await api('/connection/start', { method: 'POST', body: {}, csrf: false })).status, 403);
   assert.equal((await api('/connection/start', { method: 'POST', body: {} })).status, 409, 'Missing eligible registration must be explicit');
+  for (const [path,body] of [['/connection/export',{destination:'https://domus.example.test'}],['/connection/import',{file:{version:1,nonce:'bad',ciphertext:'bad',tag:'bad'},code:'x'.repeat(43)}]]) {
+    assert.equal((await api(path,{method:'POST',body,role:'anonymous'})).status,401);
+    assert.equal((await api(path,{method:'POST',body,ws:randomUUID()})).status,404);
+    assert.equal((await api(path,{method:'POST',body,csrf:false})).status,403);
+  }
+  assert.equal((await api('/connection/export',{method:'POST',body:{destination:'https://domus.example.test'}})).status,409);
+  assert.equal((await api('/connection/import',{method:'POST',body:{file:{version:1,nonce:'bad',ciphertext:'bad',tag:'bad'},code:'x'.repeat(43)}})).status,400);
   const metadata = await (await api('/connection', { role: 'member' })).json();
   assert.equal(metadata.connected, false); assert.equal(metadata.configured, false);
   assert.equal((await api('/connection/models')).status, 409);

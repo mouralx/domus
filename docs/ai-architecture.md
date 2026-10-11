@@ -88,3 +88,7 @@ Availability through MCP does not mean the assistant sends every record to the m
 ## Platform assistant and help
 
 A 48-pixel floating button opens the assistant from every authenticated page, replacing the duplicated board/automation header actions. It starts with the current area, allows switching between project and automation reads, restores keyboard focus on close and fits mobile safe areas. The help page has 65 searchable English/Portuguese articles, including AI setup/research limits, reviewed suggestions, concurrent installations, execution cancellation and ZIP results. Sidebar Help appears above Sign out.
+
+## Self-hosted subscription connection
+
+OAuth registration runs locally at the documented loopback callback. A reviewed export encrypts only the selected account registration with AES-256-GCM and a random 256-bit transfer code, binds it to the destination origin and a 30-minute expiry, and clears the source connection. The user uploads the protected file and separate code over HTTPS to the destination AI API. Import validates a live refresh grant and signed identity, retains the server host ID, and atomically saves the encrypted per-member connection with its replay receipt in the AI database. The destination owns subsequent token renewals. No source host ID, provider client secret or workspace membership is imported. Model tools cannot export or import credentials.

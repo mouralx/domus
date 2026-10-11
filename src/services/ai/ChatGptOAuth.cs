@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace Domus.Ai;
 
 public sealed record OAuthAttempt(Guid Actor, Guid Workspace, string State, string Nonce, string Verifier, string Redirect, string ClientId, Guid Revision, DateTimeOffset ExpiresAt);
-public sealed class ChatGptOAuth(AiStore store, IConfiguration configuration, HttpClient client)
+public sealed partial class ChatGptOAuth(AiStore store, IConfiguration configuration, HttpClient client)
 {
     private const string Issuer = "https://auth.openai.com";
     private const string RequiredScope = "chatgpt.tokens.use.direct";
@@ -109,7 +109,7 @@ public sealed class ChatGptOAuth(AiStore store, IConfiguration configuration, Ht
     private async Task<JsonObject> Exchange(JsonObject metadata, Dictionary<string, string> values, CancellationToken cancellation)
     {
         var secret = configuration["AI_OPENAI_CLIENT_SECRET"];
-        if (!OpenSource && !string.IsNullOrEmpty(secret)) values["client_secret"] = secret;
+        if (!OpenSource && values.GetValueOrDefault("client_id") == configuration["AI_OPENAI_CLIENT_ID"] && !string.IsNullOrEmpty(secret)) values["client_secret"] = secret;
         return await Send(new(HttpMethod.Post, metadata["token_endpoint"]!.GetValue<string>()) { Content = new FormUrlEncodedContent(values) }, cancellation);
     }
     private static string AccessToken(JsonObject tokens)
