@@ -10,13 +10,14 @@ const handle = service => (request, response) => {
     if (revoked || denyActions || request.headers.cookie !== 'owner' || request.headers['x-domus-workspace'] !== workspace || request.headers['x-domus-request'] !== '1' || !request.headers.origin) { response.writeHead(403); return response.end('{}'); }
     let raw='';request.on('data',v=>raw+=v);request.on('end',()=>{actions.push({service,path:request.url,method:request.method,body:JSON.parse(raw)});response.end(JSON.stringify({ok:true}));});return;
   }
-  if (['/api/membership/session/context','/api/status','/api/catalog','/api/connection','/api/workspace'].includes(request.url) || (request.method === 'GET' && (request.url.startsWith('/api/runs/') || request.url.startsWith('/api/installations/')))) {
+  if (['/api/membership/session/context','/api/status','/api/mcp/status','/api/catalog','/api/connection','/api/workspace'].includes(request.url) || (request.method === 'GET' && (request.url.startsWith('/api/catalog?') || request.url.startsWith('/api/mcp/') || request.url.startsWith('/api/runs/') || request.url.startsWith('/api/installations/')))) {
     if (revoked || request.headers.cookie !== 'owner' || request.headers['x-domus-workspace'] !== workspace) { response.writeHead(403); return response.end('{}'); }
     return response.end(JSON.stringify({ok:true}));
   }
   if (revoked || request.headers.cookie !== 'owner' || !request.url.startsWith(`/api/domus/workspaces/${workspace}/projects/one/`)) { response.writeHead(404); return response.end('{}'); }
   reads.push(request.url);
   if (request.url.includes('/cards/search')) return response.end(JSON.stringify({cards:[{id:'card-999',title:'Steering Sonae'}],hasMore:true,nextCursor:'card-999'}));
+  if (request.url.includes('/cards/card-999/data')) return response.end(JSON.stringify({data:'[{"text":"Beyond excerpt"}]',nextItemOffset:10,nextTextOffset:8000}));
   if (request.url.includes('/cards/card-999/context')) return response.end(JSON.stringify({id:'card-999',title:'Steering Sonae',checklistTotal:10,checklistDone:3}));
   if (request.url.includes('/cards/')) {response.writeHead(404);return response.end('{}');}
   response.end(JSON.stringify({project:{id:'one',name:'One'},metrics:{total:1000000,open:999999}}));
@@ -34,7 +35,7 @@ async function rpc(method,params={},options={}) {
 try {
   for(let i=0;i<100;i++){try{if((await fetch(origin+'/health')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
   const init=await rpc('initialize',{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'domus-tests',version:'1'}});assert.equal(init.status,200,logs);assert.ok(init.body.result.capabilities.tools);
-  const listed=await rpc('tools/list');assert.equal(listed.body.result.tools.length,17);
+  const listed=await rpc('tools/list');assert.equal(listed.body.result.tools.length,23);
   for (const name of ['get_my_profile','get_automation_status','get_automation_catalog','get_my_ai_connection','get_ai_settings']) {
     const result=await rpc('tools/call',{name,arguments:{}});assert.ok(!result.body.result.isError,name);
   }
@@ -48,6 +49,12 @@ try {
   const search=await rpc('tools/call',{name:'search_cards',arguments:{query:'steering Sonae',status:null,priority:null,completed:null,overdue:null,assignee:null,cursor:null,limit:20}});assert.equal(search.status,200);assert.ok(!search.body.result.isError);const cards=JSON.parse(search.body.result.content[0].text);assert.equal(cards.cards[0].id,'card-999');assert.equal(cards.hasMore,true);
   assert.ok(reads.some(path=>path.includes('q=steering%20Sonae')&&path.includes('limit=20')));
   const detail=await rpc('tools/call',{name:'get_card',arguments:{cardId:'card-999'}});assert.equal(JSON.parse(detail.body.result.content[0].text).checklistDone,3);
+  const allData = await rpc('tools/call',{name:'read_card_data',arguments:{cardId:'card-999',section:'comments',itemOffset:5,itemLimit:10,textOffset:0,textLength:8000}});
+  assert.equal(JSON.parse(allData.body.result.content[0].text).nextItemOffset,10);
+  assert.ok(reads.some(path=>path.includes('itemOffset=5')));
+  for (const [name,args] of [['list_automation_data',{kind:'runs',offset:100,limit:10}],['read_automation_data',{kind:'logs',id:randomUUID(),itemOffset:20,itemLimit:10,textOffset:8000,textLength:8000}],['read_automation_result',{runId:randomUUID(),handle:'safe-handle',offset:12000,length:12000}]]) {
+    const result=await rpc('tools/call',{name,arguments:args});assert.ok(!result.body.result.isError,name);
+  }
   assert.equal((await rpc('tools/list',{}, {cookie:''})).status,401);
   assert.equal((await rpc('tools/list',{}, {workspace:randomUUID()})).status,403);
   assert.equal((await rpc('tools/list',{}, {project:'hidden'})).status,403);

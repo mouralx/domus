@@ -30,6 +30,7 @@ public static class AssistantResearch
                 try { arguments = JsonNode.Parse(raw)?.AsObject() ?? throw new AiError(502, "Argumentos de ferramenta inválidos."); }
                 catch (System.Text.Json.JsonException) { throw new AiError(502, "Argumentos de ferramenta inválidos."); }
                 var result = await mcp.Call(normalized, arguments, ct); toolCalls++;
+                if (normalized is "read_card_data" or "read_card_attachment" && arguments["cardId"] is { } readId) seen.Add(readId.GetValue<string>());
                 if (result["cards"] is JsonArray cards) foreach (var card in cards) if (card?["id"] is { } cardId) seen.Add(cardId.GetValue<string>());
                 if (result["id"] is { } detailId && result["title"] is not null) seen.Add(detailId.GetValue<string>());
                 payload.Add(new JsonObject { ["type"] = "function_call_output", ["call_id"] = call["call_id"]!.GetValue<string>(), ["output"] = result.ToJsonString() });

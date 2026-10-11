@@ -32,13 +32,14 @@ public static class Catalog
     };
     public static void Map(WebApplication app, Database database, PackageService packages, GitHubCredentials credentials)
     {
-        app.MapGet("/api/catalog", async (HttpContext context, GitHubCredentials access) =>
+        app.MapGet("/api/catalog", async (HttpContext context, GitHubCredentials access, int? offset, int? limit, int? textOffset, int? textLength) =>
         {
+            if (offset is < 0 || limit is < 1 or > 10 || textOffset is < 0 || textLength is < 1 or > 8000) throw new AppError(400, "Página inválida.");
             var user = (Guid)context.Items["userId"]!;
             var repository = await access.Repository(user) ?? throw new AppError(409, "Configure o repositório nas Definições para consultar o catálogo.");
             var parts = repository.Split('/'); var owner = parts[0]; var repo = parts[1];
             var releases = new List<JsonNode>();
-            for (var page = 1; page <= 10; page++)
+            for (var page = 1; true; page++)
             {
                 using var request = GitHubRequest(new Uri($"https://api.github.com/repos/{owner}/{repo}/releases?per_page=100&page={page}"), await access.Token(user));
                 using var response = await Client.SendAsync(request, context.RequestAborted); if (!response.IsSuccessStatusCode) throw GitHubError(response.StatusCode);
@@ -58,7 +59,7 @@ public static class Catalog
             foreach (var asset in latest) Assets[(user, asset.Id)] = asset;
             var installed = await database.Packages(user);
             var automations = new List<CatalogEntry>();
-            foreach (var asset in latest)
+            foreach (var asset in latest.Skip(offset ?? 0).Take(limit ?? int.MaxValue))
             {
                 var entry = CatalogEntries.Describe(asset.Id, asset.AutomationId, asset.Version, Regex.Replace(asset.ReleaseName, @"\s+v\d+\.\d+\.\d+$", ""), asset.Size, installed);
                 if (entry.InstalledVersion is null)
@@ -79,7 +80,10 @@ public static class Catalog
                 }
                 automations.Add(entry);
             }
-            return Results.Ok(new { repository, automations });
+            if (limit is null) return Results.Ok(new { repository, automations });
+            var data = Automations.Core.Json.Write(automations); var start = textOffset ?? 0; var end = Math.Min(data.Length, start + (textLength ?? 8000));
+            if (start > data.Length) throw new AppError(400, "Intervalo fora da página.");
+            return Results.Ok(new { repository, totalItems = latest.Count, nextItemOffset = (offset ?? 0) + limit < latest.Count ? (int?)((offset ?? 0) + limit) : null, nextTextOffset = end < data.Length ? (int?)end : null, totalCharacters = data.Length, data = data[start..end] });
         });
         app.MapPost("/api/catalog/install", async (InstallInput input, HttpContext context) =>
         {

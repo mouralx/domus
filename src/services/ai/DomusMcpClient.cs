@@ -49,11 +49,11 @@ public sealed class DomusMcpClient(McpClient client, bool automationOnly = false
 
 public static class AssistantReadTools
 {
-    public static readonly HashSet<string> AutomationNames = new(StringComparer.Ordinal) { "get_automation_status", "get_automation_catalog", "get_automation_run", "get_automation_installation" };
+    public static readonly HashSet<string> AutomationNames = new(StringComparer.Ordinal) { "get_automation_status", "get_automation_catalog", "read_automation_catalog", "get_automation_run", "get_automation_installation", "list_automation_data", "read_automation_data", "read_automation_result" };
     public static readonly HashSet<string> Names = new(StringComparer.Ordinal)
     {
-        "search_cards", "get_card", "get_project_metrics", "get_my_profile",
-        "get_automation_status", "get_automation_catalog", "get_automation_run", "get_automation_installation",
+        "search_cards", "get_card", "read_card_data", "read_card_attachment", "get_project_metrics", "get_my_profile",
+        "get_automation_status", "get_automation_catalog", "read_automation_catalog", "get_automation_run", "get_automation_installation", "list_automation_data", "read_automation_data", "read_automation_result",
         "get_ai_settings", "get_my_ai_connection"
     };
 }

@@ -238,7 +238,7 @@
 }
 :root[data-platform-theme] .kanban-column.drag-over {
   background: var(--ui-selection);
-  outline: 2px dashed var(--ui-link);
+  outline: none;
 }
 :root[data-platform-theme] .column-heading {
   padding-bottom: 16px;
