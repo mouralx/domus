@@ -130,7 +130,7 @@ public sealed class RelationalMigrationTests
             await using var scope = fixture.Factory.Services.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<BoardsDbContext>();
             var migrated = (await scope.ServiceProvider.GetRequiredService<WorkspaceStore>().Read(workspace, user)).State;
-            Assert.Equal(18L, migrated["version"]!.GetValue<long>());
+            Assert.Equal(19L, migrated["version"]!.GetValue<long>());
             Assert.Equal("Keep this card", migrated["tasks"]![0]!["title"]!.ToString());
             Assert.Equal("Descrição", migrated["tasks"]![0]!["description"]!.ToString());
             Assert.Equal("", migrated["tasks"]![0]!["due"]!.ToString());

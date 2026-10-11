@@ -1,3 +1,4 @@
+import { ProjectIconPicker } from '../features/projects/ProjectIcon';
 import { AiSettings } from '../features/ai/AiSettings';
 import { ArrowRight, Folder, Plus, Sparkles, Trash2, X } from 'lucide-react';
 import React from 'react';
@@ -250,10 +251,35 @@ export function WorkspaceDialogs({
                 saveDefinitions(modal === 'Manage statuses' ? 'statuses' : 'buckets', items)
               }
             />
+          ) : modal === 'Project icon' ? (
+            <form
+              className="simple-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const icon = String(new FormData(event.currentTarget).get('icon') || 'folder');
+                void commit(
+                  {
+                    ...data,
+                    projects: data.projects.map((item) =>
+                      item.id === project.id ? { ...item, icon } : item,
+                    ),
+                  },
+                  'Project updated',
+                ).then((saved) => {
+                  if (saved) setModal(null);
+                });
+              }}
+            >
+              <h2>{project.name}</h2>
+              <ProjectIconPicker value={project.icon} />
+              <button className="primary" type="submit">
+                {t('Save')}
+              </button>
+            </form>
           ) : modal === 'New project' ? (
             <form
               className="simple-form"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 const f = new FormData(e.currentTarget);
                 const id = 'project-' + Date.now();
@@ -261,7 +287,7 @@ export function WorkspaceDialogs({
                   setToast('My activities already exists in this workspace.');
                   return;
                 }
-                void commit(
+                const saved = await commit(
                   {
                     ...data,
                     projects: [
@@ -270,12 +296,14 @@ export function WorkspaceDialogs({
                         id,
                         name: String(f.get('name')).trim(),
                         description: String(f.get('description')),
-                        color: String(f.get('color')),
+                        color: '#167d8d',
+                        icon: String(f.get('icon') || 'folder'),
                       },
                     ],
                   },
                   'Your new project is ready',
                 );
+                if (!saved) return;
                 setProjectId(id);
                 navigate('Projects');
                 setModal(null);
@@ -296,10 +324,7 @@ export function WorkspaceDialogs({
                 {t('Description')}
                 <textarea name="description" placeholder={t('What are we working towards?')} />
               </label>
-              <label>
-                {t('Project color')}
-                <input name="color" type="color" defaultValue="#a6bddb" />
-              </label>
+              <ProjectIconPicker />
               <button className="primary" type="submit">
                 <Plus size={16} />
                 {t('Create project')}

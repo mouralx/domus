@@ -1,13 +1,6 @@
+import { ProjectIcon } from './ProjectIcon';
 import { useEffect, useState } from 'react';
-import {
-  ArrowRight,
-  Clock3,
-  Folder,
-  Link2,
-  RefreshCw,
-  Save,
-  SlidersHorizontal,
-} from 'lucide-react';
+import { ArrowRight, Clock3, Link2, RefreshCw, Save, SlidersHorizontal } from 'lucide-react';
 import './jira-settings.css';
 import { JiraServerAccess } from './JiraServerAccess';
 import { JiraAssigneeMappings, JiraStatusMappings } from './JiraMappings';
@@ -154,8 +147,8 @@ export function JiraSettings({
       }}
     >
       <header className="jira-intro">
-        <span className="jira-project-icon" style={{ background: project.color }}>
-          <Folder size={24} />
+        <span className="jira-project-icon">
+          <ProjectIcon name={project.icon} size={22} />
         </span>
         <div>
           <span className="jira-eyebrow">{t('Jira synchronization')}</span>

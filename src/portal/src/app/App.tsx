@@ -1,3 +1,4 @@
+import { ProjectIcon } from '../features/projects/ProjectIcon';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -998,6 +999,9 @@ export function App() {
                         }}
                       >
                         <div className="project-tile-heading">
+                          <ProjectIcon
+                            name={p.icon ?? (isActivitiesProject(p) ? 'notebook' : 'folder')}
+                          />
                           <h3>{isActivitiesProject(p) ? t('My activities') : p.name}</h3>
                           <ArrowUpRight size={16} aria-hidden="true" />
                         </div>
@@ -1025,6 +1029,10 @@ export function App() {
           )}
           {page === 'Project directory' && (
             <ProjectDirectory
+              onEditIcon={(item) => {
+                setProjectId(item.id);
+                setModal('Project icon');
+              }}
               projects={data.projects}
               tasks={data.tasks}
               statuses={data.statuses}

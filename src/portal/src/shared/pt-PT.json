@@ -907,5 +907,15 @@
   "Are there any failed executions?": "Existem execuções com erro?",
   "What automations are available?": "Que automações estão disponíveis?",
   "Ask about these automations": "Pergunte sobre estas automações",
-  "Ask about these automations…": "Pergunte sobre estas automações…"
+  "Ask about these automations…": "Pergunte sobre estas automações…",
+  "Project icon": "Ícone do projeto",
+  "Notes": "Notas",
+  "Business": "Negócio",
+  "Planning": "Planeamento",
+  "Delivery": "Entrega",
+  "Infrastructure": "Infraestrutura",
+  "Product": "Produto",
+  "Security": "Segurança",
+  "Goals": "Objetivos",
+  "Team": "Equipa"
 }

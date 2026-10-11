@@ -410,3 +410,59 @@
 :root[data-platform-theme] .new-tile {
   min-height: 160px;
 }
+
+.project-tile-heading h3 {
+  flex: 1;
+}
+.project-icon-picker {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.project-icon-picker legend {
+  margin-bottom: 10px;
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+.project-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.project-icon-grid label {
+  position: relative;
+  cursor: pointer;
+}
+.project-icon-grid input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.project-icon-grid span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  background: var(--ui-surface);
+  color: var(--ui-muted);
+}
+.project-icon-grid input:checked + span {
+  border-color: var(--ui-primary);
+  background: var(--ui-selection);
+  color: var(--ui-link);
+}
+.project-icon-grid input:focus-visible + span {
+  outline: 2px solid var(--ui-link);
+  outline-offset: 2px;
+}
+:root[data-platform-theme] .directory-project-icon {
+  background: var(--ui-raised);
+  color: var(--ui-link);
+}
+
+.swimlane-heading[hidden] {
+  display: none;
+}
