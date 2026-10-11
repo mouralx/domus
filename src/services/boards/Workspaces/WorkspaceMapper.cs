@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 /// <summary>Maps the portal's workspace contract to tracked relational rows. JSON is a transport format only.</summary>
-public sealed class WorkspaceMapper(KanbadaDbContext db)
+public sealed class WorkspaceMapper(BoardsDbContext db)
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private HashSet<string> readOnlyCardIds = [];
@@ -114,8 +114,6 @@ public sealed class WorkspaceMapper(KanbadaDbContext db)
         id = x.Personal && x.OwnerId == user ? "studio" : x.Id.ToString(),
         x.Name,
         x.Icon,
-        x.Banner,
-        x.BannerPosition,
         x.Personal,
         x.OwnerId,
         canManage = x.OwnerId == user
@@ -174,8 +172,6 @@ public sealed class WorkspaceMapper(KanbadaDbContext db)
         var workspace = db.Workspaces.Local.Single(x => x.Id == id);
         workspace.Name = Text(state["workspace"], "name");
         workspace.Icon = Optional(state["workspace"], "icon");
-        workspace.Banner = Optional(state["workspace"], "banner");
-        workspace.BannerPosition = state["workspace"]?["bannerPosition"]?.GetValue<double>();
         Sync(id, WorkspaceJson.Items(state, "members").Select((x, position) => new MemberEntity { WorkspaceId = id, Position = position, Email = Text(x, "email").ToLowerInvariant(), UserId = Guid.TryParse(Text(x, "userId"), out var uid) ? uid : null, InviteToken = Optional(x, "invitationToken"), Name = Text(x, "name"), Initials = Text(x, "initials"), Color = Text(x, "color"), Photo = Optional(x, "photo") }));
         Sync(id, WorkspaceJson.Items(state, "projects").Select((x, position) => new ProjectEntity { WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Description = Text(x, "description"), Archived = Flag(x, "archived"), System = Optional(x, "system") }));
         Sync(id, WorkspaceJson.Items(state, "statuses").Select((x, position) => new StatusEntity { WorkspaceId = id, Position = position, Id = Text(x, "id"), Name = Text(x, "name"), Color = Text(x, "color"), Complete = Flag(x, "complete") }));

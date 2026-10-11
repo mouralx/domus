@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class FileEndpoints
 {
     public static void Map(RouteGroupBuilder api)
     {
         api = api.MapGroup("").WithTags("Files");
-        api.MapPost("/workspaces/{id}/files", async (string id, HttpContext ctx, WorkspaceResolver db, KanbadaDbContext context, WorkspaceStore store) =>
+        api.MapPost("/workspaces/{id}/files", async (string id, HttpContext ctx, WorkspaceResolver db, BoardsDbContext context, WorkspaceStore store) =>
         {
             var user = Auth.User(ctx);
             var workspace = await db.WorkspaceId(id, user);
@@ -27,14 +27,14 @@ public static class FileEndpoints
             await context.SaveChangesAsync();
             return Results.Ok(new { id = fileId, name, size = file.Length, type = file.ContentType, addedAt = at });
         }).DisableAntiforgery();
-        api.MapGet("/files/{id:guid}", async (Guid id, HttpContext ctx, KanbadaDbContext context) =>
+        api.MapGet("/files/{id:guid}", async (Guid id, HttpContext ctx, BoardsDbContext context) =>
         {
             var user = Auth.User(ctx);
             var file = await context.Files.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id && context.Members.Any(m => m.WorkspaceId == x.WorkspaceId && m.UserId == user))
                 ?? throw new ApiError(404, "File not found or access denied.");
             return Results.File(file.Bytes, "application/octet-stream", file.Name);
         });
-        api.MapDelete("/files/{id:guid}", async (Guid id, HttpContext ctx, KanbadaDbContext context) =>
+        api.MapDelete("/files/{id:guid}", async (Guid id, HttpContext ctx, BoardsDbContext context) =>
         {
             var user = Auth.User(ctx);
             await context.Files.Where(x => x.Id == id && x.UploaderId == user && !context.CardAttachments.Any(a => a.FileId == x.Id)).ExecuteDeleteAsync();

@@ -1,4 +1,4 @@
-import { BookOpen, ChevronDown, Search, X } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { useState } from 'react';
 import { useI18n } from '../../shared/i18n';
 import { helpArticles, helpCategories } from './helpContent';
@@ -19,14 +19,6 @@ export function HelpCenter() {
   );
   return (
     <section className="help-center">
-      <div className="help-hero">
-        <BookOpen size={30} />
-        <div>
-          <span>{t('THE KANBADA GUIDE')}</span>
-          <h2>{t('A little guidance. A lot of progress.')}</h2>
-          <p>{t('Find practical answers for your everyday work.')}</p>
-        </div>
-      </div>
       <label className="help-search">
         <Search size={19} />
         <input

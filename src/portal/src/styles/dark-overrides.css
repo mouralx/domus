@@ -42,14 +42,6 @@
   background: #1b1d21;
   border-color: #303238;
 }
-:root[data-theme='dark'] .project-banner {
-  background: #272a30;
-  border-color: #3a3d45;
-}
-:root[data-theme='dark'] .banner-progress {
-  background: #22252b;
-  border-color: #41454e;
-}
 :root[data-theme='dark'] .kanban-column {
   background: #1d1f23;
   border-color: #34373d;

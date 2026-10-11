@@ -2,7 +2,7 @@ import { apiRequest } from './apiClient';
 
 export type JiraMapping = {
   kind: 'status' | 'priority' | 'assignee';
-  kanbadaValue: string;
+  domusValue: string;
   jiraValue: string;
   isDefault?: boolean;
 };
@@ -15,7 +15,7 @@ export type JiraInput = {
   jql: string;
   jiraProjectKey: string;
   issueTypeId: string;
-  direction: 'jira-to-kanbada' | 'kanbada-to-jira' | 'bidirectional';
+  direction: 'jira-to-domus' | 'domus-to-jira' | 'bidirectional';
   cron: string;
   timeZone: string;
   enabled: boolean;

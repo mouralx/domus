@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class JiraEndpoints
 {
@@ -8,7 +8,7 @@ public static class JiraEndpoints
     public sealed record CardLink(string Key, string Url);
 
     public static async Task<List<CardLink>> CardLinks(string id, string cardId, Guid user,
-        WorkspaceResolver resolver, KanbadaDbContext db, JiraClient jira, CancellationToken ct)
+        WorkspaceResolver resolver, BoardsDbContext db, JiraClient jira, CancellationToken ct)
     {
         var workspace = await resolver.WorkspaceId(id, user);
         if (!await db.Members.AnyAsync(m => m.WorkspaceId == workspace && m.UserId == user, ct)
@@ -29,7 +29,7 @@ public static class JiraEndpoints
     public static void Map(RouteGroupBuilder api)
     {
         api.MapGet("/workspaces/{id}/cards/{cardId}/jira", async (string id, string cardId,
-            WorkspaceResolver resolver, KanbadaDbContext db, JiraClient jira, HttpContext ctx, CancellationToken ct) =>
+            WorkspaceResolver resolver, BoardsDbContext db, JiraClient jira, HttpContext ctx, CancellationToken ct) =>
         {
             ctx.Response.Headers.CacheControl = "no-store";
             try { return Results.Ok(new { links = await CardLinks(id, cardId, Auth.User(ctx), resolver, db, jira, ct) }); }
@@ -58,7 +58,7 @@ public static class JiraEndpoints
             await settings.Save(workspace, projectId, input, ct);
             return Results.Ok(await settings.Read(workspace, projectId, ct));
         });
-        routes.MapPost("/jira/run", async (string id, string projectId, JiraSettings settings, KanbadaDbContext db, HttpContext ctx, CancellationToken ct) =>
+        routes.MapPost("/jira/run", async (string id, string projectId, JiraSettings settings, BoardsDbContext db, HttpContext ctx, CancellationToken ct) =>
         {
             var workspace = await settings.Authorize(id, projectId, Auth.User(ctx), ct);
             var c = await settings.Find(workspace, projectId, ct) ?? throw new ApiError(404, "Configure Jira first.");
@@ -67,7 +67,7 @@ public static class JiraEndpoints
             await db.SaveChangesAsync(ct);
             return Results.Accepted(value: new { queued = true });
         });
-        routes.MapPost("/jira/links/{linkId:guid}/resolve", async (string id, string projectId, Guid linkId, ResolveInput input, JiraSettings settings, KanbadaDbContext db, HttpContext ctx, CancellationToken ct) =>
+        routes.MapPost("/jira/links/{linkId:guid}/resolve", async (string id, string projectId, Guid linkId, ResolveInput input, JiraSettings settings, BoardsDbContext db, HttpContext ctx, CancellationToken ct) =>
         {
             var workspace = await settings.Authorize(id, projectId, Auth.User(ctx), ct);
             var c = await settings.Find(workspace, projectId, ct) ?? throw new ApiError(404, "Configure Jira first.");

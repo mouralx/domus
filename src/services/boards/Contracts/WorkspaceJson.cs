@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class WorkspaceJson
 {

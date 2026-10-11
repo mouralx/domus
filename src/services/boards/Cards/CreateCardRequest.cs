@@ -1,4 +1,4 @@
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 /// <summary>Card creation command. Identity, audit history, and workspace version are server-owned.</summary>
 public sealed record CreateCardRequest(

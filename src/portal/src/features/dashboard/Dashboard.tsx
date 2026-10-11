@@ -261,25 +261,6 @@ export function Dashboard({
   );
   return (
     <section className="dashboard" aria-label={t(title)}>
-      <div className="dashboard-heading">
-        <div>
-          <span className="eyebrow">{t('THE BIG PICTURE')}</span>
-          <h2>{t(title)}</h2>
-          <p>{t('Every card counts. Here\u2019s where things stand.')}</p>
-        </div>
-        <button
-          className="secondary dashboard-export"
-          disabled={exporting}
-          onClick={() => void exportPdf()}
-        >
-          <Download size={16} />
-          {t(exporting ? 'Preparing PDF…' : 'Export PDF')}
-        </button>
-        <span className="dashboard-live">
-          <i />
-          {t('Live \u00B7 updates with your work')}
-        </span>
-      </div>
       <div className="dashboard-filters">
         <label>
           {t('Bucket')}
@@ -292,7 +273,7 @@ export function Dashboard({
             }}
           >
             <option value="All">{t('All buckets')}</option>
-            <option value="">{t('No bucket')}</option>
+            {!data.buckets.length && <option value="">{t('No bucket')}</option>}
             {data.buckets.map((b) => (
               <option value={b.id} key={b.id}>
                 {b.name}
@@ -311,7 +292,10 @@ export function Dashboard({
             }}
           >
             <option value="All">{t('All swimlanes')}</option>
-            <option value="">{t('No swimlane')}</option>
+            {(!availableLanes.length ||
+              allTasks.some(
+                (task) => !data.swimlanes.some((item) => item.project === task.project),
+              )) && <option value="">{t('No swimlane')}</option>}
             {availableLanes.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
@@ -338,6 +322,14 @@ export function Dashboard({
             {t('Clear dashboard filters')}
           </button>
         )}
+        <button
+          className="secondary dashboard-export"
+          disabled={exporting}
+          onClick={() => void exportPdf()}
+        >
+          <Download size={16} />
+          {t(exporting ? 'Preparing PDF…' : 'Export PDF')}
+        </button>
       </div>
       {exportError && <p role="alert">{exportError}</p>}
       <div className="kpi-grid">

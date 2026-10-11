@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Kanbada.Api.Persistence.Migrations
+namespace Domus.Boards.Api.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class RelationalStorage : Migration
@@ -729,7 +729,7 @@ namespace Kanbada.Api.Persistence.Migrations
 
         private static string ReadSql(string name)
         {
-            using var stream = typeof(RelationalStorage).Assembly.GetManifestResourceStream("Kanbada.Api.Persistence.Migrations." + name)
+            using var stream = typeof(RelationalStorage).Assembly.GetManifestResourceStream("Domus.Boards.Api.Persistence.Migrations." + name)
                 ?? throw new InvalidOperationException("Missing migration resource: " + name);
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();

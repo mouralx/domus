@@ -26,9 +26,13 @@ run('exec', 'domus-automation-postgres-1', 'pg_isready', '-U', 'domus', '-d', 'd
 backup = root / '.local/database-backups' / datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
 backup.mkdir(parents=True, mode=0o700)
 os.chmod(backup.parent, 0o700)
-writers = ['domus-portal-1', 'domus-work-api-1', 'domus-jira-worker-1',
-           'domus-automation-api-1', 'domus-automation-worker-1']
-run('stop', *writers)
+writers = ['domus-portal-1', 'domus-boards-1', 'domus-boards-worker-1',
+           'domus-automations-1', 'domus-automations-worker-1', 'domus-membership-1', 'domus-ai-1',
+           'domus-work-api-1', 'domus-jira-worker-1', 'domus-automation-api-1', 'domus-automation-worker-1', 'domus-ai-api-1']
+present = set(run('ps', '-a', '--format', '{{.Names}}').decode().splitlines())
+active_writers = [name for name in writers if name in present]
+if active_writers:
+    run('stop', *active_writers)
 
 sources = [('boards', source, 'domus_work', []),
            ('membership', source, 'domus_work', ['-t', 'public.users', '-t', 'public.sessions', '-t', 'public.identities', '-t', 'public.recovery_codes']),

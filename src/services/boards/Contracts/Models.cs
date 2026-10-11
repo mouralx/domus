@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public record Credentials(string Email, string Password, string? Name, string? Code = null);
 public record WorkspaceInput(string Name);

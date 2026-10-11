@@ -10,6 +10,26 @@
 :root[data-platform-theme] .topbar {
   height: 72px;
 }
+:root[data-platform-theme] .top-actions {
+  --header-control-height: 42px;
+}
+:root[data-platform-theme]
+  .top-actions
+  :is(.theme-control, .language-switch, .search, .notification, .avatar-button),
+:root[data-platform-theme] .top-actions .theme-control select {
+  height: var(--header-control-height);
+  min-height: var(--header-control-height);
+  box-sizing: border-box;
+}
+:root[data-platform-theme] .top-actions :is(.language-switch, .theme-control select) {
+  padding-block: 0;
+  border-radius: 10px;
+}
+:root[data-platform-theme] .top-actions :is(.notification, .avatar-button),
+:root[data-platform-theme] .top-actions .avatar-button .avatar {
+  width: var(--header-control-height);
+  height: var(--header-control-height);
+}
 :root[data-platform-theme] :is(.search, .help-search) {
   display: flex;
   align-items: center;
@@ -58,9 +78,9 @@
 }
 :root[data-platform-theme] .board-toolbar {
   height: auto;
-  min-height: 64px;
-  gap: 16px;
-  padding: 12px 0;
+  min-height: 54px;
+  gap: 12px;
+  padding: 8px 0;
   flex-wrap: wrap;
 }
 :root[data-platform-theme] .view-tabs {
@@ -103,7 +123,7 @@
   gap: 12px;
 }
 :root[data-platform-theme] .project-heading {
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   align-items: center;
 }
 :root[data-platform-theme] :is(.project-heading h1, .dashboard-heading h2) {
@@ -252,6 +272,11 @@
     padding: 18px;
   }
 }
+@media (max-width: 1000px) {
+  :root[data-platform-theme] .search {
+    display: none;
+  }
+}
 @media (max-width: 480px) {
   :root[data-platform-theme] .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -259,4 +284,129 @@
   :root[data-platform-theme] .dashboard-heading h2 {
     font-size: calc(24px * var(--ui-font-scale));
   }
+}
+
+/* Desktop navigation width follows the user's drag preference. */
+.sidebar-resize-handle {
+  display: none;
+}
+@media (min-width: 761px) {
+  .app > .sidebar {
+    width: var(--sidebar-width, 236px);
+  }
+  .app > main {
+    margin-left: var(--sidebar-width, 236px);
+    width: calc(100% - var(--sidebar-width, 236px));
+  }
+  .sidebar-resize-handle {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -4px;
+    width: 8px;
+    z-index: 2;
+    cursor: col-resize;
+    touch-action: none;
+  }
+  .sidebar-resize-handle::after {
+    content: '';
+    position: absolute;
+    inset: 0 3px;
+    background: transparent;
+  }
+  .sidebar-resize-handle:hover::after,
+  .sidebar-resize-handle:focus-visible::after,
+  .sidebar-resizing .sidebar-resize-handle::after {
+    background: var(--ui-primary);
+  }
+  .sidebar-resize-handle:focus-visible {
+    outline: 2px solid var(--ui-primary);
+    outline-offset: 2px;
+  }
+}
+.sidebar-resizing,
+.sidebar-resizing * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+:root[data-platform-theme] .project-cover {
+  height: 180px;
+  min-height: 0;
+  padding: 0;
+}
+
+:root[data-platform-theme] .dashboard-filters {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ui-border);
+  gap: 12px;
+}
+:root[data-platform-theme] .dashboard-filters select {
+  height: 38px;
+  padding-block: 0;
+  border-radius: 9px;
+}
+:root[data-platform-theme] .dashboard-filters .dashboard-export {
+  min-height: 38px;
+  margin-left: 0;
+}
+
+.board-context-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0 16px;
+  font-size: 11px;
+  color: var(--ui-muted);
+}
+.board-context-toolbar > label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.board-context-toolbar select {
+  min-height: 34px;
+  padding: 5px 28px 5px 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: var(--ui-field);
+  color: var(--ui-text);
+}
+.board-context-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+@media (max-width: 600px) {
+  :root[data-platform-theme] .board-actions {
+    flex-wrap: wrap;
+  }
+}
+
+.project-tile-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.project-tile-heading h3 {
+  margin: 0;
+}
+.project-tile-heading > svg {
+  flex-shrink: 0;
+  color: var(--ui-muted);
+}
+:root[data-platform-theme] .project-tile .progress-track {
+  background: var(--ui-border);
+}
+:root[data-platform-theme] .project-tile .progress-track i {
+  background: var(--ui-accent);
+}
+:root[data-platform-theme] .new-tile {
+  min-height: 160px;
 }

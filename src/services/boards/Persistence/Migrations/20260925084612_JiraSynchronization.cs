@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Kanbada.Api.Persistence.Migrations
+namespace Domus.Boards.Api.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class JiraSynchronization : Migration
@@ -58,7 +58,7 @@ namespace Kanbada.Api.Persistence.Migrations
                     jira_issue_id = table.Column<string>(type: "text", nullable: true),
                     jira_key = table.Column<string>(type: "text", nullable: true),
                     origin = table.Column<string>(type: "text", nullable: false),
-                    kanbada_hash = table.Column<string>(type: "text", nullable: true),
+                    domus_hash = table.Column<string>(type: "text", nullable: true),
                     jira_hash = table.Column<string>(type: "text", nullable: true),
                     creation_pending = table.Column<bool>(type: "boolean", nullable: false),
                     last_error = table.Column<string>(type: "text", nullable: true),
@@ -81,12 +81,12 @@ namespace Kanbada.Api.Persistence.Migrations
                 {
                     connection_id = table.Column<Guid>(type: "uuid", nullable: false),
                     kind = table.Column<string>(type: "text", nullable: false),
-                    kanbada_value = table.Column<string>(type: "text", nullable: false),
+                    domus_value = table.Column<string>(type: "text", nullable: false),
                     jira_value = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_jira_mappings", x => new { x.connection_id, x.kind, x.kanbada_value });
+                    table.PrimaryKey("PK_jira_mappings", x => new { x.connection_id, x.kind, x.domus_value });
                     table.ForeignKey(
                         name: "FK_jira_mappings_jira_connections_connection_id",
                         column: x => x.connection_id,

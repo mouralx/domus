@@ -18,19 +18,21 @@ class ImageSelectionTests(unittest.TestCase):
     def test_component_and_dependency_changes(self):
         cases = {
             'src/portal/src/app/App.tsx': {'portal'},
+            'src/services/ai/Program.cs': {'ai'},
+            'src/services/mcp/Program.cs': {'mcp'},
             'src/services/membership/Program.cs': {'membership'},
             'src/services/boards/Authentication/Auth.cs': {'boards', 'membership', 'boards-worker'},
             'src/services/automations/Program.cs': {'automations'},
-            'src/services/automations/Core/Database.cs': {'automations', 'automation-worker'},
+            'src/services/automations/Core/Database.cs': {'automations', 'automations-worker'},
             'src/workers/boards/Program.cs': {'boards-worker'},
-            'src/workers/automations/Program.cs': {'automation-worker'},
+            'src/workers/automations/Program.cs': {'automations-worker'},
             'infra/containers/portal.conf': {'portal'},
-            'docs/schemas/automation.schema.json': {'automations', 'automation-worker'},
+            'docs/schemas/automation.schema.json': {'automations', 'automations-worker'},
             'src/global.json': images.BACKENDS,
             'src/Directory.Build.props': images.BACKENDS,
             '.dockerignore': images.ALL,
             '.github/workflows/publish-images.yml': images.ALL,
-            '.github/scripts/image_matrix.py': images.ALL,
+            '.github/scripts/image_matrix.py': set(),
             '.github/scripts/image_version.py': images.ALL,
             '.github/image-version.json': images.ALL,
         }
@@ -44,8 +46,16 @@ class ImageSelectionTests(unittest.TestCase):
     def test_documentation_tests_and_deployment_only_do_not_publish(self):
         self.assertEqual(set(), images.affected_images([
             'README.md', 'docs/database-migration.md', 'tests/integration.mjs',
-            'src/services/boards/tests/Kanbada.Api.Tests/ApiTests.cs',
+            'src/services/boards/tests/Domus.Boards.Api.Tests/ApiTests.cs',
             'src/portal/README.md', 'infra/compose.yaml', 'infra/.env.example',
+        ]))
+
+    def test_ai_feature_publishes_only_runtime_dependencies(self):
+        self.assertEqual({'portal', 'ai'}, images.affected_images([
+            '.github/scripts/image_matrix.py', 'tests/Ai.Tests/Program.cs',
+            'src/services/ai/Program.cs', 'infra/containers/ai-api.Dockerfile',
+            'src/portal/src/features/ai/CardAi.tsx', 'infra/containers/portal.conf',
+            'infra/compose.yaml', 'docs/ai.md',
         ]))
 
     def test_combined_changes_publish_once_in_stable_order(self):
@@ -53,7 +63,7 @@ class ImageSelectionTests(unittest.TestCase):
             'src/portal/src/app/App.tsx', 'src/portal/src/main.tsx',
             'src/services/automations/Core/Database.cs',
         ]))
-        self.assertEqual(['portal', 'automations', 'automation-worker'],
+        self.assertEqual(['portal', 'automations', 'automations-worker'],
                          [item['component'] for item in result['include']])
 
     def test_push_range_includes_all_commits_and_deleted_paths(self):

@@ -1,4 +1,4 @@
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class JiraConnectionEntity
 {
@@ -12,7 +12,7 @@ public sealed class JiraConnectionEntity
     public string Jql { get; set; } = "";
     public string JiraProjectKey { get; set; } = "";
     public string IssueTypeId { get; set; } = "";
-    public string Direction { get; set; } = "jira-to-kanbada";
+    public string Direction { get; set; } = "jira-to-domus";
     public string Cron { get; set; } = "*/15 * * * *";
     public string TimeZone { get; set; } = "UTC";
     public bool Enabled { get; set; }
@@ -31,7 +31,7 @@ public sealed class JiraMappingEntity
 {
     public Guid ConnectionId { get; set; }
     public string Kind { get; set; } = "";
-    public string KanbadaValue { get; set; } = "";
+    public string DomusValue { get; set; } = "";
     public string JiraValue { get; set; } = "";
     public bool IsDefault { get; set; } = true;
 }
@@ -44,7 +44,7 @@ public sealed class JiraLinkEntity
     public string? JiraIssueId { get; set; }
     public string? JiraKey { get; set; }
     public string Origin { get; set; } = "";
-    public string? KanbadaHash { get; set; }
+    public string? DomusHash { get; set; }
     public string? JiraHash { get; set; }
     public bool CreationPending { get; set; }
     public string? LastError { get; set; }

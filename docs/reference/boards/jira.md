@@ -2,7 +2,7 @@
 
 # Project synchronization with Jira
 
-Each Kanbada project can have one Jira connection. The workspace owner opens
+Each Domus project can have one Jira connection. The workspace owner opens
 **Project options → Jira synchronization** to configure it. Other members cannot
 read or change the connection, run jobs, or access its credentials. Local/demo
 mode does not expose this feature.
@@ -37,10 +37,10 @@ of linking to the API gateway. Lookup failures show a retry action in the editor
    tokens use `https://api.atlassian.com/ex/jira/YOUR_CLOUD_ID`; the administrator
    can approve `api.atlassian.com` in **Server access** as described below.
 3. **Test connection and load mappings** checks credentials and JQL without
-   writing issues. Select the issue type for new issues and map Kanbada statuses
+   writing issues. Select the issue type for new issues and map Domus statuses
    and Low/Medium/High priorities using Jira-name dropdowns. IDs are stored internally,
-   not entered in the frontend. A Kanbada status can have several
-   Jira statuses; choose one default per mapped Kanbada status. Unmapped values fail
+   not entered in the frontend. A Domus status can have several
+   Jira statuses; choose one default per mapped Domus status. Unmapped values fail
    explicitly; they are never silently replaced by a default.
 4. Choose the direction, schedule, time zone, and enable synchronization. Save,
    then optionally **Run saved configuration now**. Use **Refresh status** to
@@ -50,7 +50,7 @@ Jira's required custom fields are not supplied by this connector. Choose a
 standard issue type whose required fields have defaults, and a workflow with an
 available direct transition to each mapped status. A transition with required
 fields or multiple possible transitions to the same status produces an explicit
-error. Jira labels cannot contain whitespace; Kanbada labels must be at most 120
+error. Jira labels cannot contain whitespace; Domus labels must be at most 120
 characters. The configured target project must allow the selected issue type.
 Status discovery combines the target project's workflow with statuses observed in
 JQL results, including other projects. Saved connections load choices automatically
@@ -62,11 +62,11 @@ or reload choices after changing the server, credentials, project, or JQL.
 ## Status and assignee mappings
 
 Under **Status mapping**, use **Add Jira status** for additional Jira states that
-should appear as the same Kanbada status. Each Jira status belongs to one Kanbada
+should appear as the same Domus status. Each Jira status belongs to one Domus
 status within a connection. The **Default** radio selects the target when writing
-that Kanbada status to Jira. If Jira is already in any state mapped to that Kanbada
+that Domus status to Jira. If Jira is already in any state mapped to that Domus
 status, no transition occurs. This preserves distinctions such as Jira Open and
-Selected both appearing as Kanbada Backlog. Priorities remain one-to-one.
+Selected both appearing as Domus Backlog. Priorities remain one-to-one.
 
 Under **Assignee mapping**, enable **Synchronize assignees from Jira** and map
 Jira identities to registered workspace members. Existing connections default to
@@ -77,7 +77,7 @@ not the entire Jira directory. Display names and emails are never used as matchi
 keys. Pending invitees cannot
 be mapped until they have joined the workspace.
 
-Assignees flow only from Jira in **Jira to Kanbada** or **Bidirectional** mode.
+Assignees flow only from Jira in **Jira to Domus** or **Bidirectional** mode.
 The single mapped member replaces the card's current assignees. An unassigned Jira
 issue clears the local assignees without warning. An unmapped Jira user (or a
 mapping whose member has left) also clears them, but records an **Assignee mapping
@@ -85,13 +85,13 @@ warning** in the run/link details. Other mapped fields still synchronize. Fixing
 the mapping resolves the assignment and warning on the next run even if no other
 issue fields changed. Missing assignee data in a Jira response is an error, not an
 instruction to clear assignments. Jira assignees are never written, including
-during issue creation. In **Kanbada to Jira** mode local assignees are untouched.
+during issue creation. In **Domus to Jira** mode local assignees are untouched.
 
 The API's `syncAssignees` flag defaults to `false`. Mapping entries use
-`kind: "status" | "priority" | "assignee"`, `kanbadaValue`, `jiraValue`, and
+`kind: "status" | "priority" | "assignee"`, `domusValue`, `jiraValue`, and
 `isDefault` (defaults to `true` for compatibility with existing single-status
-clients). For assignees, `kanbadaValue` is the member's registered user UUID.
-For statuses, exactly one row per Kanbada status must have `isDefault: true`.
+clients). For assignees, `domusValue` is the member's registered user UUID.
+For statuses, exactly one row per Domus status must have `isDefault: true`.
 
 New assignments to registered members create a private notification in that
 member's workspace notification area, including assignments made by Jira imports.
@@ -101,7 +101,7 @@ are not backfilled for existing assignments.
 ## Read-only Jira-managed cards
 
 Cards with a confirmed Jira link are entirely read-only for users when their
-connection is set to **Jira to Kanbada**. This includes fields, assignments,
+connection is set to **Jira to Domus**. This includes fields, assignments,
 comments, checklists, attachment changes, moves and deletion. The board shows a
 lock and disables dragging; the editor keeps history, downloads, and **Open in Jira**
 available while disabling editing controls. Unlinked cards remain editable.
@@ -117,8 +117,8 @@ under an outdated policy. The worker can still apply Jira updates.
 
 | Direction | Behavior |
 |---|---|
-| Jira to Kanbada | Import matching unlinked Jira issues; overwrite synchronized card fields from Jira. Never write Jira. |
-| Kanbada to Jira | Create issues for unlinked cards in this Kanbada project; update linked issues only while they match JQL. Never import unlinked Jira issues. |
+| Jira to Domus | Import matching unlinked Jira issues; overwrite synchronized card fields from Jira. Never write Jira. |
+| Domus to Jira | Create issues for unlinked cards in this Domus project; update linked issues only while they match JQL. Never import unlinked Jira issues. |
 | Bidirectional | Create missing counterparts and propagate whichever side changed since the last successful synchronization. |
 
 Fields are title/summary, description, status, priority, labels and due date.
@@ -126,7 +126,7 @@ Other fields, including comments, attachments, buckets and swimlanes,
 are not synchronized or erased. Imported labels are created as workspace label
 definitions when needed. Label names are matched without regard to capitalization
 or surrounding spaces; existing spelling and color are retained. Multiple Jira
-variants become one Kanbada label and one association per card. Database uniqueness
+variants become one Domus label and one association per card. Database uniqueness
 also prevents concurrent imports from creating duplicate definitions.
 Upgrading merges existing case/space variants while preserving every card's label
 membership. It keeps a manually created definition when available, otherwise the
@@ -134,12 +134,12 @@ first definition in workspace order, retaining its spelling, color and completio
 flag. Affected workspace versions are advanced so stale saves cannot undo the repair.
 
 In bidirectional mode, when **both** sides changed, the original creation system
-wins for the entire synchronized field set: Jira for imported cards, Kanbada for
+wins for the entire synchronized field set: Jira for imported cards, Domus for
 exported cards. A change on only one side propagates regardless of origin.
 Creation origin is persisted and does not change when the direction changes.
 Existing unrelated cards/issues are not matched heuristically by title.
 Optional inbound assignee mapping runs independently of these conflict hashes:
-Jira remains authoritative for assignees even when Kanbada wins the other fields.
+Jira remains authoritative for assignees even when Domus wins the other fields.
 
 JQL is evaluated on every run, using paginated Cloud v3 enhanced search or Data
 Center v2 search. Its scope applies to linked issues in both directions. New local
@@ -148,9 +148,9 @@ JQL: make sure the query will include them. Search indexing delays can temporari
 exclude newly created issues. Queries returning more than 10000 issues fail
 before synchronization instead of silently truncating results.
 
-Neither system's deletions are propagated. A deleted/moved Kanbada card leaves a
+Neither system's deletions are propagated. A deleted/moved Domus card leaves a
 link tombstone and is not recreated; a missing/inaccessible Jira issue, or one
-outside the JQL, is left alone and reported. Archiving the Kanbada project pauses
+outside the JQL, is left alone and reported. Archiving the Domus project pauses
 scheduled/manual runs. Deleting the project removes its connector and links but
 does not delete Jira issues. Disable synchronization and let an in-flight run
 finish before deleting a project or making major configuration changes.
@@ -190,7 +190,7 @@ next scheduled/manual run; one bad item does not stop the remaining items.
 
 ## Worker and deployment
 
-`worker/Kanbada.Worker.csproj` is a separate executable process. It references the
+`worker/Domus.Boards.Worker.csproj` is a separate executable process. It references the
 API assembly for the shared EF model and connector implementation, not HTTP
 endpoints. Build the local images, then start the Compose stack:
 
@@ -225,7 +225,7 @@ TLS validation is never disabled.
 
 The API and worker must use the same PostgreSQL database and shared
 `.data-protection` directory. Tokens are encrypted with a separate
-`Kanbada.Jira` Data Protection application discriminator and are never returned
+`Domus.Jira` Data Protection application discriminator and are never returned
 by settings endpoints or placed in workspace snapshots/exports. A blank token on
 save preserves the saved value; changing the host/account requires a new token.
 Once links exist, the Jira instance, edition and target project cannot change,

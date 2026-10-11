@@ -1,4 +1,4 @@
-using Kanbada.Api;
+using Domus.Boards.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,13 +14,13 @@ if (string.IsNullOrWhiteSpace(connection))
     connection = new NpgsqlConnectionStringBuilder
     {
         Host = builder.Configuration["POSTGRES_HOST"] ?? "postgres",
-        Database = builder.Configuration["POSTGRES_DB"] ?? "kanbada",
-        Username = builder.Configuration["POSTGRES_USER"] ?? "kanbada",
+        Database = builder.Configuration["POSTGRES_DB"] ?? "domus",
+        Username = builder.Configuration["POSTGRES_USER"] ?? "domus",
         Password = password
     }.ConnectionString;
 }
 builder.Services.AddSingleton(NpgsqlDataSource.Create(connection));
-builder.Services.AddDbContext<KanbadaDbContext>((services, options) => options.UseNpgsql(services.GetRequiredService<NpgsqlDataSource>()));
+builder.Services.AddDbContext<BoardsDbContext>((services, options) => options.UseNpgsql(services.GetRequiredService<NpgsqlDataSource>()));
 builder.Services.AddJira(builder.Configuration, builder.Configuration["Jira:KeyDirectory"] ?? Path.Combine(builder.Environment.ContentRootPath, ".data-protection"));
 builder.Services.AddScoped<WorkspaceResolver>();
 builder.Services.AddHostedService<JiraWorker>();
@@ -36,7 +36,7 @@ sealed class JiraWorker(IServiceScopeFactory scopes, ILogger<JiraWorker> logger)
             try
             {
                 using var scope = scopes.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<KanbadaDbContext>();
+                var db = scope.ServiceProvider.GetRequiredService<BoardsDbContext>();
                 if ((await db.Database.GetPendingMigrationsAsync(stoppingToken)).Any())
                 {
                     logger.LogWarning("Waiting for API/database migrations before synchronizing Jira.");

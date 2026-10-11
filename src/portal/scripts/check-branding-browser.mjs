@@ -7,7 +7,7 @@ const context = await browser.newContext({ viewport: { width: 1360, height: 1000
 const base = 'http://localhost:4173';
 const defaults = {
   version: 0,
-  name: 'kanbada',
+  name: 'domus',
   logo: null,
   collapsedLogo: null,
   showName: true,
@@ -75,7 +75,7 @@ try {
   });
   const password = 'Branding-browser-test-password';
   const registration = await context.request.post(`${base}/api/auth/register`, {
-    headers: { 'X-Kanbada-Request': '1' },
+    headers: { 'X-Domus-Request': '1' },
     data: {
       email: `branding-browser-${Date.now()}@example.test`,
       name: 'Branding Browser Owner',
@@ -151,7 +151,7 @@ try {
   await dialog.getByLabel('Show name beside logo', { exact: true }).uncheck();
   await expect(dialog.locator('.platform-preview strong')).toHaveCount(0);
   await expect(dialog.locator('.platform-preview header')).toHaveCSS('justify-content', 'center');
-  await expect(page.locator('.sidebar .logo-word')).toHaveText('kanbada');
+  await expect(page.locator('.sidebar .logo-word')).toHaveText('domus');
   await dialog.getByLabel('Show name beside logo', { exact: true }).check();
   await expect(dialog.locator('.platform-preview')).toHaveCSS(
     'background-color',
@@ -163,7 +163,7 @@ try {
     'rgb(24, 18, 37)',
   );
   await dialog.getByRole('button', { name: 'Light', exact: true }).click();
-  await expect(page.locator('.sidebar .logo-word')).toHaveText('kanbada');
+  await expect(page.locator('.sidebar .logo-word')).toHaveText('domus');
   for (const width of [1360, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     await assertDropdowns(dialog);
@@ -210,7 +210,7 @@ try {
   await expect(dialog).toHaveCSS('background-color', 'rgb(32, 32, 64)');
   await dialog.getByRole('button', { name: 'Reset to defaults', exact: true }).click();
   await dialog.getByRole('button', { name: 'Restore defaults', exact: true }).click();
-  await expect(dialog.getByLabel('Platform name', { exact: true })).toHaveValue('kanbada');
+  await expect(dialog.getByLabel('Platform name', { exact: true })).toHaveValue('domus');
   await expect(dialog.getByLabel('Text size', { exact: true })).toHaveValue('100');
   await expect(dialog.getByLabel('Corner rounding', { exact: true })).toHaveValue('8');
   await expect(dialog.getByLabel('Show name beside logo', { exact: true })).toBeChecked();
@@ -219,7 +219,7 @@ try {
   await page.reload();
   await expect(page.locator('.sidebar .logo-word')).toHaveText('Studio North');
   for (const theme of ['light', 'dark']) {
-    await page.evaluate((value) => localStorage.setItem('kanbada-theme', value), theme);
+    await page.evaluate((value) => localStorage.setItem('domus-theme', value), theme);
     saved = { ...saved, accent: '#f8f9fb' };
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
@@ -337,7 +337,7 @@ try {
   ).toBeVisible();
   assert.equal(saved.showName, false);
   await dialog.getByRole('button', { name: 'Close dialog' }).click();
-  await page.evaluate(() => localStorage.setItem('kanbada-theme', 'light'));
+  await page.evaluate(() => localStorage.setItem('domus-theme', 'light'));
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await expect(page.locator('.sidebar .logo-word')).toHaveCount(0);

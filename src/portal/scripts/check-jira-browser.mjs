@@ -4,7 +4,7 @@ import { enrollApiAccount } from './authenticator-test-helpers.mjs';
 
 const browser = await chromium.launch();
 const context = await browser.newContext();
-const headers = { 'X-Kanbada-Request': '1' };
+const headers = { 'X-Domus-Request': '1' };
 const base = 'http://localhost:4173';
 const settingsPath = `${base}/api/workspaces/studio/projects/my-activities/jira`;
 const password = 'Jira-browser-test-password';
@@ -127,16 +127,14 @@ try {
       .filter((m) => m.kind === 'status')
       .sort((a, b) => a.jiraValue.localeCompare(b.jiraValue)),
     [
-      { kind: 'status', kanbadaValue: 'backlog', jiraValue: '10', isDefault: false },
-      { kind: 'status', kanbadaValue: 'backlog', jiraValue: '11', isDefault: true },
+      { kind: 'status', domusValue: 'backlog', jiraValue: '10', isDefault: false },
+      { kind: 'status', domusValue: 'backlog', jiraValue: '11', isDefault: true },
     ],
   );
   assert.ok(
     connection.mappings.some(
       (m) =>
-        m.kind === 'assignee' &&
-        m.kanbadaValue === registeredUser.id &&
-        m.jiraValue === 'jira-user',
+        m.kind === 'assignee' && m.domusValue === registeredUser.id && m.jiraValue === 'jira-user',
     ),
   );
   assert.equal(connection.direction, 'bidirectional');

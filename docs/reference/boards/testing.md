@@ -10,14 +10,14 @@ From the repository root:
 npm --prefix src/portal ci
 npm --prefix src/portal run check
 npm --prefix src/portal run build
-dotnet restore api/Kanbada.Api.csproj --locked-mode
-dotnet format whitespace api/Kanbada.Api.csproj --no-restore --verify-no-changes
+dotnet restore api/Domus.Boards.Api.csproj --locked-mode
+dotnet format whitespace api/Domus.Boards.Api.csproj --no-restore --verify-no-changes
 ```
 
 With PostgreSQL running:
 
 ```sh
-dotnet test api/tests/Kanbada.Api.Tests/Kanbada.Api.Tests.csproj
+dotnet test api/tests/Domus.Boards.Api.Tests/Domus.Boards.Api.Tests.csproj
 ```
 
 With API and portal running at the documented ports:
@@ -62,7 +62,7 @@ assignees, unmapped-user warnings, clearing unassigned issues, mapping fixes wit
 other field changes, and disabled/outbound-only assignment preservation. Fake Jira
 asserts that issue creation/update bodies never contain an assignee.
 Run just this feature with
-`dotnet test api/tests/Kanbada.Api.Tests/Kanbada.Api.Tests.csproj --filter FullyQualifiedName~Jira`.
+`dotnet test api/tests/Domus.Boards.Api.Tests/Domus.Boards.Api.Tests.csproj --filter FullyQualifiedName~Jira`.
 
 ## Browser coverage
 

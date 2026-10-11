@@ -1,8 +1,8 @@
 import { apiEnabled, apiRequest } from './apiClient';
 export type Provider = 'google' | 'microsoft';
 export type Account = { id: string; name: string; email: string; provider: Provider };
-const sessionKey = 'kanbada-session-v1';
-const accountsKey = 'kanbada-accounts-v1';
+const sessionKey = 'domus-session-v1';
+const accountsKey = 'domus-accounts-v1';
 export const sampleAccounts: Account[] = [
   { id: 'owner', name: 'Alex Morgan', email: 'alex@studio.co', provider: 'google' },
   { id: 'microsoft-alex', name: 'Alex Morgan', email: 'alex@outlook.com', provider: 'microsoft' },

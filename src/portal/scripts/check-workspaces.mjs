@@ -60,7 +60,7 @@ export async function checkWorkspaces(browser) {
   await page.locator('.due-chart-day').first().click();
   await expect(page.locator('.dashboard-drilldown')).toBeVisible();
   await page.getByRole('button', { name: 'Close metric details', exact: true }).click();
-  await page.screenshot({ path: '/private/tmp/kanbada-charts-final.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-charts-final.png', fullPage: true });
   // Remove workspace members without removing their cards.
   await page.getByRole('button', { name: 'Members', exact: true }).click();
   await page.getByRole('button', { name: 'Remove member Sophie Chen', exact: true }).click();
@@ -69,7 +69,7 @@ export async function checkWorkspaces(browser) {
   await page.getByRole('button', { name: 'Remove member Sophie Chen', exact: true }).click();
   await page.getByRole('button', { name: 'Confirm removal', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Sophie Chen', exact: true })).toHaveCount(0);
-  const after = await page.evaluate(() => JSON.parse(localStorage.getItem('kanbada-v1')));
+  const after = await page.evaluate(() => JSON.parse(localStorage.getItem('domus-v1')));
   assert.equal(after.tasks.length, 11);
   assert.equal(
     after.tasks.some((task) => task.assignees.includes('Sophie Chen')),
@@ -110,7 +110,7 @@ export async function checkWorkspaces(browser) {
   await expect(
     page.getByRole('heading', { name: 'Desempenho por faixa', exact: false }),
   ).toBeVisible();
-  await page.screenshot({ path: '/private/tmp/kanbada-portuguese.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-portuguese.png', fullPage: true });
   await page.reload();
   await expect(page.getByLabel('Idioma da interface')).toHaveValue('pt-PT');
   await page.getByLabel('Idioma da interface').selectOption('en-US');
@@ -119,7 +119,7 @@ export async function checkWorkspaces(browser) {
   await page.getByRole('button', { name: 'Toggle navigation', exact: true }).click();
   await page.getByRole('button', { name: 'Projects', exact: true }).click();
   await page.screenshot({
-    path: '/private/tmp/kanbada-project-directory-mobile.png',
+    path: '/private/tmp/domus-project-directory-mobile.png',
     fullPage: true,
   });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);

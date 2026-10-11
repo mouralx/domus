@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public record AvatarInput(string? Photo, bool UseGravatar = false);
-public sealed class AccountAvatar(KanbadaDbContext db, IHttpClientFactory clients, UserDirectoryBridge? directory = null)
+public sealed class AccountAvatar(BoardsDbContext db, IHttpClientFactory clients, IIdentityDirectory? directory = null)
 {
     public const int MaxBytes = 2 * 1024 * 1024;
     public static string Validate(string? photo)
@@ -74,7 +74,8 @@ public sealed class AccountAvatar(KanbadaDbContext db, IHttpClientFactory client
             .ExecuteUpdateAsync(s => s.SetProperty(x => x.Version, x => x.Version + 1), cancellationToken);
         await db.Members.Where(x => x.UserId == id).ExecuteUpdateAsync(s => s.SetProperty(x => x.Photo, photo), cancellationToken);
         }
-        await tx.CommitAsync(cancellationToken);
         if (directory is not null) await directory.Sync(id);
+        await tx.CommitAsync(cancellationToken);
+        if (directory is not null) await directory.Flush(id);
     }
 }

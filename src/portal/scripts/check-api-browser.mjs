@@ -112,9 +112,9 @@ try {
         (control) => control.height >= 30 && control.padding >= 34 && control.radius > 0,
       ),
     );
-    if (process.env.KANBADA_SCREENSHOT_DIR)
+    if (process.env.DOMUS_SCREENSHOT_DIR)
       await page.screenshot({
-        path: `${process.env.KANBADA_SCREENSHOT_DIR}/sharing-${width}.png`,
+        path: `${process.env.DOMUS_SCREENSHOT_DIR}/sharing-${width}.png`,
       });
   }
   await page.setViewportSize({ width: 1440, height: 1050 });
@@ -139,14 +139,14 @@ try {
     const registration = await memberContext.request.post(
       'http://localhost:4173/api/auth/register',
       {
-        headers: { 'X-Kanbada-Request': '1' },
+        headers: { 'X-Domus-Request': '1' },
         data: { email, name: 'API Browser Member', password: 'A-long-browser-test-password' },
       },
     );
     assert.equal(registration.status(), 200);
     await enrollApiAccount(memberContext.request, 'A-long-browser-test-password');
     const workspaceResponse = await page.request.post('http://localhost:4173/api/workspaces', {
-      headers: { 'X-Kanbada-Request': '1' },
+      headers: { 'X-Domus-Request': '1' },
       data: { name: 'Profile collaboration' },
     });
     const workspace = await workspaceResponse.json();
@@ -154,7 +154,7 @@ try {
     const invitedResponse = await page.request.put(
       `http://localhost:4173/api/workspaces/${workspace.workspace.id}`,
       {
-        headers: { 'X-Kanbada-Request': '1', 'If-Match': String(workspace.version) },
+        headers: { 'X-Domus-Request': '1', 'If-Match': String(workspace.version) },
         data: workspace,
       },
     );
@@ -162,7 +162,7 @@ try {
     const accepted = await memberContext.request.post(
       `http://localhost:4173/api/invitations/${invited.members[1].invitationToken}/accept`,
       {
-        headers: { 'X-Kanbada-Request': '1' },
+        headers: { 'X-Domus-Request': '1' },
       },
     );
     assert.equal(accepted.status(), 200);
@@ -192,7 +192,7 @@ try {
     complete: false,
   }));
   const saveResponse = await page.request.put('http://localhost:4173/api/workspaces/studio', {
-    headers: { 'X-Kanbada-Request': '1', 'If-Match': String(state.version) },
+    headers: { 'X-Domus-Request': '1', 'If-Match': String(state.version) },
     data: state,
   });
   assert.equal(saveResponse.status(), 200);
@@ -229,7 +229,7 @@ try {
   const reference = await context.newPage();
   await reference.goto('http://localhost:4173/api/scalar');
   await expect(
-    reference.getByRole('heading', { name: 'Kanbada API', exact: true }).first(),
+    reference.getByRole('heading', { name: 'Domus API', exact: true }).first(),
   ).toBeVisible();
   await reference.getByRole('button', { name: 'Open Group - Cards', exact: true }).click();
   await reference.getByText('Create a card', { exact: true }).first().click();
@@ -279,7 +279,7 @@ try {
   await page.getByLabel('Tema', { exact: true }).selectOption('dark');
   await page.setViewportSize({ width: 1440, height: 1050 });
   await page.screenshot({
-    path: process.env.KANBADA_SCREENSHOT_PATH || '/tmp/kanbada-help-api.png',
+    path: process.env.DOMUS_SCREENSHOT_PATH || '/tmp/domus-help-api.png',
     fullPage: true,
   });
   assert.deepEqual(errors, []);

@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed record StateChange(string Op, string Path, JsonNode? Value = null);
 public sealed record ChangeRequest(StateChange[] Changes);
@@ -64,7 +64,7 @@ public static class StateChanges
             var keys = change.Path[1..].Split('/').Select(x => x.Replace("~1", "/").Replace("~0", "~")).ToArray();
             if (keys.Any(x => x is "__proto__" or "constructor" or "prototype") || keys[0] is not ("tasks" or "projects" or "members" or "statuses" or "buckets" or "labels" or "swimlanes" or "activity" or "notifications" or "workspace"))
                 throw new ApiError(400, "This path is not editable.");
-            if (keys[0] == "workspace" && (keys.Length != 2 || keys[1] is not ("name" or "icon" or "banner" or "bannerPosition")))
+            if (keys[0] == "workspace" && (keys.Length != 2 || keys[1] is not ("name" or "icon")))
                 throw new ApiError(400, "This workspace field is server-controlled.");
             if (keys.Length >= 3 && ((keys[0] == "tasks" && keys[2] is "history" or "readOnly") || (keys[0] == "members" && keys[2] is "userId" or "invitationToken")))
                 throw new ApiError(400, "This field is server-controlled.");

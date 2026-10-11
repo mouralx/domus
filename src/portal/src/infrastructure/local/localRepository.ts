@@ -1,3 +1,4 @@
+import { assignDefaultPlacement } from '../../domain/cardPlacement';
 import type { Definition, Member, State, Status, Task, Workspace } from '../../domain/models';
 import {
   ensureActivitiesProject,
@@ -116,8 +117,8 @@ export const initialState: State = {
 // Replace this adapter with HTTP requests when your API is ready.
 // The UI consumes the same asynchronous load/save contract in either mode.
 export const workspaceKey = (id: string) =>
-  id === 'studio' ? 'kanbada-v1' : 'kanbada-workspace-' + id;
-const activeWorkspace = () => accountStorage.getItem('kanbada-active-workspace') || 'studio';
+  id === 'studio' ? 'domus-v1' : 'domus-workspace-' + id;
+const activeWorkspace = () => accountStorage.getItem('domus-active-workspace') || 'studio';
 export const localRepository = {
   async load(): Promise<State> {
     const key = workspaceKey(activeWorkspace());
@@ -171,6 +172,7 @@ export const localRepository = {
     return structuredClone(initialState);
   },
   async save(state: State): Promise<State> {
+    state = assignDefaultPlacement(state);
     const personal = state.projects.find(isActivitiesProject);
     if (!personal || personal.archived || personal.name !== 'My activities')
       throw new Error('My activities cannot be archived, deleted, or renamed.');
@@ -187,7 +189,7 @@ export const localRepository = {
       }
     };
     const personal = hydrate({ id: 'studio', name: 'My Workspace' });
-    const raw = accountStorage.getItem('kanbada-workspaces-v1');
+    const raw = accountStorage.getItem('domus-workspaces-v1');
     if (raw) {
       try {
         const list = JSON.parse(raw);
@@ -228,20 +230,20 @@ export const localRepository = {
           retainedFiles.add(file.id);
       }
     }
-    const previousActive = accountStorage.getItem('kanbada-active-workspace');
-    const previousCatalog = accountStorage.getItem('kanbada-workspaces-v1');
+    const previousActive = accountStorage.getItem('domus-active-workspace');
+    const previousCatalog = accountStorage.getItem('domus-workspaces-v1');
     try {
-      if (activeWorkspace() === id) accountStorage.setItem('kanbada-active-workspace', 'studio');
+      if (activeWorkspace() === id) accountStorage.setItem('domus-active-workspace', 'studio');
       accountStorage.setItem(
-        'kanbada-workspaces-v1',
+        'domus-workspaces-v1',
         JSON.stringify(remaining.map(({ id, name }) => ({ id, name }))),
       );
       accountStorage.removeItem(workspaceKey(id));
     } catch (error) {
-      if (previousActive === null) accountStorage.removeItem('kanbada-active-workspace');
-      else accountStorage.setItem('kanbada-active-workspace', previousActive);
-      if (previousCatalog === null) accountStorage.removeItem('kanbada-workspaces-v1');
-      else accountStorage.setItem('kanbada-workspaces-v1', previousCatalog);
+      if (previousActive === null) accountStorage.removeItem('domus-active-workspace');
+      else accountStorage.setItem('domus-active-workspace', previousActive);
+      if (previousCatalog === null) accountStorage.removeItem('domus-workspaces-v1');
+      else accountStorage.setItem('domus-workspaces-v1', previousCatalog);
       throw error;
     }
     await Promise.allSettled(
@@ -257,11 +259,11 @@ export const localRepository = {
     if (!entries.some((w) => w.id === id))
       throw new Error('This workspace is no longer available.');
     const previous = activeWorkspace();
-    accountStorage.setItem('kanbada-active-workspace', id);
+    accountStorage.setItem('domus-active-workspace', id);
     try {
       return await localRepository.load();
     } catch (e) {
-      accountStorage.setItem('kanbada-active-workspace', previous);
+      accountStorage.setItem('domus-active-workspace', previous);
       throw e;
     }
   },
@@ -286,10 +288,10 @@ export const localRepository = {
     };
     await localRepository.save(state);
     accountStorage.setItem(
-      'kanbada-workspaces-v1',
+      'domus-workspaces-v1',
       JSON.stringify([...entries, workspace].map(({ id, name }) => ({ id, name }))),
     );
-    accountStorage.setItem('kanbada-active-workspace', workspace.id);
+    accountStorage.setItem('domus-active-workspace', workspace.id);
     return state;
   },
 };
@@ -330,7 +332,7 @@ export function migrate(data: State): State {
     ];
     return { ...current, labels };
   });
-  return {
+  return assignDefaultPlacement({
     ...data,
     projects: ensureActivitiesProject(data.projects),
     notifications:
@@ -366,5 +368,5 @@ export function migrate(data: State): State {
         },
       ],
     })),
-  };
+  });
 }

@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public class JiraSyncException(string message) : Exception(message);
 public sealed class JiraHttpException(System.Net.HttpStatusCode status)
@@ -184,7 +184,7 @@ public sealed class JiraClient(HttpClient http, JiraSecrets secrets, JiraDestina
     public async Task Transition(JiraConnectionEntity c, JiraIssue current, string status, CancellationToken ct)
     {
         var currentStatus = current.Fields["status"]?["id"]?.GetValue<string>();
-        if (c.Mappings.Any(m => m.Kind == "status" && m.KanbadaValue == status && m.JiraValue == currentStatus)) return;
+        if (c.Mappings.Any(m => m.Kind == "status" && m.DomusValue == status && m.JiraValue == currentStatus)) return;
         var target = JiraSnapshot.ToJira(c, "status", status);
         if (current.Fields["status"]?["id"]?.GetValue<string>() == target) return;
         var path = "issue/" + Uri.EscapeDataString(current.Id) + "/transitions";
@@ -200,7 +200,7 @@ public sealed class JiraClient(HttpClient http, JiraSecrets secrets, JiraDestina
     {
         if (s.Title.Length is < 1 or > 255) throw new JiraSyncException("Jira summaries must contain 1 to 255 characters.");
         if (s.Labels.Any(l => l.Any(char.IsWhiteSpace)))
-            throw new JiraSyncException("Jira labels cannot contain whitespace. Rename the corresponding Kanbada labels.");
+            throw new JiraSyncException("Jira labels cannot contain whitespace. Rename the corresponding Domus labels.");
         JiraSnapshot.ToJira(c, "status", s.Status);
         JiraSnapshot.ToJira(c, "priority", s.Priority);
     }

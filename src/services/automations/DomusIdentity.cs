@@ -14,6 +14,7 @@ public sealed class DomusIdentity
     {
         var path = context.Request.Path.Value!.TrimEnd('/').ToLowerInvariant();
         if (path is "/api/login" or "/api/register" or "/api/logout" or "/api/session") throw new AppError(404, "Use o login da plataforma Domus.");
+        if (string.IsNullOrEmpty(context.Request.Headers.Cookie)) throw new AppError(401, "Entre na plataforma para continuar.");
         var settings = path.StartsWith("/api/settings/", StringComparison.Ordinal);
         var workspace = context.Request.Headers["X-Domus-Workspace"].ToString();
         if (string.IsNullOrEmpty(workspace)) workspace = context.Request.Query["workspace"].ToString();

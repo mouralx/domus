@@ -5,8 +5,18 @@ export default defineConfig({
   server: {
     port: 4173,
     strictPort: true,
-    allowedHosts: ['kanbada.mouras.me'],
+    allowedHosts: ['domus.mouras.me'],
     proxy: {
+      '/auth/callback': {
+        target: process.env.AI_PROXY_TARGET || 'http://127.0.0.1:4330',
+        changeOrigin: false,
+        rewrite: (path) => path.replace(/^\/auth\/callback/, '/oauth/callback'),
+      },
+      '/ai-api': {
+        target: process.env.AI_PROXY_TARGET || 'http://127.0.0.1:4330',
+        changeOrigin: false,
+        rewrite: (path) => path.replace(/^\/ai-api/, ''),
+      },
       '/automations-api': {
         target: process.env.AUTOMATIONS_PROXY_TARGET || 'http://127.0.0.1:4310',
         changeOrigin: false,

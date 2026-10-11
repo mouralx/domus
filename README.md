@@ -1,6 +1,6 @@
 # domus
 
-One portal for a law firm's boards, daily tasks and automations. The three APIs and two workers run independently on .NET 10.
+One portal for a law firm's boards, daily tasks and automations. The four APIs, MCP server and two workers run independently on .NET 10.
 
 ## Run
 
@@ -12,17 +12,19 @@ From the repository root:
 
 Open **http://localhost:8088**. Register, choose a profile photo and enroll an authenticator for two-factor authentication. One session covers all modules.
 
-There is **one Compose file**, `infra/compose.yaml`. It starts eight services:
+There is **one Compose file**, `infra/compose.yaml`. It starts ten services:
 
 | Service | Responsibility |
 | --- | --- |
 | `portal` | React portal and Nginx gateway |
-| `membership` | Registration, authentication, sessions, 2FA, account profiles and invitation acceptance |
-| `work-api` | Boards, projects, tasks, workspaces, permissions and public identity projections |
-| `automation-api` | Catalog, platform GitHub configuration, installation requests, inputs and results |
-| `jira-worker` | External synchronization for boards |
-| `automation-worker` | Queued package installation and execution |
-| `postgres` | One PostgreSQL 18 instance with `membership`, `boards` and `automations` databases |
+| `membership` | Registration, authentication, sessions, 2FA, account profiles and durable identity delivery |
+| `boards` | Boards, projects, tasks, workspaces, permissions, invitations and public identity projections |
+| `automations` | Catalog, platform GitHub configuration, installation requests, inputs and results |
+| `boards-worker` | External synchronization for boards |
+| `automations-worker` | Queued package installation and execution |
+| `ai` | Model connections, personal OAuth, settings and assistant orchestration |
+| `mcp-server` | Independent MCP server exposing read-only domain tools |
+| `postgres` | One PostgreSQL 18 instance with `membership`, `boards`, `automations` and `ai` databases |
 | `rabbitmq` | Persistent installation and execution queues |
 
 Only the portal exposes a host port. Each database has its own application role. Membership uses the boards role to provision workspaces, maintain public identity projections and accept invitations; passwords, sessions and authenticator secrets belong to membership. Automation files are shared between its API and worker; PAT encryption keys are mounted only into the API.
@@ -37,6 +39,8 @@ src/
     membership/                 Identity API
     boards/                     Boards API
     automations/                Automation API and shared Core library
+    ai/                         AI assistance API
+    mcp/                        Independent MCP server
   workers/
     boards/                     External synchronization worker
     automations/                Installation and execution worker
@@ -52,13 +56,13 @@ README.md
 LICENSE.md
 ```
 
-The original project namespaces remain compatible. The root contains only README.md and LICENSE.md as visible files. Hidden `.gitignore` and `.dockerignore` retain standard Git/build behavior. No software licence has been selected; LICENSE.md records this status.
+The original project namespaces remain compatible. The root contains only README.md and LICENSE.md as visible files. Hidden `.gitignore` and `.dockerignore` retain standard Git/build behavior. The project is licensed under MIT; see LICENSE.md.
 
 ## Configuration
 
 Copy `infra/.env.example` to `infra/.env` and choose private database and RabbitMQ passwords before hosting. `DOMUS_PUBLIC_URL` must match the browser origin, including `DOMUS_PORT`. Configure HTTPS at your public gateway. `DOMUS_ALLOWED_HOSTS` lists accepted API hosts separated by `;`; retain `localhost` for internal health checks.
 
-`PLATFORM_ADMIN_EMAILS` identifies existing accounts allowed to manage platform appearance and GitHub access. After registering an account, set its email and recreate `membership` and `work-api` to load the administrators. Workspace ownership alone does not confer platform administration.
+`PLATFORM_ADMIN_EMAILS` identifies existing accounts allowed to manage platform appearance and GitHub access. After registering an account, set its email and recreate `membership` and `boards` to load the administrators. Workspace ownership alone does not confer platform administration.
 
 **Settings → Automations** configures one repository and one encrypted PAT for the entire platform. The catalog uses this configuration in every workspace. Tokens are never returned to the browser. Workspace owners manage installation/removal; members execute and consult their workspace's runs. Logs, uploads, packages and results remain isolated by workspace. Completed runs count as completed even when they require review. Results are downloaded as ZIP archives.
 
@@ -85,7 +89,7 @@ npm --prefix tests test
 
 ```sh
 ./infra/scripts/compose.sh ps
-./infra/scripts/compose.sh logs -f membership work-api automation-api automation-worker
+./infra/scripts/compose.sh logs -f membership boards automations automations-worker
 ./infra/scripts/compose.sh down
 ```
 
@@ -93,7 +97,7 @@ npm --prefix tests test
 
 The [architecture decision](docs/decisions/001-platform-boundaries.md) documents service boundaries. The [automation authoring guide](docs/reference/automations/manifest-authoring.md) documents manifests stored alongside each automation and the [schema](docs/schemas/automation.schema.json).
 
-`.github/workflows/publish-images.yml` publishes affected application images on pushes to `main` (stable) and `develop` (preview). The six image suffixes are `portal`, `membership`, `boards`, `automations`, `boards-worker` and `automation-worker`, under `ghcr.io/<owner>/<repository>-<component>`. Images support AMD64/ARM64 and receive a version tag, their channel alias (`stable` or `preview`), and a commit tag; stable builds also retain `latest`. The automatic GitHub token supplies package publication permissions; the workflow does not deploy the platform.
+`.github/workflows/publish-images.yml` publishes affected application images on pushes to `main` (stable) and `develop` (preview). The eight image suffixes are `portal`, `ai`, `mcp`, `membership`, `boards`, `automations`, `boards-worker` and `automations-worker`, under `ghcr.io/<owner>/<repository>-<component>`. Images support AMD64/ARM64 and receive a version tag, their channel alias (`stable` or `preview`), and a commit tag; stable builds also retain `latest`. The automatic GitHub token supplies package publication permissions; the workflow does not deploy the platform.
 
 The workflow compares the entire pushed commit range, including deletions and moves:
 
@@ -104,8 +108,8 @@ The workflow compares the entire pushed commit range, including deletions and mo
 | Boards | boards, membership, boards-worker (shared project references) |
 | Boards worker | boards-worker |
 | Automation API | automations |
-| Automation Core or package schema | automations, automation-worker |
-| Automation worker | automation-worker |
+| Automation Core or package schema | automations, automations-worker |
+| Automation worker | automations-worker |
 | A component's Dockerfile | That component |
 | Shared .NET SDK/build configuration | All five .NET images |
 | Docker ignore rules or publication workflow/tagging scripts | All six images |
@@ -146,3 +150,9 @@ Workflow numbers are shared across both channels and include documentation-only 
 Use a version tag or image digest to pin deployments. Registry tags remain mutable, and retries may replace a version tag; an image digest pins exact bytes. Examples: `ghcr.io/<owner>/<repository>-portal:stable`, `ghcr.io/<owner>/<repository>-portal:preview`, and `ghcr.io/<owner>/<repository>-portal:prev-v0.1.0`.
 
 The workflow uses GitHub's [run variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables) and Docker's [metadata action](https://github.com/docker/metadata-action) to generate tags and image labels.
+
+## AI assistance
+
+Card suggestions and the read-only project and automation assistants use a personal ChatGPT subscription connected through OAuth in workspace AI settings. See [AI configuration and deployment](docs/ai.md) and [the separate MCP service architecture](docs/ai-architecture.md). There are no API-key fields or monthly limits. Workspace AI is disabled until enabled by its owner. For the local open-source flow, use `http://127.0.0.1:8088` and `AI_OPENAI_OAUTH_MODE=opensource`.
+
+See [service boundaries and identity delivery](docs/domain-boundaries.md) for domain ownership, service names and upgrade steps.

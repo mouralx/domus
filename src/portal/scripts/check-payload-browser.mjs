@@ -6,7 +6,7 @@ try {
   const page = await browser.newPage();
   await page.goto('http://localhost:4173');
   const registration = await page.request.post('http://localhost:4173/api/auth/register', {
-    headers: { 'X-Kanbada-Request': '1' },
+    headers: { 'X-Domus-Request': '1' },
     data: {
       email: `payload-${Date.now()}@example.test`,
       name: 'Payload Test',
@@ -22,10 +22,10 @@ try {
     const { setStorageAccount } = await import('/src/infrastructure/accountStorage.ts');
     const { workspaceChanges, applyChanges, differences } =
       await import('/src/infrastructure/stateChanges.ts');
-    const headers = { 'X-Kanbada-Request': '1', 'Content-Type': 'application/json' };
+    const headers = { 'X-Domus-Request': '1', 'Content-Type': 'application/json' };
     setStorageAccount({ id, name: 'Payload Test', email: 'payload@example.test' });
     let state = await repository.load();
-    state.workspace.banner = 'data:image/png;base64,' + 'x'.repeat(250000);
+    state.workspace.icon = 'data:image/png;base64,' + 'x'.repeat(250000);
     state.tasks = Array.from({ length: 100 }, (_, index) => ({
       id: `KB-PAYLOAD-${index}`,
       title: `Card ${index}`,
@@ -76,7 +76,7 @@ try {
       if (
         saved.tasks[50].title !== 'A tiny edit' ||
         saved.tasks[50].history.length !== 2 ||
-        saved.workspace.banner !== state.workspace.banner
+        saved.workspace.icon !== state.workspace.icon
       )
         throw new Error('Canonical delta reconstruction failed');
       const cached = await repository.load();

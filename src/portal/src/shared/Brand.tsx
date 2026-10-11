@@ -35,7 +35,7 @@ export function Brand({ sidebar = false }: { sidebar?: boolean }) {
         <img className="platform-logo brand-collapsed-logo" src={branding.collapsedLogo} alt="" />
       )}
       {!logoOnly && <span className="logo-word">{branding.name}</span>}
-      {!logoOnly && branding.name === 'kanbada' && <span className="logo-dot">®</span>}
+      {!logoOnly && branding.name === 'domus' && <span className="logo-dot">®</span>}
     </span>
   );
 }

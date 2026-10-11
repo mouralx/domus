@@ -11,7 +11,7 @@ export type CardShare = {
   expiresAt: string | null;
   createdAt: string;
 };
-const key = 'kanbada-card-shares-v1';
+const key = 'domus-card-shares-v1';
 const entries = (): CardShare[] => {
   try {
     const value = JSON.parse(localStorage.getItem(key) || '[]');
@@ -82,7 +82,7 @@ export const shareRepository = {
       throw new Error('This link has expired or is no longer available.');
     const raw = localStorage.getItem(
       share.sourcePrefix +
-        (share.workspaceId === 'studio' ? 'kanbada-v1' : 'kanbada-workspace-' + share.workspaceId),
+        (share.workspaceId === 'studio' ? 'domus-v1' : 'domus-workspace-' + share.workspaceId),
     );
     const data: State | null = raw ? JSON.parse(raw) : null;
     const task = data?.tasks.find((task) => task.id.toUpperCase() === share.cardId.toUpperCase());

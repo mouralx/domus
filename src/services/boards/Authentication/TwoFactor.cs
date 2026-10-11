@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OtpNet;
 using System.Security.Cryptography;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public record ChangePasswordInput(string Password, string NewPassword, string? Code = null);
 public record TwoFactorInput(string Password, string? Code = null);
@@ -12,9 +12,19 @@ public record TwoFactorStatus(bool Available, bool Enabled, int RecoveryCodesRem
 public record TwoFactorSetup(string Secret, string Uri);
 public record RecoveryCodes(string[] Codes);
 
-public sealed class TwoFactor(KanbadaDbContext db, IDataProtectionProvider protection, TimeProvider clock)
+public sealed class TwoFactor(BoardsDbContext db, IDataProtectionProvider protection, TimeProvider clock)
 {
-    private IDataProtector Protector(Guid user) => protection.CreateProtector("Kanbada.TwoFactor.v1", user.ToString());
+    private IDataProtector Protector(Guid user) => protection.CreateProtector("Domus.TwoFactor.v1", user.ToString());
+    // Persisted encryption contexts are protocol identifiers; retain decoding for existing secrets.
+    private string Unprotect(Guid user, string value)
+    {
+        try { return Protector(user).Unprotect(value); }
+        catch (System.Security.Cryptography.CryptographicException)
+        {
+            var context = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String("S2FuYmFkYS5Ud29GYWN0b3IudjE="));
+            return protection.CreateProtector(context, user.ToString()).Unprotect(value);
+        }
+    }
     private sealed class InvalidFactor : Exception;
 
     public async Task<TwoFactorStatus> Status(Guid id)
@@ -71,7 +81,7 @@ public sealed class TwoFactor(KanbadaDbContext db, IDataProtectionProvider prote
         if ((code?.Length ?? 0) > 100) return null;
         var normalized = (code ?? "").Replace(" ", "");
         if (normalized.Length != 6 || normalized.Any(c => c < '0' || c > '9')) return null;
-        var secret = Protector(user.Id).Unprotect(encryptedSecret);
+        var secret = Unprotect(user.Id, encryptedSecret);
         var totp = new Totp(Base32Encoding.ToBytes(secret));
         return totp.VerifyTotp(clock.GetUtcNow().UtcDateTime, normalized, out var step,
             new VerificationWindow(previous: 1, future: 1)) && step > (user.TwoFactorLastStep ?? -1) ? step : null;
@@ -116,7 +126,7 @@ public sealed class TwoFactor(KanbadaDbContext db, IDataProtectionProvider prote
         var secret = Base32Encoding.ToString(RandomNumberGenerator.GetBytes(20));
         user.TwoFactorPendingSecret = Protector(id).Protect(secret);
         user.TwoFactorPendingExpiresAt = clock.GetUtcNow().AddMinutes(10);
-        var uri = $"otpauth://totp/{Uri.EscapeDataString("Kanbada:" + user.Email)}?secret={secret}&issuer=Kanbada&algorithm=SHA1&digits=6&period=30";
+        var uri = $"otpauth://totp/{Uri.EscapeDataString("Domus:" + user.Email)}?secret={secret}&issuer=Domus&algorithm=SHA1&digits=6&period=30";
         return Task.FromResult(new TwoFactorSetup(secret, uri));
     });
 

@@ -71,7 +71,7 @@ export async function checkProjects(browser) {
     .getByRole('region', { name: 'No swimlane', exact: true })
     .locator('.swimlane-heading')
     .click();
-  await page.screenshot({ path: '/private/tmp/kanbada-swimlanes.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-swimlanes.png', fullPage: true });
   const options = () => page.getByRole('button', { name: 'Project options', exact: true }).click();
   await options();
   await page.getByRole('button', { name: 'Archive project', exact: true }).click();
@@ -84,7 +84,7 @@ export async function checkProjects(browser) {
   await expect(page.locator('.kpi-card').first().locator('strong')).toHaveText('0');
   await page.getByRole('button', { name: 'Projects', exact: true }).click();
   await page.getByRole('button', { name: 'Open project Website redesign', exact: true }).click();
-  await expect(page.locator('.archive-banner')).toBeVisible();
+  await expect(page.locator('.archive-notice')).toBeVisible();
   await page.getByRole('button', { name: 'Restore project', exact: true }).click();
   await expect(
     page.locator('.project-nav').getByRole('button', { name: 'Website redesign', exact: true }),
@@ -99,7 +99,7 @@ export async function checkProjects(browser) {
   await expect(
     page.locator('.project-nav').getByRole('button', { name: 'Website redesign', exact: true }),
   ).toHaveCount(0);
-  const state = await page.evaluate(() => JSON.parse(localStorage.getItem('kanbada-v1')));
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem('domus-v1')));
   assert.equal(state.tasks.length, 0);
   assert.equal(state.swimlanes.length, 0);
   await expect
@@ -107,7 +107,7 @@ export async function checkProjects(browser) {
       page.evaluate(
         () =>
           new Promise((resolve, reject) => {
-            const request = indexedDB.open('kanbada-files', 1);
+            const request = indexedDB.open('domus-files', 1);
             request.onsuccess = () => {
               const db = request.result;
               const keys = db.transaction('files', 'readonly').objectStore('files').getAllKeys();

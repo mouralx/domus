@@ -23,9 +23,9 @@ export async function checkThemes(browser) {
   await page.getByRole('button', { name: 'Continue with Google', exact: true }).click();
   await page.getByRole('button', { name: /Alex Morgan alex@studio.co/ }).click();
   await expect(page.locator('.task-card')).toHaveCount(11);
-  await page.screenshot({ path: '/private/tmp/kanbada-dark-board.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-dark-board.png', fullPage: true });
   await page.getByRole('button', { name: 'Dashboard', exact: true }).click();
-  await page.screenshot({ path: '/private/tmp/kanbada-dark-dashboard.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-dark-dashboard.png', fullPage: true });
   await page
     .locator('#domus-nav-settings')
     .getByRole('button', { name: 'Workspace', exact: true })
@@ -48,7 +48,7 @@ export async function checkThemes(browser) {
   ).toBeAttached();
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-  await page.screenshot({ path: '/private/tmp/kanbada-dark-mobile.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-dark-mobile.png', fullPage: true });
   await context.close();
   console.log(
     'PASS: light/dark/system, OS changes, explicit override, reload, cross-tab sync, settings, Portuguese and mobile.',

@@ -61,7 +61,16 @@ app.Use(async (context, next) =>
 {
     try
     {
-        if (context.Request.Path.StartsWithSegments("/api"))
+        if (context.Request.Path.Equals("/health", StringComparison.OrdinalIgnoreCase)
+            && (context.Connection.RemoteIpAddress is not { } address || !System.Net.IPAddress.IsLoopback(address))) throw new AppError(401, "Health probes are local-only.");
+        if (context.Request.Path.StartsWithSegments("/internal"))
+        {
+            var secret = await File.ReadAllTextAsync(Path.Combine(storage.Root, "worker-token"));
+            var supplied = context.Request.Headers.Authorization.ToString();
+            if (!CryptographicOperations.FixedTimeEquals(SHA256.HashData(Encoding.UTF8.GetBytes(supplied)), SHA256.HashData(Encoding.UTF8.GetBytes("Bearer " + secret)))) throw new AppError(401, "Acesso interno não autorizado.");
+        }
+        // Only technical health and the bearer-authenticated worker route bypass user authentication.
+        if (!context.Request.Path.Equals("/health", StringComparison.OrdinalIgnoreCase) && !context.Request.Path.StartsWithSegments("/internal"))
         {
             context.Response.Headers.CacheControl = "no-store";
             context.Response.Headers.XContentTypeOptions = "nosniff";

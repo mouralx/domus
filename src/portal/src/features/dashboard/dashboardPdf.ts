@@ -32,7 +32,7 @@ export function exportDashboardPdf(
   };
   pdf.setFillColor('#20344f');
   pdf.rect(0, 0, 210, 65, 'F');
-  text('kanbada / ' + t('Dashboard report'), 16, 16, 10, '#b4cce9');
+  text('domus / ' + t('Dashboard report'), 16, 16, 10, '#b4cce9');
   pdf.setFont('helvetica', 'bold');
   const heading = pdf.splitTextToSize(name, 176);
   text(heading.slice(0, 2), 16, 29, 23, '#ffffff');
@@ -236,9 +236,9 @@ export function exportDashboardPdf(
     pdf.setPage(i);
     pdf.setDrawColor('#dbe4ef');
     pdf.line(16, 279, 194, 279);
-    text('KANBADA', 16, 286, 8, '#60748e');
+    text('DOMUS', 16, 286, 8, '#60748e');
     text(`${t('Page')} ${i} / ${pages}`, 169, 286, 8, '#60748e');
     if (i > 1) text(pdf.splitTextToSize(name, 176)[0], 16, 13, 9, '#60748e');
   }
-  pdf.save(`${name.replace(/[^\p{L}\p{N} -]/gu, '').slice(0, 70) || 'kanbada'}-${today}.pdf`);
+  pdf.save(`${name.replace(/[^\p{L}\p{N} -]/gu, '').slice(0, 70) || 'domus'}-${today}.pdf`);
 }

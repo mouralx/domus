@@ -1,4 +1,4 @@
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 /// <summary>Enrollment/second-factor sessions cannot access application data or other auth flows.</summary>
 public sealed class TwoFactorEnrollmentMiddleware(RequestDelegate next)

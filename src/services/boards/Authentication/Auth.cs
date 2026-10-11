@@ -4,15 +4,16 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
-public sealed class Auth(KanbadaDbContext db, WorkspaceStore workspaces, UserDirectoryBridge? directory = null)
+public sealed class Auth(BoardsDbContext db, WorkspaceStore? workspaces = null, IIdentityDirectory? directory = null)
 {
     public static string Token() => Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
     public static string Hash(string token) => Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(token)));
     public static Guid User(HttpContext ctx) => Guid.TryParse(ctx.User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : throw new ApiError(401, "Please sign in.");
     public async Task Session(HttpContext ctx, Guid user, bool twoFactorVerified = false)
     {
+        if (directory is not null) await directory.Flush(user);
         var previous = ctx.User.FindFirstValue("sid");
         await db.Sessions.Where(x => x.Id == previous || x.ExpiresAt < DateTimeOffset.UtcNow).ExecuteDeleteAsync();
         var sid = Hash(Token());
@@ -37,7 +38,7 @@ public sealed class Auth(KanbadaDbContext db, WorkspaceStore workspaces, UserDir
             db.Users.Add(new UserEntity { Id = id, Email = email, Name = name, PasswordHash = hash, PhotoRequired = true });
             await db.SaveChangesAsync();
             if (directory is not null) await directory.Sync(id);
-            await workspaces.Create(id, "My Workspace", true);
+            if (directory is null) await workspaces!.Create(id, "My Workspace", true);
             await tx.CommitAsync();
             return id;
         }
@@ -85,7 +86,7 @@ public sealed class Auth(KanbadaDbContext db, WorkspaceStore workspaces, UserDir
         db.Identities.Add(new IdentityEntity { Provider = provider, Subject = subject, UserId = id });
         await db.SaveChangesAsync();
         if (directory is not null) await directory.Sync(id);
-        await workspaces.Create(id, "My Workspace", true);
+        if (directory is null) await workspaces!.Create(id, "My Workspace", true);
         await tx.CommitAsync();
         return id;
     }

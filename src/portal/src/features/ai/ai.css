@@ -1,0 +1,429 @@
+.ai-settings {
+  padding: 24px;
+}
+.ai-settings fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.ai-settings label {
+  display: grid;
+  gap: 8px;
+}
+.ai-settings :is(input:not([type='checkbox']), select) {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+}
+.ai-settings .ai-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ai-settings > p,
+.ai-settings small,
+.card-ai > p,
+.card-ai small {
+  color: var(--ui-muted);
+  line-height: 1.6;
+}
+.ai-provider,
+.ai-settings > form,
+.card-ai {
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  padding: 20px;
+  background: var(--ui-surface);
+  margin-block: 20px;
+}
+.ai-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.ai-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.ai-actions select {
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  max-width: 100%;
+}
+.card-ai header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ui-link);
+}
+.card-ai p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.ai-suggestion {
+  margin-top: 18px;
+  border-top: 1px solid var(--ui-border);
+  padding-top: 18px;
+}
+.ai-suggestion li {
+  margin-block: 8px;
+  overflow-wrap: anywhere;
+}
+:is(.card-ai, .ai-settings) [role='alert'] {
+  color: #b94036;
+}
+@media (max-width: 600px) {
+  .ai-settings {
+    padding: 16px;
+  }
+  .card-ai {
+    padding: 16px;
+  }
+}
+/* AI follows the same control sizes and surface hierarchy as cards and settings. */
+:is(.card-ai, .ai-settings, .assistant-panel) :is(button.primary, button.secondary),
+.assistant-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+:is(.card-ai, .ai-settings, .assistant-panel) button.primary {
+  background: var(--ui-primary);
+  color: var(--ui-on-primary);
+  border-color: var(--ui-primary);
+}
+:is(.card-ai, .ai-settings, .assistant-panel) button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+:is(.card-ai, .ai-settings, .assistant-panel) :is(select, textarea) {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  padding: 10px 12px;
+}
+.card-ai {
+  padding: 0;
+  margin: 0 0 20px;
+  border: 0;
+  background: transparent;
+}
+.card-ai-content {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+}
+.card-ai-content > p {
+  color: var(--ui-muted);
+  font-size: 12px;
+  margin-top: 0;
+}
+.card-ai-content > small {
+  display: block;
+  margin-top: 12px;
+}
+.ai-settings {
+  padding: 24px;
+}
+.ai-settings > p {
+  margin-top: 0;
+}
+.ai-settings .ai-provider,
+.ai-settings > form {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--ui-border);
+  border-radius: 0;
+  padding: 20px 0;
+  margin: 0;
+}
+.ai-settings h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.ai-settings p {
+  color: var(--ui-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.ai-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.ai-status {
+  border: 1px solid var(--ui-border);
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--ui-muted);
+  font-size: 11px;
+}
+.ai-settings .ai-actions {
+  margin-top: 16px;
+}
+.ai-settings small {
+  display: block;
+  margin-top: 16px;
+  font-size: 11px;
+}
+.ai-settings fieldset > button {
+  justify-self: start;
+}
+.assistant-trigger {
+  flex-shrink: 0;
+  align-self: center;
+}
+.modal.card-drawer.assistant-panel {
+  width: min(520px, 100vw);
+  padding: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+.assistant-panel .assistant-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  margin: 0;
+  border-bottom: 1px solid var(--ui-border);
+}
+.assistant-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: 17px;
+}
+.assistant-scope {
+  padding: 16px 24px;
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.assistant-scope label {
+  display: grid;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--ui-muted);
+}
+.assistant-scope select {
+  width: 100%;
+}
+.assistant-new-conversation {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.assistant-messages {
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.assistant-empty {
+  padding: 24px 0;
+  color: var(--ui-muted);
+}
+.assistant-empty h3 {
+  color: var(--ui-text);
+  font-size: 18px;
+  margin: 16px 0 10px;
+}
+.assistant-empty p,
+.assistant-setup p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.assistant-starters {
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+}
+.assistant-starters button.secondary {
+  justify-content: space-between;
+  text-align: left;
+}
+.assistant-turn {
+  margin-bottom: 24px;
+}
+.assistant-question {
+  margin-left: 24px;
+  padding: 12px 14px;
+  background: var(--ui-selection);
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.assistant-prose {
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.assistant-sources {
+  display: grid;
+  gap: 7px;
+  margin: 16px 0;
+}
+.assistant-sources > small,
+.assistant-note {
+  color: var(--ui-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.assistant-note {
+  display: block;
+}
+.assistant-sources a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  color: var(--ui-link);
+  text-decoration: none;
+  font-size: 12px;
+}
+.assistant-sources a span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.assistant-composer {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--ui-border);
+}
+.assistant-composer textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 80px;
+  max-height: 160px;
+  box-sizing: border-box;
+}
+.assistant-composer .ai-actions {
+  justify-content: space-between;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+.assistant-composer small {
+  max-width: 260px;
+  color: var(--ui-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.assistant-panel [role='alert'] {
+  color: var(--ui-text);
+  padding: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .assistant-heading,
+  .assistant-scope,
+  .assistant-messages,
+  .assistant-composer {
+    padding-inline: 16px;
+  }
+  .assistant-scope {
+    flex-wrap: wrap;
+  }
+  .assistant-scope label {
+    flex-basis: 100%;
+  }
+  .assistant-new-conversation {
+    width: 100%;
+  }
+  .project-heading {
+    flex-wrap: wrap;
+  }
+}
+
+.assistant-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--ui-muted);
+}
+
+.modal.ai-settings-modal {
+  width: min(560px, 100%);
+}
+.ai-settings .ai-provider:last-child {
+  padding-bottom: 0;
+}
+.ai-settings :is(select, input) {
+  box-sizing: border-box;
+}
+.ai-settings .ai-workspace-heading {
+  margin-bottom: 16px;
+}
+.ai-settings .ai-check {
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+.ai-settings .ai-check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--ui-primary);
+}
+@media (max-width: 600px) {
+  .ai-settings {
+    padding: 20px;
+  }
+}
+:root[data-platform-theme] :is(.ai-settings, .card-ai, .assistant-panel) button.secondary {
+  background: var(--ui-surface);
+  color: var(--ui-panel-text);
+  border-color: var(--ui-border);
+}
+:root[data-platform-theme]
+  :is(.ai-settings, .card-ai, .assistant-panel)
+  button.secondary:hover:not(:disabled) {
+  background: var(--ui-field);
+  color: var(--ui-panel-text);
+}
+
+.assistant-prose p {
+  margin: 0 0 12px;
+}
+.assistant-prose :is(ul, ol) {
+  padding-left: 22px;
+  margin: 0 0 12px;
+}
+.assistant-prose li {
+  margin: 6px 0;
+}
+.assistant-prose code {
+  font-size: 0.92em;
+  background: var(--ui-field);
+  border-radius: 4px;
+  padding: 2px 4px;
+}

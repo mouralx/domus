@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
-public sealed class WorkspaceStore(KanbadaDbContext db, WorkspaceMapper mapper)
+public sealed class WorkspaceStore(BoardsDbContext db, WorkspaceMapper mapper)
 {
     public async Task<(JsonObject State, long Version, Guid Owner, bool Personal)> Read(Guid id, Guid user, bool shared = false)
     {
@@ -49,6 +49,7 @@ public sealed class WorkspaceStore(KanbadaDbContext db, WorkspaceMapper mapper)
         var old = await Read(id, user);
         if (old.Version != expected)
             throw new ApiError(409, "This workspace changed. Refresh before saving to avoid overwriting someone else's changes.");
+        CardPlacement.AssignDefaults(state);
         WorkspaceValidator.Validate(state, old.Personal);
         JiraCardPolicy.ValidateChanges(old.State, state);
         var previousMembers = WorkspaceJson.Items(old.State, "members");

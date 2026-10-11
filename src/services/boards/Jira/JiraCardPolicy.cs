@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Nodes;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class JiraCardPolicy
 {
-    public const string ReadOnlyMessage = "This card is managed by Jira and is read-only in Kanbada. Make changes in Jira.";
+    public const string ReadOnlyMessage = "This card is managed by Jira and is read-only in Domus. Make changes in Jira.";
 
-    public static IQueryable<string> ReadOnlyCardIds(KanbadaDbContext db, Guid workspace) =>
+    public static IQueryable<string> ReadOnlyCardIds(BoardsDbContext db, Guid workspace) =>
         (from link in db.Set<JiraLinkEntity>()
          join connection in db.Set<JiraConnectionEntity>() on link.ConnectionId equals connection.Id
-         where connection.WorkspaceId == workspace && connection.Direction == "jira-to-kanbada"
+         where connection.WorkspaceId == workspace && connection.Direction == "jira-to-domus"
              && link.JiraIssueId != null && !link.CreationPending
          select link.CardId).Distinct();
 
@@ -40,7 +40,7 @@ public static class JiraCardPolicy
         }
     }
 
-    public static async Task InvalidateWorkspace(KanbadaDbContext db, Guid workspaceId, CancellationToken ct)
+    public static async Task InvalidateWorkspace(BoardsDbContext db, Guid workspaceId, CancellationToken ct)
     {
         var workspace = await db.Workspaces.SingleAsync(w => w.Id == workspaceId, ct);
         workspace.Version++;

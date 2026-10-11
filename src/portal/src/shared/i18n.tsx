@@ -46,7 +46,7 @@ const Context = createContext<{
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>(() => {
     try {
-      return localStorage.getItem('kanbada-locale') === 'pt-PT' ? 'pt-PT' : 'en-US';
+      return localStorage.getItem('domus-locale') === 'pt-PT' ? 'pt-PT' : 'en-US';
     } catch {
       return 'en-US';
     }
@@ -54,7 +54,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = locale;
     try {
-      localStorage.setItem('kanbada-locale', locale);
+      localStorage.setItem('domus-locale', locale);
     } catch {
       /* Keep the session language. */
     }

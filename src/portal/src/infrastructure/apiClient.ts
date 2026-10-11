@@ -10,13 +10,13 @@ export class ApiError extends Error {
 }
 export async function apiRequest<T>(path: string, init: RequestInit = {}, cached?: T): Promise<T> {
   const headers = new Headers(init.headers);
-  headers.set('X-Kanbada-Request', '1');
+  headers.set('X-Domus-Request', '1');
   if (init.body && !(init.body instanceof FormData))
     headers.set('Content-Type', 'application/json');
   const response = await fetch('/api' + path, { ...init, headers, credentials: 'include' });
   if (response.status === 304 && cached !== undefined) return structuredClone(cached);
   if (!response.ok) {
-    if (response.status === 401) window.dispatchEvent(new Event('kanbada-session-expired'));
+    if (response.status === 401) window.dispatchEvent(new Event('domus-session-expired'));
     let body: { detail?: string; error?: string; title?: string } = {};
     try {
       body = await response.json();

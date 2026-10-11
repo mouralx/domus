@@ -47,7 +47,7 @@ packages are private, then redeploy with image pulling enabled.
 npm --prefix src/portal ci
 npm --prefix src/portal run check
 npm --prefix src/portal run build
-dotnet publish api/Kanbada.Api.csproj -c Release -o artifacts/api
+dotnet publish api/Domus.Boards.Api.csproj -c Release -o artifacts/api
 ```
 
 Serve `src/portal/dist` as static files with fallback to `index.html` for frontend navigation. Route `/api/*` to the published API; never send API 404s through the frontend fallback. The API currently does not serve portal assets itself. Run the API with its content root set to the published API directory. Configure the production PostgreSQL connection and public HTTPS `PortalOrigin` via your secret/configuration service.
@@ -74,12 +74,12 @@ Back up PostgreSQL with the tools and retention policy for your environment. Bot
 
 ## Troubleshooting
 
-- **Port 4173/5180 is busy:** stop the older Kanbada process or choose consistent alternative portal, API, proxy, and provider callback settings.
+- **Port 4173/5180 is busy:** stop the older Domus process or choose consistent alternative portal, API, proxy, and provider callback settings.
 - **PostgreSQL connection refused:** start the container engine/VM, start the database, and check its health. With Podman on macOS, `podman machine start` is required after reboot.
-- **Container name already exists:** an earlier database may be running as `kanbada-postgres-api`. Inspect/start it instead of deleting it or its volume. Existing installations may have a manually created container rather than Compose ownership labels.
+- **Container name already exists:** an earlier database may be running as `domus-postgres-api`. Inspect/start it instead of deleting it or its volume. Existing installations may have a manually created container rather than Compose ownership labels.
 - **Database password authentication failed:** compare local configuration with the credentials used to initialize the persistent database. Changing `.postgres.env` does not reset an existing PostgreSQL user's password. Restore the matching configuration or rotate the database password intentionally.
 - **Portal cannot connect:** verify `http://127.0.0.1:5180/api/health/ready`, then `/api/health/ready` through Vite. API mode is the default; missing API connectivity is not silently replaced with local data.
-- **403 on writes:** confirm `X-Kanbada-Request: 1`, the public Origin, and `PortalOrigin`. Do not remove the request-security middleware to bypass configuration mistakes.
+- **403 on writes:** confirm `X-Domus-Request: 1`, the public Origin, and `PortalOrigin`. Do not remove the request-security middleware to bypass configuration mistakes.
 - **409 on save:** another save won the workspace version race. Reload and reconcile changes; never auto-retry an old snapshot with a new version.
 - **Google/Microsoft button disabled:** both client ID and secret must be configured, followed by an API restart. Verify the registered callback URI exactly matches the public origin.
 - **Scalar can read but cannot write:** sign in on the same origin, include the mutation header, and set `If-Match` for workspace saves. The latest workspace JSON must contain all collections.
@@ -88,7 +88,7 @@ Back up PostgreSQL with the tools and retention policy for your environment. Bot
 
 ## Authenticator-based two-factor authentication
 
-Every password and external-provider account must enroll an authenticator before workspace access, including accounts created before this feature. New registrations first require a profile photo, then open authenticator setup. A Gravatar lookup for the account email offers an explicit choice when a photo exists; users can always upload their own image. Gravatar outages do not prevent uploading. Every subsequent login requires a code. No account can disable 2FA. Setup requires the current password for password accounts, a locally rendered QR code (or manual key), and a confirming six-digit TOTP code. External accounts authenticate through their provider instead of confirming a local password. Microsoft Authenticator supports this as an **Other account**. New Google/Microsoft identities also enroll a Kanbada authenticator. Subsequent provider logins require a Kanbada authenticator or recovery code before workspace access. This feature does not add push approvals or link identities by email. Local demo mode does not offer production security settings.
+Every password and external-provider account must enroll an authenticator before workspace access, including accounts created before this feature. New registrations first require a profile photo, then open authenticator setup. A Gravatar lookup for the account email offers an explicit choice when a photo exists; users can always upload their own image. Gravatar outages do not prevent uploading. Every subsequent login requires a code. No account can disable 2FA. Setup requires the current password for password accounts, a locally rendered QR code (or manual key), and a confirming six-digit TOTP code. External accounts authenticate through their provider instead of confirming a local password. Microsoft Authenticator supports this as an **Other account**. New Google/Microsoft identities also enroll a Domus authenticator. Subsequent provider logins require a Domus authenticator or recovery code before workspace access. This feature does not add push approvals or link identities by email. Local demo mode does not offer production security settings.
 
 Apply the `AuthenticatorTwoFactor`, `RequireTwoFactorForNewAccounts`, and `EnforceTwoFactorForAllAccounts` EF migrations before starting an updated production API. Development startup applies it automatically. Existing accounts without an authenticator are restricted to enrollment; there is no per-account opt-out flag. Existing sessions for accounts with an authenticator are re-verified after the mandatory-enrollment migration. No email service is required.
 

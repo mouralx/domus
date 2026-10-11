@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed record MembershipSession(Guid UserId, string Name, string Email, bool AvatarPending, bool TwoFactorPending, bool CanManagePlatform);
 public sealed class MembershipSessionEvents : CookieAuthenticationEvents

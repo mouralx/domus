@@ -14,7 +14,7 @@ import { useBranding } from './PlatformBranding';
 type Theme = 'light' | 'dark' | 'system';
 const valid = (value: string | null): Theme =>
   value === 'light' || value === 'dark' ? value : 'system';
-const key = 'kanbada-theme';
+const key = 'domus-theme';
 const Context = createContext<{ theme: Theme; setTheme: (theme: Theme) => void }>({
   theme: 'system',
   setTheme: () => {},

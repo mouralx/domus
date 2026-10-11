@@ -19,5 +19,11 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<ExecutionConsumer>
 var app = builder.Build();
 await app.Services.GetRequiredService<Database>().Initialize();
 await app.Services.GetRequiredService<JobQueue>().Initialize();
+app.Use(async (context, next) => {
+    if (!context.Request.Path.Equals("/health", StringComparison.OrdinalIgnoreCase)
+        || context.Connection.RemoteIpAddress is not { } address || !System.Net.IPAddress.IsLoopback(address))
+    { context.Response.StatusCode = 401; return; }
+    await next();
+});
 app.MapGet("/health", async (Database database, JobQueue queue, ExecutionConsumer consumer, CancellationToken ct) => consumer.Ready && queue.Healthy && await database.Healthy(ct) ? Results.Ok(new { ok = true }) : Results.StatusCode(503));
 await app.RunAsync();

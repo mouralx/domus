@@ -40,7 +40,11 @@ export function useWorkspaceLocation({ setProjectId, setPage, setDraft, setToast
             url.searchParams.delete('card');
             window.history.replaceState(null, '', url);
           }
-          if (!loaded.projects.length) setPage('Overview');
+          const project = params.get('project');
+          if (project && loaded.projects.some((item) => item.id === project)) {
+            setProjectId(project);
+            setPage('Projects');
+          } else setPage('Overview');
         }
       } catch {
         if (mounted && request === sequence) {
@@ -53,6 +57,7 @@ export function useWorkspaceLocation({ setProjectId, setPage, setDraft, setToast
           }
           setData(loaded);
           setDraft(null);
+          setPage('Overview');
           setToast('This workspace or card is unavailable.');
           const url = new URL(window.location.href);
           url.searchParams.delete('card');
@@ -67,9 +72,9 @@ export function useWorkspaceLocation({ setProjectId, setPage, setDraft, setToast
       if (accountStoragePrefix() && !event.key?.startsWith(accountStoragePrefix())) return;
       const key = event.key?.slice(accountStoragePrefix().length);
       if (
-        key === 'kanbada-v1' ||
-        key?.startsWith('kanbada-workspace-') ||
-        key === 'kanbada-active-workspace'
+        key === 'domus-v1' ||
+        key?.startsWith('domus-workspace-') ||
+        key === 'domus-active-workspace'
       )
         repository
           .load()

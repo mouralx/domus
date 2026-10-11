@@ -525,7 +525,7 @@ export function PlatformSettings() {
             <div className="jira-notice">
               <p>
                 {t(
-                  'Restore the original Kanbada name, logo, colors and default theme? Save to apply the reset.',
+                  'Restore the original Domus name, logo, colors and default theme? Save to apply the reset.',
                 )}
               </p>
               <div className="platform-reset-actions">

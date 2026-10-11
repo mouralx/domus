@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Kanbada.Api.Persistence.Migrations
+namespace Domus.Boards.Api.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class JiraFlexibleMappings : Migration
@@ -41,7 +41,7 @@ namespace Kanbada.Api.Persistence.Migrations
                 DO $$
                 BEGIN
                     IF EXISTS (SELECT 1 FROM jira_mappings WHERE kind = 'assignee')
-                       OR EXISTS (SELECT 1 FROM jira_mappings GROUP BY connection_id, kind, kanbada_value HAVING count(*) > 1)
+                       OR EXISTS (SELECT 1 FROM jira_mappings GROUP BY connection_id, kind, domus_value HAVING count(*) > 1)
                     THEN
                         RAISE EXCEPTION 'Remove assignee mappings and reduce statuses to one Jira value before downgrading.';
                     END IF;
@@ -62,7 +62,7 @@ namespace Kanbada.Api.Persistence.Migrations
             migrationBuilder.AddPrimaryKey(
                 name: "PK_jira_mappings",
                 table: "jira_mappings",
-                columns: new[] { "connection_id", "kind", "kanbada_value" });
+                columns: new[] { "connection_id", "kind", "domus_value" });
         }
     }
 }

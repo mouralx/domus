@@ -17,17 +17,17 @@ export function JiraStatusMappings({
 }: Props & { statuses: Definition[] }) {
   const { t } = useI18n();
   return statuses.map((status) => {
-    const configured = mappings.filter((m) => m.kind === 'status' && m.kanbadaValue === status.id);
+    const configured = mappings.filter((m) => m.kind === 'status' && m.domusValue === status.id);
     const blank: JiraMapping = {
       kind: 'status',
-      kanbadaValue: status.id,
+      domusValue: status.id,
       jiraValue: '',
       isDefault: true,
     };
     const rows = configured.length ? configured : [blank];
     const update = (next: JiraMapping[]) =>
       onChange([
-        ...mappings.filter((m) => !(m.kind === 'status' && m.kanbadaValue === status.id)),
+        ...mappings.filter((m) => !(m.kind === 'status' && m.domusValue === status.id)),
         ...next,
       ]);
     return (
@@ -160,20 +160,18 @@ export function JiraAssigneeMappings({
           <label>
             {t('Workspace member')}
             <select
-              value={row.kanbadaValue}
+              value={row.domusValue}
               required
               aria-label={t('Workspace member ({0})', String(index + 1))}
               onChange={(event) =>
                 update(
-                  rows.map((m, i) =>
-                    i === index ? { ...m, kanbadaValue: event.target.value } : m,
-                  ),
+                  rows.map((m, i) => (i === index ? { ...m, domusValue: event.target.value } : m)),
                 )
               }
             >
               <option value="">{t('Select a member')}</option>
-              {row.kanbadaValue && !registered.some((m) => m.userId === row.kanbadaValue) && (
-                <option value={row.kanbadaValue}>{t('Unavailable member')}</option>
+              {row.domusValue && !registered.some((m) => m.userId === row.domusValue) && (
+                <option value={row.domusValue}>{t('Unavailable member')}</option>
               )}
               {registered.map((m) => (
                 <option key={m.userId} value={m.userId}>
@@ -196,7 +194,7 @@ export function JiraAssigneeMappings({
         type="button"
         className="jira-add-mapping"
         onClick={() =>
-          update([...rows, { kind: 'assignee', kanbadaValue: '', jiraValue: '', isDefault: false }])
+          update([...rows, { kind: 'assignee', domusValue: '', jiraValue: '', isDefault: false }])
         }
       >
         <Plus size={14} />

@@ -12,6 +12,6 @@ The helper refuses to run when a membership database already exists in the sourc
 
 Backups contain account hashes, encrypted secrets and application data. Their directory is private; preserve them securely. For production, also take consistent backups of the automation-data, work-keys, automation-keys and RabbitMQ volumes, and test recovery. Changing encryption keys would invalidate existing PATs and authenticator/Jira secrets.
 
-The automation API migrates an unambiguous legacy repository/PAT pair into `platform_github_settings`, using the existing keys and a platform-specific protection purpose. If previous workspaces configured different repositories or tokens, legacy rows remain intact and a platform administrator must choose the desired pair. Set `PLATFORM_ADMIN_EMAILS` to existing account email addresses and recreate membership/work-api to manage platform settings.
+The automation API migrates an unambiguous legacy repository/PAT pair into `platform_github_settings`, using the existing keys and a platform-specific protection purpose. If previous workspaces configured different repositories or tokens, legacy rows remain intact and a platform administrator must choose the desired pair. Set `PLATFORM_ADMIN_EMAILS` to existing account email addresses and recreate membership/boards to manage platform settings.
 
 The Compose database initialization script runs only on an empty `platform-db` volume. Password changes in `infra/.env` do not automatically change existing PostgreSQL roles. Adjust roles explicitly when rotating credentials.

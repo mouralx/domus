@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 /// <summary>Resolves the personal-workspace alias at the API boundary.</summary>
-public sealed class WorkspaceResolver(KanbadaDbContext context)
+public sealed class WorkspaceResolver(BoardsDbContext context)
 {
     public async Task<Guid> WorkspaceId(string id, Guid user)
     {

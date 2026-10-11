@@ -1,8 +1,10 @@
 <Solution>
+  <Project Path="services/ai/Domus.Ai.Api.csproj" />
+  <Project Path="services/mcp/Domus.Mcp.Server.csproj" />
   <Project Path="services/membership/Domus.Membership.Api.csproj" />
-  <Project Path="services/boards/Kanbada.Api.csproj" />
+  <Project Path="services/boards/Domus.Boards.Api.csproj" />
   <Project Path="services/automations/Automations.Api.csproj" />
-  <Project Path="workers/boards/Kanbada.Worker.csproj" />
+  <Project Path="workers/boards/Domus.Boards.Worker.csproj" />
   <Project Path="workers/automations/Automations.Worker.csproj" />
   <Project Path="../tests/Automations.Tests/Automations.Tests.csproj" />
 </Solution>

@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class AssignmentNotifications
 {
-    public static async Task CreateForNewAssignments(KanbadaDbContext db, Guid workspace, CancellationToken ct)
+    public static async Task CreateForNewAssignments(BoardsDbContext db, Guid workspace, CancellationToken ct)
     {
         var added = db.ChangeTracker.Entries<CardAssigneeEntity>()
             .Where(e => e.State == EntityState.Added && e.Entity.WorkspaceId == workspace).Select(e => e.Entity).ToList();

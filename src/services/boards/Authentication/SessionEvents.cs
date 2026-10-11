@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
-public sealed class SessionEvents(KanbadaDbContext db) : CookieAuthenticationEvents
+public sealed class SessionEvents(BoardsDbContext db) : CookieAuthenticationEvents
 {
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
     {

@@ -7,9 +7,9 @@ export async function checkCardLinks(browser) {
     reducedMotion: 'reduce',
   });
   await context.addInitScript(() => {
-    if (!localStorage.getItem('kanbada-session-v1'))
+    if (!localStorage.getItem('domus-session-v1'))
       localStorage.setItem(
-        'kanbada-session-v1',
+        'domus-session-v1',
         JSON.stringify({
           id: 'owner',
           name: 'Alex Morgan',
@@ -38,7 +38,7 @@ export async function checkCardLinks(browser) {
   await expect(drawer).toBeVisible();
   await page.reload();
   await expect(drawer).toBeVisible();
-  await page.screenshot({ path: '/private/tmp/kanbada-card-drawer.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-card-drawer.png', fullPage: true });
   await page.getByRole('button', { name: 'Share link', exact: true }).click();
   await page.getByRole('button', { name: 'Create share link', exact: true }).click();
   const url = await page.getByRole('textbox', { name: 'Share link', exact: true }).inputValue();
@@ -65,7 +65,7 @@ export async function checkCardLinks(browser) {
   const outsider = await browser.newContext({ storageState: snapshot });
   const guest = await outsider.newPage();
   await guest.goto(restricted);
-  await guest.evaluate(() => localStorage.removeItem('kanbada-session-v1'));
+  await guest.evaluate(() => localStorage.removeItem('domus-session-v1'));
   await guest.reload();
   await expect(
     guest.getByRole('button', { name: 'Continue with Microsoft', exact: true }),

@@ -6,9 +6,9 @@ export async function checkMyTasks(browser) {
     reducedMotion: 'reduce',
   });
   await page.addInitScript(() => {
-    if (!localStorage.getItem('kanbada-session-v1'))
+    if (!localStorage.getItem('domus-session-v1'))
       localStorage.setItem(
-        'kanbada-session-v1',
+        'domus-session-v1',
         JSON.stringify({
           id: 'owner',
           name: 'Alex Morgan',
@@ -61,7 +61,6 @@ export async function checkMyTasks(browser) {
   await expect(page.locator('.list-row').filter({ hasText: 'Across projects' })).toHaveCount(1);
   await expect(page.locator('.list-row').filter({ hasText: 'Someone else' })).toHaveCount(0);
   await expect(page.locator('.list-row').filter({ hasText: 'Archived assignment' })).toHaveCount(0);
-  await expect(page.locator('.project-banner')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Project options', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Add task', exact: true }).first().click();
   await expect(page.getByRole('group', { name: 'Project', exact: true })).toContainText(
@@ -72,7 +71,7 @@ export async function checkMyTasks(browser) {
   await page.getByRole('button', { name: 'Save task', exact: true }).click();
   await expect(page.locator('.list-row').filter({ hasText: 'No deadline needed' })).toHaveCount(1);
   const saved = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem('kanbada-v1')).tasks.find(
+    JSON.parse(localStorage.getItem('domus-v1')).tasks.find(
       (t) => t.title === 'No deadline needed',
     ),
   );

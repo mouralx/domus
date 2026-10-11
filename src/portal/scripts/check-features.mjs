@@ -32,7 +32,7 @@ export async function checkNewFeatures(browser) {
   await page.getByLabel('Attach documents').setInputFiles({
     name: 'project-brief.txt',
     mimeType: 'text/plain',
-    buffer: Buffer.from('Kanbada attachment verification'),
+    buffer: Buffer.from('Domus attachment verification'),
   });
   await expect(
     page.getByRole('button', { name: 'Download project-brief.txt', exact: true }),
@@ -54,7 +54,7 @@ export async function checkNewFeatures(browser) {
   const stream = await download.createReadStream();
   let contents = '';
   for await (const chunk of stream) contents += chunk.toString();
-  assert.equal(contents, 'Kanbada attachment verification');
+  assert.equal(contents, 'Domus attachment verification');
   await page.getByRole('button', { name: 'Close task', exact: true }).click();
   await page.reload();
   await openCard();
@@ -98,7 +98,7 @@ export async function checkNewFeatures(browser) {
   await expect(page.getByLabel('Status', { exact: true })).toHaveValue('Released');
   await page.getByRole('tab', { name: /History/ }).click();
   await expect(page.getByRole('tabpanel')).toContainText('Status: Published → Released');
-  await page.screenshot({ path: '/private/tmp/kanbada-history.png' });
+  await page.screenshot({ path: '/private/tmp/domus-history.png' });
   await page.getByRole('button', { name: 'Close task', exact: true }).click();
   await page.getByRole('button', { name: 'Manage statuses', exact: true }).click();
   await page.getByLabel('Status name 5', { exact: true }).fill('Done');
@@ -125,7 +125,7 @@ export async function checkNewFeatures(browser) {
   await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
   await page.getByRole('button', { name: 'Filter', exact: true }).click();
   await page.getByRole('button', { name: 'Dashboard', exact: true }).click();
-  await page.screenshot({ path: '/private/tmp/kanbada-project-dashboard.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-project-dashboard.png', fullPage: true });
   await page.getByRole('button', { name: 'Overview', exact: true }).click();
   await expect(
     page.getByRole('region', { name: 'Workspace dashboard', exact: true }),
@@ -137,7 +137,7 @@ export async function checkNewFeatures(browser) {
     .click();
   await expect(page.locator('.metric-task')).toHaveCount(4);
   await page.getByRole('button', { name: 'Close metric details', exact: true }).click();
-  await page.screenshot({ path: '/private/tmp/kanbada-workspace-dashboard.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-workspace-dashboard.png', fullPage: true });
 
   // Profile photo preview, validation, persistence, and removal.
   const photo = await page.screenshot({ clip: { x: 250, y: 10, width: 64, height: 64 } });
@@ -170,7 +170,7 @@ export async function checkNewFeatures(browser) {
   await page.getByRole('button', { name: 'Overview', exact: true }).click();
   await expect(page.locator('.kpi-card').first().locator('strong')).toHaveText('12');
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.screenshot({ path: '/private/tmp/kanbada-dashboard-mobile.png', fullPage: true });
+  await page.screenshot({ path: '/private/tmp/domus-dashboard-mobile.png', fullPage: true });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   assert.deepEqual(errors, []);
   await page.close();
@@ -187,7 +187,7 @@ export async function checkNewFeatures(browser) {
     delete task.history;
   }
   await legacy.evaluate(
-    (state) => localStorage.setItem('kanbada-v1', JSON.stringify(state)),
+    (state) => localStorage.setItem('domus-v1', JSON.stringify(state)),
     initialState,
   );
   await legacy.reload();

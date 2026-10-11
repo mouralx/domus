@@ -2,7 +2,7 @@
 
 # Technical documentation
 
-Read [the root README](../README.md) first to run Kanbada.
+Read [the root README](../README.md) first to run Domus.
 
 1. [Architecture and separation of concerns](architecture.md): system boundaries, source map, data flow, and design tradeoffs.
 2. [Frontend](frontend.md): components, hooks, persistence, themes, translations, and extension points.

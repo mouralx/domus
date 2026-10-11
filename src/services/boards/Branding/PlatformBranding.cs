@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public sealed class PlatformBrandingEntity
 {
@@ -41,7 +41,7 @@ public sealed class PlatformAdmins
 {
     private HashSet<Guid> ids = [];
 
-    public async Task Initialize(IConfiguration configuration, KanbadaDbContext db)
+    public async Task Initialize(IConfiguration configuration, BoardsDbContext db)
     {
         var emails = (configuration["Platform:AdminEmails"] ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(e => e.ToLowerInvariant()).Distinct().ToArray();
@@ -59,7 +59,7 @@ public sealed class PlatformAdmins
     }
 }
 
-public sealed class PlatformBranding(KanbadaDbContext db, PlatformAdmins admins)
+public sealed class PlatformBranding(BoardsDbContext db, PlatformAdmins admins)
 {
     public async Task<PlatformBrandingEntity> Read(CancellationToken ct) =>
         await db.Set<PlatformBrandingEntity>().AsNoTracking().SingleOrDefaultAsync(ct) ?? new PlatformBrandingEntity();
@@ -124,7 +124,7 @@ public sealed class PlatformBranding(KanbadaDbContext db, PlatformAdmins admins)
             var etag = $"\"branding-{value.Version}\"";
             ctx.Response.Headers.ETag = etag;
             return ctx.Request.Headers.IfNoneMatch.ToString() == etag ? Results.StatusCode(304) : Results.Ok(value);
-        }).WithTags("Platform branding").AllowAnonymous();
+        }).WithTags("Platform branding").RequireAuthorization();
         app.MapGet("/api/platform/branding/access", (PlatformAdmins admins, HttpContext ctx) =>
         {
             ctx.Response.Headers.CacheControl = "no-store";

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Kanbada.Api.Persistence.Migrations
+namespace Domus.Boards.Api.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class RequiredRegistrationAvatar : Migration

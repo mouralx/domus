@@ -5,7 +5,7 @@ export const setStorageAccount = (value: Account | null) => {
 };
 export const currentStorageAccount = () => account;
 export const accountStoragePrefix = () =>
-  account && account.id !== 'owner' ? `kanbada-account-${account.id}:` : '';
+  account && account.id !== 'owner' ? `domus-account-${account.id}:` : '';
 export const accountStorage = {
   getItem: (key: string) => localStorage.getItem(accountStoragePrefix() + key),
   setItem: (key: string, value: string) =>

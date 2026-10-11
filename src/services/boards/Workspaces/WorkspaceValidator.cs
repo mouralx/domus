@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Kanbada.Api;
+namespace Domus.Boards.Api;
 
 public static class WorkspaceValidator
 {

@@ -200,7 +200,7 @@ function LocalAuthBoundary({ children }: { children: ReactNode }) {
           <p>
             {t(
               provider
-                ? 'Continue to Kanbada with your selected account.'
+                ? 'Continue to Domus with your selected account.'
                 : 'Sign in or create an account to get started.',
             )}
           </p>

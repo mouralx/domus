@@ -2,8 +2,7 @@ import { applyChanges, workspaceChanges, type ChangeResult } from './stateChange
 import type { Member, State, Workspace } from '../domain/models';
 import { accountStorage, accountStoragePrefix } from './accountStorage';
 import { ApiError, apiRequest } from './apiClient';
-export const activeWorkspaceId = () =>
-  accountStorage.getItem('kanbada-active-workspace') || 'studio';
+export const activeWorkspaceId = () => accountStorage.getItem('domus-active-workspace') || 'studio';
 const snapshots = new Map<string, State>();
 const cacheKey = (id: string) => accountStoragePrefix() + id;
 async function loadWorkspace(id: string): Promise<State> {
@@ -25,7 +24,7 @@ export const remoteRepository = {
       return await loadWorkspace(activeWorkspaceId());
     } catch (e) {
       if (e instanceof ApiError && e.status === 404 && activeWorkspaceId() !== 'studio') {
-        accountStorage.removeItem('kanbada-active-workspace');
+        accountStorage.removeItem('domus-active-workspace');
         return loadWorkspace('studio');
       }
       throw e;
@@ -54,7 +53,7 @@ export const remoteRepository = {
   },
   async switchWorkspace(id: string): Promise<State> {
     const state = await loadWorkspace(id);
-    accountStorage.setItem('kanbada-active-workspace', id);
+    accountStorage.setItem('domus-active-workspace', id);
     return state;
   },
   async createWorkspace(name: string, _owner: Member): Promise<State> {
@@ -62,13 +61,13 @@ export const remoteRepository = {
       method: 'POST',
       body: JSON.stringify({ name }),
     });
-    accountStorage.setItem('kanbada-active-workspace', state.workspace.id);
+    accountStorage.setItem('domus-active-workspace', state.workspace.id);
     return state;
   },
   async deleteWorkspace(id: string): Promise<State> {
     await apiRequest('/workspaces/' + encodeURIComponent(id), { method: 'DELETE' });
     snapshots.delete(cacheKey(id));
-    if (activeWorkspaceId() === id) accountStorage.setItem('kanbada-active-workspace', 'studio');
+    if (activeWorkspaceId() === id) accountStorage.setItem('domus-active-workspace', 'studio');
     return this.load();
   },
 };

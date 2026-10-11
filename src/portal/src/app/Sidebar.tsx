@@ -39,7 +39,7 @@ import {
   Archive,
   type LucideIcon,
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Member } from '../domain/models';
 import { type Project, type State, type Task } from '../domain/models';
@@ -51,6 +51,8 @@ type SidebarProps = {
   sidebar: boolean;
   navigate: (name: string) => void;
   t: (value: unknown, ...values: unknown[]) => string;
+  sidebarWidth: number;
+  setSidebarWidth: React.Dispatch<React.SetStateAction<number>>;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   data: State;
@@ -68,6 +70,8 @@ export function Sidebar({
   sidebar,
   navigate,
   t,
+  sidebarWidth,
+  setSidebarWidth,
   sidebarCollapsed,
   setSidebarCollapsed,
   data,
@@ -79,6 +83,52 @@ export function Sidebar({
   project,
   setProjectId,
 }: SidebarProps) {
+  const sidebarElement = useRef<HTMLElement>(null);
+  const drag = useRef<{ x: number; width: number; latest: number } | null>(null);
+  const [maximumWidth, setMaximumWidth] = useState(420);
+  useEffect(() => {
+    const measure = () => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      let longest = 0;
+      sidebarElement.current
+        ?.querySelectorAll<HTMLElement>(
+          '.nav-text, .project-nav-text, .workspace > span:nth-child(2)',
+        )
+        .forEach((label) => {
+          context.font = getComputedStyle(label).font;
+          longest = Math.max(longest, context.measureText(label.textContent ?? '').width);
+        });
+      const maximum = Math.max(236, Math.min(Math.ceil(longest + 140), window.innerWidth - 320));
+      setMaximumWidth(maximum);
+      setSidebarWidth((width) => Math.max(180, Math.min(width, maximum)));
+    };
+    measure();
+    void document.fonts.ready.then(measure);
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [data.projects, data.workspace.name, t, setSidebarWidth]);
+  useEffect(() => () => document.documentElement.classList.remove('sidebar-resizing'), []);
+  const resize = (requested: number, persist = false) => {
+    const width = Math.max(76, Math.min(requested, maximumWidth));
+    const collapsed = width < 180;
+    setSidebarCollapsed(collapsed);
+    if (!collapsed) setSidebarWidth(width);
+    if (persist) {
+      try {
+        localStorage.setItem('domus-sidebar-collapsed', String(collapsed));
+        if (!collapsed) localStorage.setItem('domus-sidebar-width', String(width));
+      } catch {
+        /* Keep the current session preference. */
+      }
+    }
+  };
+  const finishResize = () => {
+    if (drag.current) resize(drag.current.latest, true);
+    drag.current = null;
+    document.documentElement.classList.remove('sidebar-resizing');
+  };
   const [groups, setGroups] = useState({
     management: false,
     projects: false,
@@ -152,6 +202,7 @@ export function Sidebar({
   }, []);
   return (
     <aside
+      ref={sidebarElement}
       className={`sidebar ${sidebar ? 'open' : ''}`}
       onMouseOver={showTooltip}
       onMouseLeave={() => setTooltip(null)}
@@ -183,7 +234,7 @@ export function Sidebar({
           const next = !sidebarCollapsed;
           setSidebarCollapsed(next);
           try {
-            localStorage.setItem('kanbada-sidebar-collapsed', String(next));
+            localStorage.setItem('domus-sidebar-collapsed', String(next));
           } catch {
             /* Keep the current session preference. */
           }
@@ -191,6 +242,51 @@ export function Sidebar({
       >
         {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
       </button>
+      <div
+        className="sidebar-resize-handle"
+        role="separator"
+        aria-label={t('Resize sidebar')}
+        aria-orientation="vertical"
+        aria-valuemin={76}
+        aria-valuemax={maximumWidth}
+        aria-valuenow={sidebarCollapsed ? 76 : Math.round(sidebarWidth)}
+        tabIndex={0}
+        onPointerDown={(event) => {
+          if (event.button !== 0) return;
+          event.preventDefault();
+          const width = sidebarCollapsed ? 76 : sidebarWidth;
+          drag.current = { x: event.clientX, width, latest: width };
+          event.currentTarget.setPointerCapture(event.pointerId);
+          document.documentElement.classList.add('sidebar-resizing');
+        }}
+        onPointerMove={(event) => {
+          if (!drag.current) return;
+          drag.current.latest = drag.current.width + event.clientX - drag.current.x;
+          resize(drag.current.latest);
+        }}
+        onPointerUp={finishResize}
+        onPointerCancel={finishResize}
+        onLostPointerCapture={finishResize}
+        onDoubleClick={() => resize(maximumWidth, true)}
+        onKeyDown={(event) => {
+          const width = sidebarCollapsed ? 76 : sidebarWidth;
+          const next =
+            event.key === 'ArrowRight'
+              ? sidebarCollapsed
+                ? 180
+                : width + 16
+              : event.key === 'ArrowLeft'
+                ? width - 16
+                : event.key === 'Home'
+                  ? 76
+                  : event.key === 'End'
+                    ? maximumWidth
+                    : null;
+          if (next === null) return;
+          event.preventDefault();
+          resize(next, true);
+        }}
+      />
       <div className="sidebar-scroll">
         <a
           className="logo"
